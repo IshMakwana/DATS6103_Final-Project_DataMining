@@ -145,5 +145,7 @@ humanDev_final
 
 new_df = pd.merge(vdem_21century_df, humanDev_final, how='inner', left_on=['country_name', 'year'], right_on=['country', 'year'])
 # %%
+print(new_df.shape)
 new_df.head()
 # %%
+new_df.tail()
