@@ -80,7 +80,8 @@ null_columns = vdem_df.columns[vdem_df.isnull().all()] # Find columns containing
 # %%
 # (Test) 
 vdem_21century_df = vdem_df[(vdem_df['year'] >= 2000) & (vdem_df['year'] <= 2022)]
-
+print(vdem_21century_df.head())
+print(vdem_21century_df.shape)
 #%%
 # (Test) import anther dataset and import as a dataframe
 from io import StringIO
@@ -108,5 +109,6 @@ for col_name in humanDev_df.columns:
     print(col_name)
 # %%
 # Reshape humanDev_df 
+
 
 # %%
