@@ -43,7 +43,7 @@ import io
 import zipfile
 
 #%%
-# Import data sets from online?
+# Import data sets from online
 # (Test) importing v-dem datasets online
 def getDFfromZip(url):
     """ Return the data frame from a zip file
@@ -61,8 +61,8 @@ def getDFfromZip(url):
             for file in zip_file.namelist():
                 if file.endswith(".csv"):
                     # Read the CSV file into a pandas DataFrame
-                    df = pd.read_csv(zip_file.open(file))
-                    print(df.info())                    
+                    df = pd.read_csv(zip_file.open(file))                    
+                    print(df.shape)                                        
     else: 
         print("Failed to download the dataset.")
         return 0
@@ -71,17 +71,15 @@ def getDFfromZip(url):
 
 url = "https://v-dem.net/media/datasets/V-Dem-CY-Core_csv_v13.zip"
 vdem_df = getDFfromZip(url)
-
-# %%
-vdem_df.shape
+vdem_df.head()
 # %%
 # (Test) data preparation and cleaning
 null_columns = vdem_df.columns[vdem_df.isnull().all()] # Find columns containing only null values
 # %%
-# (Test) 
+# (Test) Create a new dataframe with only the data from the 21st century
 vdem_21century_df = vdem_df[(vdem_df['year'] >= 2000) & (vdem_df['year'] <= 2022)]
-print(vdem_21century_df.head())
 print(vdem_21century_df.shape)
+vdem_21century_df.head()
 #%%
 # (Test) import anther dataset and import as a dataframe
 from io import StringIO
@@ -93,8 +91,6 @@ def getCSVasDF(url):
 
     # Convert the CSV data to a pandas DataFrame
     df = pd.read_csv(StringIO(csv_data))
-    print(df.head())
-    print(df.info())
     print(df.shape)
 
     return df
@@ -102,13 +98,52 @@ def getCSVasDF(url):
 url = "https://hdr.undp.org/sites/default/files/2021-22_HDR/HDR21-22_Composite_indices_complete_time_series.csv"
 # Display the first few rows of the DataFrame
 humanDev_df = getCSVasDF(url)
-
+humanDev_df.head()
 # %%
-column_name = humanDev_df.columns
-for col_name in humanDev_df.columns:
-    print(col_name)
+# Creates a long format DataFrame from a wide format DataFrame
+
+# Drop unnecessary columns
+columns_to_drop = ['iso3', 'hdicode', 'region', 'hdi_rank_2021']
+humanDev_wide_df = humanDev_df.drop(columns_to_drop, axis=1)
+
+# Drop unnecessary time Series
+years_to_remove = [str(year) for year in range(1990, 2000)]
+cols_to_remove = [col for col in humanDev_wide_df.columns if any(year in col for year in years_to_remove)]
+humanDev_wide_df = humanDev_wide_df.drop(cols_to_remove, axis=1)
+
+# Reshape humanDev_wide_df into long_df 
+df_long = pd.melt(humanDev_wide_df, id_vars='country', var_name='measures', value_name='value')
+
+# Sort the DataFrame by country and measures
+df_long_sorted = df_long.sort_values(by=['country', 'measures'])
+df_long_sorted.reset_index(drop=True, inplace=True)
+
+# Split the "measures" column into two columns ("prefix" and "year")
+df_long_sorted[['measure_id', 'year']] = df_long_sorted['measures'].str.rsplit('_', n=1, expand=True)
+
+# Drop the "measures" column
+humanDev_long_df = df_long_sorted.drop('measures', axis=1)
+
+# Change the data type of the "year" column to integer
+humanDev_long_df['year'] = humanDev_long_df['year'].astype(int)
+
+# Change the order of the columns
+humanDev_long_df = humanDev_long_df[['country', 'year', 'measure_id', 'value']]
+
+# Display the first few rows of the DataFrame
+humanDev_long_df.head()
+
+# Print the sum of null values in each column
+print(humanDev_long_df.isnull().sum())
+
+# Resahape the DataFrame to a wide format
+humanDev_final = humanDev_long_df.pivot_table(index=['country', 'year'], columns='measure_id', values='value')
+
+humanDev_final
 # %%
-# Reshape humanDev_df 
+# (Test) merge vdem_21century_df and humanDev_final on country and yearvdem_21century_df
 
-
+new_df = pd.merge(vdem_21century_df, humanDev_final, how='inner', left_on=['country_name', 'year'], right_on=['country', 'year'])
+# %%
+new_df.head()
 # %%
