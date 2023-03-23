@@ -41,6 +41,7 @@ import statsmodels.api as sm
 import requests
 import io
 import zipfile
+from io import StringIO
 
 #%%
 # Import data sets from online
@@ -82,8 +83,6 @@ print(vdem_21century_df.shape)
 vdem_21century_df.head()
 #%%
 # (Test) import anther dataset and import as a dataframe
-from io import StringIO
-
 def getCSVasDF(url):
     # Fetch the CSV data using requests library
     response = requests.get(url)
@@ -100,16 +99,24 @@ url = "https://hdr.undp.org/sites/default/files/2021-22_HDR/HDR21-22_Composite_i
 humanDev_df = getCSVasDF(url)
 humanDev_df.head()
 # %%
-# Creates a long format DataFrame from a wide format DataFrame
+# (Test) data preparation and cleaning for humanDev_df
 
 # Drop unnecessary columns
 columns_to_drop = ['iso3', 'hdicode', 'region', 'hdi_rank_2021']
 humanDev_wide_df = humanDev_df.drop(columns_to_drop, axis=1)
 
+# humanDev_wide_df.shape
+# humanDev_wide_df.head()
+# humanDev_wide_df.tail()
+
 # Drop unnecessary time Series
 years_to_remove = [str(year) for year in range(1990, 2000)]
 cols_to_remove = [col for col in humanDev_wide_df.columns if any(year in col for year in years_to_remove)]
 humanDev_wide_df = humanDev_wide_df.drop(cols_to_remove, axis=1)
+
+# humanDev_wide_df.shape
+# humanDev_wide_df.head()
+# humanDev_wide_df.tail()
 
 # Reshape humanDev_wide_df into long_df 
 df_long = pd.melt(humanDev_wide_df, id_vars='country', var_name='measures', value_name='value')
@@ -118,11 +125,23 @@ df_long = pd.melt(humanDev_wide_df, id_vars='country', var_name='measures', valu
 df_long_sorted = df_long.sort_values(by=['country', 'measures'])
 df_long_sorted.reset_index(drop=True, inplace=True)
 
+# df_long_sorted.shape
+# df_long_sorted.head()
+# df_long_sorted.tail()
+
 # Split the "measures" column into two columns ("prefix" and "year")
 df_long_sorted[['measure_id', 'year']] = df_long_sorted['measures'].str.rsplit('_', n=1, expand=True)
 
+# df_long_sorted.shape
+# df_long_sorted.head()
+# df_long_sorted.tail()
+
 # Drop the "measures" column
 humanDev_long_df = df_long_sorted.drop('measures', axis=1)
+
+# humanDev_long_df.shape
+# humanDev_long_df.head()
+# humanDev_long_df.tail()
 
 # Change the data type of the "year" column to integer
 humanDev_long_df['year'] = humanDev_long_df['year'].astype(int)
@@ -130,20 +149,31 @@ humanDev_long_df['year'] = humanDev_long_df['year'].astype(int)
 # Change the order of the columns
 humanDev_long_df = humanDev_long_df[['country', 'year', 'measure_id', 'value']]
 
-# Display the first few rows of the DataFrame
-humanDev_long_df.head()
+# humanDev_long_df.shape
+# humanDev_long_df.head()
+# humanDev_long_df.tail()
+
+# Resahape the DataFrame to a wide format
+humanDev_21century_df = humanDev_long_df.pivot_table(index=['country', 'year'], columns='measure_id', values='value')
+
+humanDev_21century_df
 
 # Print the sum of null values in each column
 print(humanDev_long_df.isnull().sum())
 
-# Resahape the DataFrame to a wide format
-humanDev_final = humanDev_long_df.pivot_table(index=['country', 'year'], columns='measure_id', values='value')
+#%% (Test) Generalize each dataset to Generalize data for each country based on data for each country for each year
+"""
+vdem_21century_df: Degree of Democracy in Each Country in the 21st Century
 
-humanDev_final
-# %%
+humanDev_21centry_df: Degree of human resources growth in each country in the 21st century
+
+we can add more datasets to the list
+"""
+
+#%%
 # (Test) merge vdem_21century_df and humanDev_final on country and yearvdem_21century_df
 
-new_df = pd.merge(vdem_21century_df, humanDev_final, how='inner', left_on=['country_name', 'year'], right_on=['country', 'year'])
+new_df = pd.merge(vdem_21century_df, humanDev_21century_df, how='inner', left_on=['country_name', 'year'], right_on=['country', 'year'])
 # %%
 print(new_df.shape)
 new_df.head()
