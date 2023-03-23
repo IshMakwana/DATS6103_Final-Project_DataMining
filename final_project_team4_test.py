@@ -7,10 +7,10 @@ The dataset 1 used is ... dataset from ... (https://).
 The dataset 2 used is ... dataset from ... (https://).
 
 The project team consists of:
-- Team Member 1
-- Team Member 2
-- Team Member 3
-- Team Member 4
+- Daniel Felberg
+- Ei Tanaka
+- Ishani Makwana
+- Tharaka Maddineni 
 
 Usage:
     Run the script in a Python environment with the necessary libraries installed. The script reads the dataset from the 'data' directory and outputs evaluation metrics and visualizations in the 'output' directory.
