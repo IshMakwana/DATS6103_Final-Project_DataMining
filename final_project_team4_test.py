@@ -7,9 +7,9 @@ The dataset 1 used is ... dataset from ... (https://).
 The dataset 2 used is ... dataset from ... (https://).
 
 The project team consists of:
-- Ishani Makwana
-- Ei Tanaka
 - Daniel Felberg
+- Ei Tanaka
+- Ishani Makwana
 - Tharaka Maddineni 
 
 Usage:
