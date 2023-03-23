@@ -5,6 +5,7 @@ This script performs data preprocessing, feature engineering, model selection, a
 
 The dataset 1 used is ... dataset from ... (https://).
 The dataset 2 used is ... dataset from ... (https://).
+The dataset 3 used is ... dataset from ... (https://).
 
 The project team consists of:
 - Daniel Felberg
@@ -29,6 +30,9 @@ Note: this script requires scikit-learn version ... and pandas version ....
 
 # ## Introduction
 #%%
+"""
+This chunk is for set up libraries
+"""
 # Set up library
 import numpy as np
 import pandas as pd
@@ -44,6 +48,10 @@ import zipfile
 from io import StringIO
 
 #%%
+"""
+In this chunk, we will import data sets from online and import as a dataframe
+"""
+
 # Import data sets from online
 # (Test) importing v-dem datasets online
 def getDFfromZip(url):
@@ -74,14 +82,19 @@ url = "https://v-dem.net/media/datasets/V-Dem-CY-Core_csv_v13.zip"
 vdem_df = getDFfromZip(url)
 vdem_df.head()
 # %%
-# (Test) data preparation and cleaning
+# (Test) data preparation and cleaning for vdem_df
 null_columns = vdem_df.columns[vdem_df.isnull().all()] # Find columns containing only null values
 # %%
 # (Test) Create a new dataframe with only the data from the 21st century
 vdem_21century_df = vdem_df[(vdem_df['year'] >= 2000) & (vdem_df['year'] <= 2022)]
 print(vdem_21century_df.shape)
 vdem_21century_df.head()
+
 #%%
+"""
+This chunk is for importing data sets from online and import as a dataframe named humanDev_df
+"""
+
 # (Test) import anther dataset and import as a dataframe
 def getCSVasDF(url):
     # Fetch the CSV data using requests library
@@ -99,6 +112,10 @@ url = "https://hdr.undp.org/sites/default/files/2021-22_HDR/HDR21-22_Composite_i
 humanDev_df = getCSVasDF(url)
 humanDev_df.head()
 # %%
+"""
+This chunk is for data preparation and cleaning for humanDev_df
+"""
+
 # (Test) data preparation and cleaning for humanDev_df
 
 # Drop unnecessary columns
@@ -172,7 +189,6 @@ we can add more datasets to the list
 
 #%%
 # (Test) merge vdem_21century_df and humanDev_final on country and yearvdem_21century_df
-
 new_df = pd.merge(vdem_21century_df, humanDev_21century_df, how='inner', left_on=['country_name', 'year'], right_on=['country', 'year'])
 # %%
 print(new_df.shape)
