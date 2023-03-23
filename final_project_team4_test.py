@@ -81,3 +81,30 @@ null_columns = vdem_df.columns[vdem_df.isnull().all()] # Find columns containing
 # (Test) 
 vdem_21century_df = vdem_df[(vdem_df['year'] >= 2000) & (vdem_df['year'] <= 2022)]
 
+#%%
+# (Test) import anther dataset and import as a dataframe
+from io import StringIO
+
+def getCSVasDF(url):
+    # Fetch the CSV data using requests library
+    response = requests.get(url)
+    csv_data = response.text
+
+    # Convert the CSV data to a pandas DataFrame
+    df = pd.read_csv(StringIO(csv_data))
+    print(df.head())
+    print(df.info())
+    print(df.shape)
+
+    return df
+
+url = "https://hdr.undp.org/sites/default/files/2021-22_HDR/HDR21-22_Composite_indices_complete_time_series.csv"
+# Display the first few rows of the DataFrame
+humanDev_df = getCSVasDF(url)
+
+# %%
+column_name = humanDev_df.columns
+for col_name in humanDev_df.columns:
+    print(col_name)
+# %%
+# Reshape humanDev_df 
