@@ -1,34 +1,6 @@
 """
-DATS 6103 - Final Project - Team 4
-
-This script performs data preprocessing, feature engineering, model selection, and evaluation for predicting customer churn for a telecom company.
-
-The dataset 1 used is ... dataset from ... (https://).
-The dataset 2 used is ... dataset from ... (https://).
-The dataset 3 used is ... dataset from ... (https://).
-
-The project team consists of:
-- Daniel Felberg
-- Ei Tanaka
-- Ishani Makwana
-- Tharaka Maddineni 
-
-Usage:
-    Run the script in a Python environment with the necessary libraries installed. The script reads the dataset from the 'data' directory and outputs evaluation metrics and visualizations in the 'output' directory.
-
-Output:
-    - Metrics.csv: CSV file containing evaluation metrics for each model
-    - Feature_Importances.png: bar chart showing feature importances for the selected model
-    - Confusion_Matrix.png: confusion matrix for the selected model
-    - ROC_Curve.png: ROC curve for the selected model
-
-Note: this script requires scikit-learn version ... and pandas version ....
+Data Cleaning and Preparation
 """
-#%%[markdown]
-# # Title
-# Team Member: 1, 2, 3, 4
-
-# ## Introduction
 #%%
 """
 This chunk is for set up libraries
@@ -71,16 +43,18 @@ def getDFfromZip(url):
                 if file.endswith(".csv"):
                     # Read the CSV file into a pandas DataFrame
                     df = pd.read_csv(zip_file.open(file))                    
-                    print(df.shape)                                        
+                    print(df.shape)      
+                    return df
+            # If the CSV file was not found, return None
+            return None
     else: 
         print("Failed to download the dataset.")
-        return 0
-    
-    return df
+        return None
 
 url = "https://v-dem.net/media/datasets/V-Dem-CY-Core_csv_v13.zip"
 vdem_df = getDFfromZip(url)
 vdem_df.head()
+
 # %%
 # (Test) data preparation and cleaning for vdem_df
 null_columns = vdem_df.columns[vdem_df.isnull().all()] # Find columns containing only null values
