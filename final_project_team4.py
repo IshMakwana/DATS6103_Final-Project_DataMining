@@ -2,8 +2,6 @@
 DATS 6103 - Final Project - Team 4
 
 The dataset 1 used is ... dataset from ... (https://).
-The dataset 2 used is ... dataset from ... (https://).
-The dataset 3 used is ... dataset from ... (https://).
 
 The project team consists of:
 - Daniel Felberg
