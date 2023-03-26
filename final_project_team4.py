@@ -16,9 +16,7 @@ The project team consists of:
 # ## Introduction
 
 #%%
-"""
-This chunk is for set up libraries
-"""
+# This chunk is for set up mmodules and libraries
 # Set up library
 import numpy as np
 import pandas as pd
@@ -26,13 +24,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 import statsmodels.api as sm
-
-# Import data set
 import requests
 import io
 import zipfile
 from io import StringIO
-
 #%%
 """
 In this chunk, we will import data sets from online and import as a dataframe
