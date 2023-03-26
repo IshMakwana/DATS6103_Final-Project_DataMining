@@ -76,3 +76,40 @@ vdem_df.head()
 """
 In this chunk, we will clean and prepare the data sets
 """
+
+#%%[markdown]
+# ## EDA
+
+#%%
+
+#%%[markdown]
+# ### Basic EDA
+
+#%%
+
+#%%[markdown]
+# ### Descriptive Statistics
+
+#%%
+
+#%%[markdown]
+# ### Hypothesis Testing(Correlation, Regression, etc.)
+
+#%%
+
+#%%[markdown]
+# ## Model Building
+
+#%%
+
+#%%[markdown]
+# ## Result
+
+#%%[markdown]
+# ## Discussion
+
+#%%[markdown]
+# ## Conclusion
+
+#%%[markdown]
+# ## References
