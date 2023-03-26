@@ -75,3 +75,6 @@ vdem_df.head()
 # ## Data Cleaning and Prepareation
 
 #%%
+"""
+In this chunk, we will clean and prepare the data sets
+"""
