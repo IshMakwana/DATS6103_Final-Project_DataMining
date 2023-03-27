@@ -29,18 +29,13 @@ import io
 import zipfile
 from io import StringIO
 #%%
-"""
-In this chunk, we will import data sets from online and import as a dataframe
-"""
-
 # Import data sets from online
-# (Test) importing v-dem datasets online
 def getDFfromZip(url):
-    """ Return the data frame from a zip file
+    """ Return the data frame from a csv file in a zip file
     Parameters:
-        url(string): the url we want to unzip which contains file
+        url(str): url of the zip file
     Returns:
-        df(pandas DataFrame object): pandas dataframe objects
+        df(pandas.DataFrame): data frame of the csv file
     """
     response = requests.get(url) # Send a request to download the file
     
