@@ -83,14 +83,31 @@ In this chunk, we will clean and prepare the data sets
 #%%
 
 #%%[markdown]
+# Interpreting the results of the basic EDA
+
+#%%[markdown]
 # ### Descriptive Statistics
 
 #%%
 
 #%%[markdown]
+# Interpreting the results of the descriptive statistics
+
+#%%[markdown]
 # ### Hypothesis Testing(Correlation, Regression, etc.)
 
 #%%
+
+#%%[markdown]
+# Interpreting the results of the hypothesis testing
+
+#%%[markdown]
+# ### Correlation Analysis
+
+#%%
+
+#%%[markdown]
+# Interpreting the results of the correlation analysis
 
 #%%[markdown]
 # ## Model Building
