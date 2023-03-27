@@ -118,8 +118,7 @@ In this chunk, we will clean and prepare the data sets
 # ## Result
 
 #%%[markdown]
-# ## Discussion
-
+# ## Discussion (Limitations, Future Work, etc.)
 #%%[markdown]
 # ## Conclusion
 
