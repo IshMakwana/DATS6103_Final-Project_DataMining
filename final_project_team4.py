@@ -55,18 +55,29 @@ def getDFfromZip(url):
         print("Failed to download the dataset.")
         return None
 
-url = "https://v-dem.net/media/datasets/V-Dem-CY-Core_csv_v13.zip"
+url = "https://v-dem.net/media/datasets/V-Dem-CY-FullOthers_csv_v13.zip"
 vdem_df = getDFfromZip(url)
 vdem_df.head()
+vdem_df.shape
 
 #%%[markdown]
 # ## Data Cleaning and Prepareation
 
 #%%
-"""
-In this chunk, we will clean and prepare the data sets
-"""
+col_name = 'e_peaveduc'
+print(vdem_df.loc[vdem_df['country_name'] == 'Mexico', col_name])
 
+col_name = 'e_area'
+print(vdem_df.loc[vdem_df['country_name'] == 'Mexico', col_name])
+
+col_name = 'e_pop'
+print(vdem_df.loc[vdem_df['country_name'] == 'Mexico', col_name])
+
+col_name = 'e_radio_n'
+print(vdem_df.loc[vdem_df['country_name'] == 'Mexico', col_name])
+
+col_name = 'e_pefeliex'
+print(vdem_df.loc[vdem_df['country_name'] == 'Mexico', col_name])
 #%%[markdown]
 # ## EDA
 
