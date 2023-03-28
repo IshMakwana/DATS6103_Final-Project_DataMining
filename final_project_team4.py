@@ -11,7 +11,7 @@ The project team consists of:
 """
 #%%[markdown]
 # # Title
-# Team Member: 1, 2, 3, 4
+# Team Member: Daniel Felberg, Ei Tanaka, Ishani Makwana, Tharaka Maddineni
 
 # ## Introduction
 
