@@ -168,14 +168,11 @@ variables = [
 
 # Select the desired columns from the DataFrame
 vdem_df = VDem.loc[:, variables]
-
 # Check the shape of the new DataFrame
 print(vdem_df.shape)
 vdem_df.head()
-
 #%%
 # Step 2: Create a new democracy index column at right to country_id column from 5 democracy variables
-
 # Calculate the mean of the five democracy variables for each row
 vdem_df['democracy_index'] = vdem_df[['v2x_polyarchy', 'v2x_libdem', 'v2x_partipdem', 'v2x_delibdem', 'v2x_egaldem']].mean(axis=1)
 # Move the new 'democracy_index' column to the right of the 'country_id' column
@@ -187,32 +184,34 @@ print(vdem_df.shape)
 vdem_df.head()
 #%% 
 # Step 3: Create subset containing only 2000s in year column
+# Create a new DataFrame containing only the rows from 2000 onwards
 vdem_2000s_df = vdem_df.loc[vdem_df["year"] >= 2000]
 # Check the shape of the new DataFrame
 print(vdem_2000s_df.shape)
 vdem_2000s_df.head()
 #%%
 # Step 4: Combine the datasets by country (Combine multiple years into one and remove year column)
-
 # Set 'country_id' and 'country_name' as a multi-level index
 vdem_2000s_df = vdem_2000s_df.set_index(['country_name', 'country_id'])
-
 # Group by 'country_id' and 'country_name', and aggregate the mean
 vdem_2000s_grouped_df = vdem_2000s_df.groupby(['country_name', 'country_id']).agg("mean")
-
 # Reset the index, so 'country_name' becomes a column again
 vdem_2000s_grouped_df = vdem_2000s_grouped_df.reset_index()
-
 # Remove the 'year' column
 vdem_2000s_grouped_df = vdem_2000s_grouped_df.drop(columns=["year"])
-
 # Display the combined DataFrame
 print(vdem_2000s_grouped_df.shape)
 vdem_2000s_grouped_df.head()
-
+#%%[markdown]
+# Dataframe variables we created so far
+"""
+VDem: original data set
+vdem_df: subset containing only the columns of interest (38 variables) + democracy index
+vdem_2000s_df: subset containing only 2000s in year column
+vdem_2000s_grouped_df: combine the datasets by country (Combine multiple years into one and remove year column)
+"""
 #%%
 # Step 5: Test 1 (If something is wrong, tell team members and go back to Step 1)
-
 #%%
 # Step 6: Data Cleaning(drop null, drop duplicates, etc.)
 
