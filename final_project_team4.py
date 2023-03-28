@@ -212,14 +212,19 @@ vdem_2000s_grouped_df: combine the datasets by country (Combine multiple years i
 """
 #%%
 # Step 5: Test 1 (If something is wrong, tell team members and go back to Step 1)
+
 #%%
 # Step 6: Data Cleaning(drop null, drop duplicates, etc.)
 
+#%%
 # Step 7: change variable name
 
+#%%
 # Step 8: check data type (and change if necessary)
 
+#%%
 # Step 9: Test 2
+
 #%%[markdown]
 # ## EDA
 
