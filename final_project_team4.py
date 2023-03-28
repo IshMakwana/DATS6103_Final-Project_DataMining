@@ -203,7 +203,7 @@ vdem_2000s_grouped_df = vdem_2000s_grouped_df.drop(columns=["year"])
 print(vdem_2000s_grouped_df.shape)
 vdem_2000s_grouped_df.head()
 #%%[markdown]
-# Dataframe variables we created so far
+# Dataframe variables we created so far(Step 1-4)
 """
 VDem: original data set
 vdem_df: subset containing only the columns of interest (38 variables) + democracy index
