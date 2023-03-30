@@ -83,7 +83,7 @@ Variables of interest (38 in totall): original variables in the dataset
 - e_peaveduc (float): The average years of education among citizens older than 15
 - e_peedgini (float): Education inequality (Gini coefficient)
 
-(Gegraphy: 4 variables)
+(Geography: 4 variables)
 - e_area (float): Area of the country (km2)
 - e_regiongeo (int): Region (geographic)
 - e_regionpol (int): Region (politico-geographic)
@@ -275,9 +275,9 @@ conflict_coup_attempts: int # Number of coups attempts in a year
 '''
 #%%
 # Step 6:  change variable name
-variable_names = ['country_name', 'country_id', 'year', 'v2x_polyarchy', 'v2x_libdem', 'v2x_partipdem', 'v2x_delibdem', 'v2x_egaldem', 'e_peaveduc', 'e_peedgini', 'e_area', 'e_regiongeo', 'e_regionpol', 'e_regionpol_6C', 'e_cow_exports', 'e_cow_imports', 'e_gdp', 'e_gdppc', 'e_miinflat', 'e_pop', 'e_total_fuel_income_pc', 'e_total_oil_income_pc', 'e_total_resources_income_pc', 'e_radio_n', 'e_miferrat', 'e_mipopula', 'e_miurbani', 'e_miurbpop', 'e_pefeliex', 'e_peinfmor', 'e_pelifeex', 'e_pematmor', 'e_wb_pop', 'e_civil_war', 'e_miinteco', 'e_miinterc', 'e_pt_coup', 'e_pt_coup_attempts']
+variable_names = ['country_name', 'country_id', 'year', 'elec_demo_idx', 'lib_demo_idx', 'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 'geo_area', 'geo_reg_geo', 'geo_reg_pol_g', 'geo_reg_pol_g6c', 'eco_exports', 'eco_imports', 'eco_gdp', 'eco_gdp_pc', 'eco_ifl_rate(a)', 'eco_popultn', 'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 'infra_radio(num)_sets', 'e_miferrat', 'e_mipopula', 'e_miurbani', 'e_miurbpop', 'e_pefeliex', 'e_peinfmor', 'e_pelifeex', 'e_pematmor', 'e_wb_pop', 'e_civil_war', 'e_miinteco', 'e_miinterc', 'e_pt_coup', 'e_pt_coup_attempts']
 vdem_2000s_grouped_df.columns = variable_names
-vdem_2000s_grouped_df.head()
+vdem_2000s_grouped_df.head
 #%%
 # Step 7: Data Cleaning(drop null, drop duplicates, etc.)
 
