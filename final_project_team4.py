@@ -213,7 +213,7 @@ vdem_2000s_df: subset containing only 2000s in year column
 vdem_2000s_grouped_df: combine the datasets by country (Combine multiple years into one and remove year column)
 """
 #%%
-# Step 5: Test 1 (If something is wrong, tell team members and go back to Step 1)
+# Step 5: Test 1 (If anything goes wrong, just go back and check Step 1)
 
 #%%[markdown]
 '''
@@ -274,8 +274,21 @@ conflict_successful_coup_attempts: int # Number of successful coup attempts in a
 conflict_coup_attempts: int # Number of coups attempts in a year
 '''
 #%%
+<<<<<<< Updated upstream
 # Step 6:  change variable name
 variable_names = ['country_name', 'country_id', 'year', 'elec_demo_idx', 'lib_demo_idx', 'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 'geo_area', 'geo_reg_geo', 'geo_reg_pol_g', 'geo_reg_pol_g6c', 'eco_exports', 'eco_imports', 'eco_gdp', 'eco_gdp_pc', 'eco_ifl_rate(a)', 'eco_popultn', 'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 'infra_radio(num)_sets', 'e_miferrat', 'e_mipopula', 'e_miurbani', 'e_miurbpop', 'e_pefeliex', 'e_peinfmor', 'e_pelifeex', 'e_pematmor', 'e_wb_pop', 'e_civil_war', 'e_miinteco', 'e_miinterc', 'e_pt_coup', 'e_pt_coup_attempts']
+=======
+# Step 6: Changing variable name for better understanding.
+variable_names = ['country_name', 'country_id', 'year', 'elec_demo_idx', 'lib_demo_idx', 
+                  'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 
+                  'geo_area', 'geo_rgn_geo', 'geo_reg_polc_g', 'geo_reg_polc_g6c', 'eco_exports', 
+                  'eco_imports', 'eco_gdp', 'eco_gdp_pc', 'eco_a_ifl_rate', 'eco_popln', 
+                  'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 
+                  'infra_radio(n)_sets', 'demo_frtly_rate', 'demo_ttl_popln', 'demo_urbzn_rate', 'demo_urbn_popln', 
+                  'demo_lf_expcy(w)', 'demo_mrty(i)_rate', 'demo_life_expcy', 'demo_mrty(m)_rate', 'demo_ttl_popln_wb', 'c_civil_war', 
+                  'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp']
+
+>>>>>>> Stashed changes
 vdem_2000s_grouped_df.columns = variable_names
 vdem_2000s_grouped_df.head
 #%%
