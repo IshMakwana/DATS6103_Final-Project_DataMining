@@ -10,14 +10,15 @@ The project team consists of:
 - Tharaka Maddineni 
 """
 #%%[markdown]
-# # Title
+## Data Mining Project-Team4
+## Project Title: 
 # Team Member: Daniel Felberg, Ei Tanaka, Ishani Makwana, Tharaka Maddineni
 
 # ## Introduction
 
 #%%
-# This chunk is for set up mmodules and libraries
-# Set up library
+# This chunk is for set up modules and libraries
+# Import all required list of libraries here. 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -62,7 +63,7 @@ VDem.head()
 VDem.shape
 
 #%%[markdown]
-# ## Data Cleaning and Prepareation
+# ## Data Cleaning and Preparation
 
 """
 Variables of interest (38 in totall): original variables in the dataset 
@@ -274,11 +275,8 @@ conflict_successful_coup_attempts: int # Number of successful coup attempts in a
 conflict_coup_attempts: int # Number of coups attempts in a year
 '''
 #%%
-<<<<<<< Updated upstream
-# Step 6:  change variable name
-variable_names = ['country_name', 'country_id', 'year', 'elec_demo_idx', 'lib_demo_idx', 'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 'geo_area', 'geo_reg_geo', 'geo_reg_pol_g', 'geo_reg_pol_g6c', 'eco_exports', 'eco_imports', 'eco_gdp', 'eco_gdp_pc', 'eco_ifl_rate(a)', 'eco_popultn', 'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 'infra_radio(num)_sets', 'e_miferrat', 'e_mipopula', 'e_miurbani', 'e_miurbpop', 'e_pefeliex', 'e_peinfmor', 'e_pelifeex', 'e_pematmor', 'e_wb_pop', 'e_civil_war', 'e_miinteco', 'e_miinterc', 'e_pt_coup', 'e_pt_coup_attempts']
-=======
-# Step 6: Changing variable name for better understanding.
+
+# Step 6: Changing variable names for better understanding.
 variable_names = ['country_name', 'country_id', 'year', 'elec_demo_idx', 'lib_demo_idx', 
                   'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 
                   'geo_area', 'geo_rgn_geo', 'geo_reg_polc_g', 'geo_reg_polc_g6c', 'eco_exports', 
@@ -288,7 +286,7 @@ variable_names = ['country_name', 'country_id', 'year', 'elec_demo_idx', 'lib_de
                   'demo_lf_expcy(w)', 'demo_mrty(i)_rate', 'demo_life_expcy', 'demo_mrty(m)_rate', 'demo_ttl_popln_wb', 'c_civil_war', 
                   'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp']
 
->>>>>>> Stashed changes
+# Changing the dataframe name to vdem_2000s_grouped_df
 vdem_2000s_grouped_df.columns = variable_names
 vdem_2000s_grouped_df.head
 #%%
