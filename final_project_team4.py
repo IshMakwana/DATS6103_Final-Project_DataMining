@@ -18,6 +18,7 @@ The project team consists of:
 
 #%%
 # This chunk is for set up modules and libraries
+# Set up library
 # Import all required list of libraries here. 
 import numpy as np
 import pandas as pd
@@ -29,6 +30,7 @@ import requests
 import io
 import zipfile
 from io import StringIO
+from scipy.stats import shapiro
 
 #%%
 # Import data sets from online
@@ -174,6 +176,7 @@ vdem_df = VDem.loc[:, variables]
 # Check the shape of the new DataFrame
 print(vdem_df.shape)
 vdem_df.head()
+
 #%%
 # Step 2: Create a new democracy index column at right to country_id column from 5 democracy variables
 # Calculate the mean of the five democracy variables for each row
@@ -185,6 +188,7 @@ vdem_df = vdem_df[columns]
 # Check the shape of the new DataFrame
 print(vdem_df.shape)
 vdem_df.head()
+
 #%% 
 # Step 3: Create subset containing only 2000s in year column
 # Create a new DataFrame containing only the rows from 2000 onwards
@@ -192,16 +196,22 @@ vdem_2000s_df = vdem_df.loc[vdem_df["year"] >= 2000]
 # Check the shape of the new DataFrame
 print(vdem_2000s_df.shape)
 vdem_2000s_df.head()
+
 #%%
 # Step 4: Combine the datasets by country (Combine multiple years into one and remove year column)
+
 # Set 'country_id' and 'country_name' as a multi-level index
 vdem_2000s_df = vdem_2000s_df.set_index(['country_name', 'country_id'])
+
 # Group by 'country_id' and 'country_name', and aggregate the mean
 vdem_2000s_grouped_df = vdem_2000s_df.groupby(['country_name', 'country_id']).agg("mean")
+
 # Reset the index, so 'country_name' becomes a column again
 vdem_2000s_grouped_df = vdem_2000s_grouped_df.reset_index()
+
 # Remove the 'year' column
 vdem_2000s_grouped_df = vdem_2000s_grouped_df.drop(columns=["year"])
+
 # Display the combined DataFrame
 print(vdem_2000s_grouped_df.shape)
 vdem_2000s_grouped_df.head()
@@ -213,6 +223,7 @@ vdem_df: subset containing only the columns of interest (38 variables) + democra
 vdem_2000s_df: subset containing only 2000s in year column
 vdem_2000s_grouped_df: combine the datasets by country (Combine multiple years into one and remove year column)
 """
+
 #%%
 # Step 5: Test 1 (If anything goes wrong, just go back and check Step 1)
 
@@ -275,22 +286,128 @@ conflict_successful_coup_attempts: int # Number of successful coup attempts in a
 conflict_coup_attempts: int # Number of coups attempts in a year
 '''
 #%%
-
-# Step 6: Changing variable names for better understanding.
+# Step 6:  change variable name
 variable_names = ['country_name', 'country_id', 'year', 'elec_demo_idx', 'lib_demo_idx', 
                   'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 
-                  'geo_area', 'geo_rgn_geo', 'geo_reg_polc_g', 'geo_reg_polc_g6c', 'eco_exports', 
-                  'eco_imports', 'eco_gdp', 'eco_gdp_pc', 'eco_a_ifl_rate', 'eco_popln', 
+                  'geo_area', 'geo_reg_geo', 'geo_reg_pol_g', 'geo_reg_pol_g6c', 'eco_exports', 
+                  'eco_imports', 'eco_gdp', 'eco_gdp_pc', 'eco_ifl_rate(a)', 'eco_popultn', 
                   'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 
-                  'infra_radio(n)_sets', 'demo_frtly_rate', 'demo_ttl_popln', 'demo_urbzn_rate', 'demo_urbn_popln', 
-                  'demo_lf_expcy(w)', 'demo_mrty(i)_rate', 'demo_life_expcy', 'demo_mrty(m)_rate', 'demo_ttl_popln_wb', 'c_civil_war', 
-                  'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp']
+                  'infra_radio(num)_sets', 'e_miferrat', 'e_mipopula', 'e_miurbani', 'e_miurbpop', 
+                  'e_pefeliex', 'e_peinfmor', 'e_pelifeex', 'e_pematmor', 'e_wb_pop', 'e_civil_war', 
+                  'e_miinteco', 'e_miinterc', 'e_pt_coup', 'e_pt_coup_attempts']
 
-# Changing the dataframe name to vdem_2000s_grouped_df
 vdem_2000s_grouped_df.columns = variable_names
-vdem_2000s_grouped_df.head
+print(vdem_2000s_grouped_df.shape)
+print(vdem_2000s_grouped_df.head())
+
+#%%[markdown]
+## Step 7: Data Cleaning(drop null, drop duplicates, etc.)
+
+#%%[markdown]
+### 7.1 Check - Identifying and replacing null values
+def mean_median_imputation(column : pd.Series):
+    """
+    This code uses the shapiro() function from the scipy.stats module to perform the Shapiro-Wilk test, 
+    which is a statistical test used to determine if a set of data is normally distributed.
+    If normally distributed -> mean imputation
+    If data is skewed -> median imputation
+
+    Keyword arguments:
+    column : V-dem dataframe column of type - Pandas Series
+
+    Retuns:
+    mean/median : a floating number (mean/median) of the column
+    """
+
+    stat, p = shapiro(column)
+    alpha = 0.05
+    
+    if p >= alpha:
+        # print(f'The distribution of {column} is normal (p={p})')
+        return column.mean()
+    else:
+        # print(f'The distribution of {column} is skewed (p={p})')
+        return column.median()
+
+
+# Checking null values on latest dataframe (vdem_2000s_grouped_df) 
+# [Ask team members to check which dataframe needs to be cleaned]
+
+print(f"Count of null records in the dataset before cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
+
+def fill_na(df):
+    """
+    This function replace the null values with mean or median value,
+    within in the dataframe and returns the cleaned dataframe
+
+    Keyword arguments:
+    df : V-dem dataframe 
+
+    Returns:
+    cleaned_df : Clean dataframe
+    """
+    fill_null_0 = lambda col: col.fillna(0) if col.dtype in ['float64', 'int64'] else col.fillna(method='ffill')
+    df = df.apply(fill_null_0)
+
+    # Replacing null values with appropriate value (either mean or median)
+    fill_null_imputation = lambda col: col.fillna(mean_median_imputation(column = col)) if col.dtype in ['float64', 'int64'] else col.fillna(method='ffill')
+    cleaned_df = df.apply(fill_null_imputation)
+
+    return cleaned_df
+
+vdem_2000s_grouped_df = fill_na(df = vdem_2000s_grouped_df)
+
+print(f"Count of null records in the dataset after cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
+
+#%%[markdown]
+### 7.2 Check - Duplicate records
+
 #%%
-# Step 7: Data Cleaning(drop null, drop duplicates, etc.)
+# checking duplicated values on latest dataframe (vdem_2000s_grouped_df)
+print(f"Count of duplicated records in the dataset: {vdem_2000s_grouped_df.duplicated().sum()}")
+
+#%%[markdown]
+### 7.3 Check - Outliers
+
+#%%
+def identify_outliers_tukey(df, column):
+    """
+    Identifying outliers in tukey method using IQR (Inter-Quartile range)
+
+    Keyword arguments:
+    df : Pandas dataframe
+    column: Column name of the dataframe
+
+    Returns:
+    outliers: dictionary contains all outliers of numerical columns
+
+    """
+    # if df[column].dtype in ['float64', 'int64']:
+    q1 = df[column].quantile(0.25)
+    q3 = df[column].quantile(0.75)
+    iqr = q3 - q1
+    outlier_cutoff = 1.5 * iqr
+    lower_bound = q1 - outlier_cutoff
+    upper_bound = q3 + outlier_cutoff
+    outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
+    return outliers
+
+# identify outliers in all numeric columns using the Tukey method
+outliers_dict = {}
+for column in vdem_2000s_grouped_df.select_dtypes(include=np.number).columns:
+    outliers = identify_outliers_tukey(vdem_2000s_grouped_df, column)
+    if not outliers.empty:
+        outliers_dict[column] = outliers
+
+# print the outlier results from all columns
+if not outliers_dict:
+    print("No outliers found.")
+else:
+    for column, outliers in outliers_dict.items():
+        print(f"The outliers in column {column} are:\n{outliers}")
+        
+#%%[markdown]
+## EDA
 
 #%%
 # Step 8: check data type (and change if necessary)
