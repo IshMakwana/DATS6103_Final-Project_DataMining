@@ -10,7 +10,8 @@ The project team consists of:
 - Tharaka Maddineni 
 """
 #%%[markdown]
-# # Title
+## Data Mining Project-Team4
+## Project Title: 
 # Team Member: Daniel Felberg, Ei Tanaka, Ishani Makwana, Tharaka Maddineni
 
 # ## Introduction
@@ -18,6 +19,7 @@ The project team consists of:
 #%%
 # This chunk is for set up modules and libraries
 # Set up library
+# Import all required list of libraries here. 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -63,9 +65,10 @@ VDem.head()
 VDem.shape
 
 #%%[markdown]
-# ## Data Cleaning and Prepareation
+# ## Data Cleaning and Preparation
+
 """
-Variables of interest (38 in totall):
+Variables of interest (38 in totall): original variables in the dataset 
 
 - country_name(str)
 - country_id(int)
@@ -83,7 +86,7 @@ Variables of interest (38 in totall):
 - e_peaveduc (float): The average years of education among citizens older than 15
 - e_peedgini (float): Education inequality (Gini coefficient)
 
-(Gegraphy: 4 variables)
+(Geography: 4 variables)
 - e_area (float): Area of the country (km2)
 - e_regiongeo (int): Region (geographic)
 - e_regionpol (int): Region (politico-geographic)
@@ -123,6 +126,7 @@ Variables of interest (38 in totall):
 - e_pt_coup (int): Number of successful coup attempts in a year
 - e_pt_coup_attempts (int): Number of coups attempts in a year
 """
+
 #%%
 # Step 1: Create subset containing only the columns of interest (38 variables)
 # Create a list containing the names of the variables you want to select
@@ -221,8 +225,66 @@ vdem_2000s_grouped_df: combine the datasets by country (Combine multiple years i
 """
 
 #%%
-# Step 5: Test 1 (If something is wrong, tell team members and go back to Step 1)
+# Step 5: Test 1 (If anything goes wrong, just go back and check Step 1)
 
+#%%[markdown]
+'''
+# # Variables of interest
+country_name: str
+country_id: int
+year: int
+
+# Independent variables
+v2x_polyarchy: int # Electoral democracy index
+v2x_libdem: int # Liberal democracy index
+v2x_partipdem: int # Participatory democracy index
+v2x_delibdem: int # Deliberative democracy index
+v2x_egaldem: int # Egalitarian democracy index
+
+# Dependent variables - Education
+edu_avg_years: float # The average years of education among citizens older than 15
+edu_inequality: float # Education inequality (Gini coefficient)
+
+# Dependent variables - Geography
+geo_area: float # Area of the country (km2)
+geo_region_geographic: int # Region (geographic)
+geo_region_politico_geographic: int # Region (politico-geographic)
+geo_region_politico_geographic_6C: int # Region (politico-geographic 6-category)
+
+# Dependent variables - Economic
+econ_exports: float # the total value of a country's exports
+econ_imports: float # the total value of a country's imports
+econ_gdp: float # GDP
+econ_gdp_per_capita: float # GDP per capita
+econ_annual_inflation_rate: float # Annual inflation rate
+econ_population: float # Population
+
+# Dependent variables - Natural Resources Wealth
+natres_total_fuel_income_per_capita: float # the real value of a country's petroleum, coal, and natural gas production
+natres_total_oil_income_per_capita: float # the real value of a country's petroleum production
+natres_total_resources_income_per_capita: float # the real value of a country's petroleum, coal, natural gas, and mineral production
+
+# Dependent variables - Infrastructure
+infra_num_radio_sets: int # the number of radio sets
+
+# Dependent variables - Demography
+demo_fertility_rate: float # the fertility rate
+demo_total_population: int # the total population (in thousands)
+demo_urbanization_rate: float # the urbanization rate
+demo_urban_population: int # the urban population (in thousands)
+demo_life_expectancy_women: float # the life expectancy at birth among women
+demo_infant_mortality_rate: float # the infant mortality rate
+demo_life_expectancy: float # the life expectancy
+demo_maternal_mortality_rate: float # the maternal mortality rate
+demo_total_population_wb: int # the total population (in thousands)
+
+# Dependent variables - Conflict
+conflict_civil_war: bool # Was there a civil war?
+conflict_international_armed_conflict: bool # Did the country participate in an international armed conflict?
+conflict_internal_armed_conflict: bool # Did the country experience an internal armed conflict?
+conflict_successful_coup_attempts: int # Number of successful coup attempts in a year
+conflict_coup_attempts: int # Number of coups attempts in a year
+'''
 #%%
 # Step 6:  change variable name
 variable_names = ['country_name', 'country_id', 'year', 'elec_demo_idx', 'lib_demo_idx', 
@@ -343,7 +405,9 @@ if not outliers_dict:
 else:
     for column, outliers in outliers_dict.items():
         print(f"The outliers in column {column} are:\n{outliers}")
-
+        
+#%%[markdown]
+## EDA
 
 #%%
 # Step 8: check data type (and change if necessary)
