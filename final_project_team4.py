@@ -1,7 +1,7 @@
 """
-DATS 6103 - Final Project - Team 4
+DATS 6103 Data Mining - Final Project - Team 4
 
-The dataset 1 used is ... dataset from ... (https://).
+The dataset 1 used is ... dataset from ... (https://v-dem.net/data/the-v-dem-dataset/ - “V-Dem-CY-Full+Others-v13.csv”).
 
 The project team consists of:
 - Daniel Felberg
@@ -9,12 +9,24 @@ The project team consists of:
 - Ishani Makwana
 - Tharaka Maddineni 
 """
+## About dataset we used: 
+"""
+The Varieties of Democracy (V-Dem) dataset offers a novel method for envisioning and 
+analyzing democracy. It propose a multidimensional and disaggregated dataset that 
+captures the complicated nature of democracy as a political system that encompasses 
+more than just holding elections. In order to measure these characteristics, the V-Dem 
+project separates democracy into five high-level principles: electoral, liberal, participatory, 
+deliberative, and and egalitarian, and collects data to measure these principles.
+"""
+
+
 #%%[markdown]
 ## Data Mining Project-Team4
 ## Project Title: 
 # Team Member: Daniel Felberg, Ei Tanaka, Ishani Makwana, Tharaka Maddineni
 
 # ## Introduction
+# Our project is comparing metrics used to determine democracy level  in different countries during the 21st century. The data set was created by V-Dem with 27,555 rows and 808 variables, which measures how democratic countries are using indices, based on numerous factors, including censorship, media bias, political repression, relationship between branches of government, equal rights, and access to democratic processes. The data set also includes “background factors” such as economic, education and other socioeconomic variables.
 
 #%%
 # This chunk is for set up modules and libraries
