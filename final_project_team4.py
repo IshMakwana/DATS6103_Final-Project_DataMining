@@ -43,6 +43,9 @@ import io
 import zipfile
 from io import StringIO
 from scipy.stats import shapiro
+import gapminder
+from matplotlib.animation import FuncAnimation
+import plotly.express as px
 
 #%%
 # Import data sets from online
@@ -213,10 +216,10 @@ vdem_2000s_df.head()
 # Step 4: Combine the datasets by country (Combine multiple years into one and remove year column)
 
 # Set 'country_id' and 'country_name' as a multi-level index
-vdem_2000s_df = vdem_2000s_df.set_index(['country_name', 'country_id'])
+vdem_2000s_df_indexed = vdem_2000s_df.set_index(['country_name', 'country_id'])
 
 # Group by 'country_id' and 'country_name', and aggregate the mean
-vdem_2000s_grouped_df = vdem_2000s_df.groupby(['country_name', 'country_id']).agg("mean")
+vdem_2000s_grouped_df = vdem_2000s_df_indexed.groupby(['country_name', 'country_id']).agg("mean")
 
 # Reset the index, so 'country_name' becomes a column again
 vdem_2000s_grouped_df = vdem_2000s_grouped_df.reset_index()
@@ -228,11 +231,15 @@ vdem_2000s_grouped_df = vdem_2000s_grouped_df.drop(columns=["year"])
 print(vdem_2000s_grouped_df.shape)
 vdem_2000s_grouped_df.head()
 #%%[markdown]
-# Dataframe variables we created so far(Step 1-4)
+### Dataframe variables we created so far(Step 1-4):
+# 
 """
 VDem: original data set
+# 
 vdem_df: subset containing only the columns of interest (38 variables) + democracy index
+#  
 vdem_2000s_df: subset containing only 2000s in year column
+# 
 vdem_2000s_grouped_df: combine the datasets by country (Combine multiple years into one and remove year column)
 """
 
@@ -367,6 +374,7 @@ def fill_na(df):
     return cleaned_df
 
 vdem_2000s_grouped_df = fill_na(df = vdem_2000s_grouped_df)
+vdem_2000s_df = fill_na(df = vdem_2000s_df)
 
 print(f"Count of null records in the dataset after cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
 
@@ -423,13 +431,55 @@ else:
 #%%
 # Step 8: check data type (and change if necessary)
 
+print(vdem_2000s_grouped_df.dtypes) # As intended, all variables are floating values.
+
+print(vdem_2000s_df.dtypes)
+
+vdem_2000s_df['year'] = vdem_2000s_df['year'].astype(int) # change 'year' to integer
+print(vdem_2000s_df.dtypes)
+
 #%%
-# Step 9: Test 2
+# Step 9: Test 2 (If anything goes wrong, just go back and check Step 5)
 
 #%%[markdown]
 # ## EDA
 
-#%%
+
+# %%
+
+
+
+#%% Initial time-series line plot
+
+vdem_2000s_df_sample = vdem_2000s_df.sample(n=5, replace=False)
+
+sns.lineplot(data=vdem_2000s_df_sample, x='year', y='democracy_index', hue='country_name')
+
+#%% Bubble plot animation (attempt #1)
+
+fig, ax = plt.subplots(figsize=(10,6))
+sns.set(style="whitegrid")
+
+def update(year):
+    # Filter data by year
+    data_year = vdem_2000s_df[vdem_2000s_df['year'] == year]
+
+    # Updating plot
+    ax.clear()
+    sns.scatterplot(x='democracy_index', y='e_peedgini', data=vdem_2000s_df, size='e_gdppc', hue='country_name', sizes=(20, 2000), ax=ax)
+    plt.title('Year: ' + str(year))
+
+# Creating animation
+animation = FuncAnimation(fig, update, frames=range(2000,2022, 1), repeat=True)
+plt.show()
+
+# %% Bubble plot animation (attempt #2)
+
+vdem_2000s_df.fillna(0, inplace=True)
+
+fig = px.scatter(vdem_2000s_df, x='democracy_index', y='e_peedgini', size='e_gdppc', color='country_name', animation_frame='year', range_x=[0, 1], range_y=[0, 100], log_x=True, hover_name='country_name', size_max=60)
+
+fig.show()
 
 #%%[markdown]
 # ### Basic EDA
