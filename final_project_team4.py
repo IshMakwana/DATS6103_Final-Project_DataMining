@@ -44,7 +44,7 @@ import zipfile
 from io import StringIO
 from scipy.stats import shapiro
 import gapminder
-from matplotlib.animation import FuncAnimation
+import matplotlib.animation as animation
 import plotly.express as px
 
 #%%
@@ -475,15 +475,25 @@ vdem_2000s_grouped_df.shape
 # ## EDA
 
 
-# %%
+# %% work on stat summary for demo_index variable here!
 
 
 
 #%% Initial time-series line plot
 
+vdem_2000s_df['year'] = vdem_2000s_df['year'].astype(int)
+
 vdem_2000s_df_sample = vdem_2000s_df.sample(n=5, replace=False)
 
 sns.lineplot(data=vdem_2000s_df_sample, x='year', y='democracy_index', hue='country_name')
+
+#%% Another time-series line plot attempt
+
+ax = plt.figure().add_subplot(projection='3d')
+
+x = vdem_2000s_df['year']
+y = vdem_2000s_df['democracy_index']
+ax.plot(x, y, zs=0, zdir='z')
 
 #%% Bubble plot animation (attempt #1)
 
@@ -510,6 +520,22 @@ vdem_2000s_df.fillna(0, inplace=True)
 fig = px.scatter(vdem_2000s_df, x='democracy_index', y='e_peedgini', size='e_gdppc', color='country_name', animation_frame='year', range_x=[0, 1], range_y=[0, 100], log_x=True, hover_name='country_name', size_max=60)
 
 fig.show()
+
+#%% Bubble plot animation (attempt #3)
+
+fig, ax = plt.subplots()
+
+scat = ax.scatter(1,0)
+x = vdem_2000s_df['democracy_index']
+
+def animate(i):
+    scat.set_offsets((x[i], 0))
+    return scat,
+
+ani = animation.FuncAnimation(fig, animate, repeat=True,
+                              frames=vdem_2000s_df['year'] - 1, interval=50)
+
+plt.show()
 
 #%%[markdown]
 # ### Basic EDA
