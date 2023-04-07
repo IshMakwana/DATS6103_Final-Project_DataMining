@@ -449,6 +449,24 @@ vdem_2000s_grouped_df['c_suc_coup_attp'] = vdem_2000s_grouped_df['c_suc_coup_att
 vdem_2000s_grouped_df['c_coup_attp'] = vdem_2000s_grouped_df['c_coup_attp'].astype(int) 
 
 print(vdem_2000s_grouped_df.dtypes)
+"""
+The goal of the data cleaning process is to prepare the dataset ready for further modeling and analysis. Starting with a checking for null values, it then replaces them with the appropriate values, looks for duplicate records, and identifies outliers. The Tukey method is used by the code to find outliers in all numerical columns.
+The EDA procedure seeks to investigate the data and comprehend its properties. Data types are examined, made changes as necessary. The distribution of the variables, their correlations, and any additional relevant information are next checked.
+Overall, the code offers a thorough EDA and data cleaning process that aids in getting the dataset ready for analysis and modeling.
+"""
+#%%
+# A statistical summary of the numerical columns in the dataframe
+summary = vdem_2000s_df.describe()
+print(summary) #This will print summary statistics of vdem_2000s_df dataframe
+summary_grouped = vdem_2000s_grouped_df.describe()
+print(summary_grouped) #This will print summary statistics of vdem_2000s_grouped_df dataframe
+
+#An overview of the dataframe's columns, including their names, data types, and non-null count.
+vdem_2000s_df.info()
+vdem_2000s_grouped_df.info()
+#The dimensions of the dataframe
+vdem_2000s_df.shape
+vdem_2000s_grouped_df.shape
 
 #%%
 # Step 9: Test 2 (If anything goes wrong, just go back and check Step 5)
