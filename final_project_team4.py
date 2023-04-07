@@ -230,6 +230,7 @@ vdem_2000s_grouped_df = vdem_2000s_grouped_df.drop(columns=["year"])
 # Display the combined DataFrame
 print(vdem_2000s_grouped_df.shape)
 vdem_2000s_grouped_df.head()
+
 #%%[markdown]
 ### Dataframe variables we created so far(Step 1-4):
 # 
@@ -434,9 +435,20 @@ else:
 print(vdem_2000s_grouped_df.dtypes) # As intended, all variables are floating values.
 
 print(vdem_2000s_df.dtypes)
+#%%
 
-vdem_2000s_df['year'] = vdem_2000s_df['year'].astype(int) # change 'year' to integer
-print(vdem_2000s_df.dtypes)
+vdem_2000s_grouped_df['demo_index'] = vdem_2000s_grouped_df['demo_index'].astype(int) # change 'democracy_index' to integer
+vdem_2000s_grouped_df['geo_rgn_geo'] = vdem_2000s_grouped_df['geo_rgn_geo'].astype(int) 
+vdem_2000s_grouped_df['geo_reg_polc_g'] = vdem_2000s_grouped_df['geo_reg_polc_g'].astype(int)  
+vdem_2000s_grouped_df['geo_reg_polc_g6c'] = vdem_2000s_grouped_df['geo_reg_polc_g6c'].astype(int) 
+vdem_2000s_grouped_df['infra_radio(n)_sets'] = vdem_2000s_grouped_df['infra_radio(n)_sets'].astype(int) 
+vdem_2000s_grouped_df['demo_ttl_popln'] = vdem_2000s_grouped_df['demo_ttl_popln'].astype(int) 
+vdem_2000s_grouped_df['demo_urbn_popln'] = vdem_2000s_grouped_df['demo_urbn_popln'].astype(int) 
+vdem_2000s_grouped_df['demo_ttl_popln_wb'] = vdem_2000s_grouped_df['demo_ttl_popln_wb'].astype(int) 
+vdem_2000s_grouped_df['c_suc_coup_attp'] = vdem_2000s_grouped_df['c_suc_coup_attp'].astype(int) 
+vdem_2000s_grouped_df['c_coup_attp'] = vdem_2000s_grouped_df['c_coup_attp'].astype(int) 
+
+print(vdem_2000s_grouped_df.dtypes)
 
 #%%
 # Step 9: Test 2 (If anything goes wrong, just go back and check Step 5)
