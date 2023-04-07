@@ -1,3 +1,4 @@
+#%%
 """
 DATS 6103 Data Mining - Final Project - Team 4
 
@@ -44,7 +45,8 @@ import zipfile
 from io import StringIO
 from scipy.stats import shapiro
 import gapminder
-import matplotlib.animation as animation
+import matplotlib.animation as ani
+from matplotlib.animation import FuncAnimation
 import plotly.express as px
 
 #%%
@@ -377,6 +379,7 @@ def fill_na(df):
 vdem_2000s_grouped_df = fill_na(df = vdem_2000s_grouped_df)
 vdem_2000s_df = fill_na(df = vdem_2000s_df)
 
+
 print(f"Count of null records in the dataset after cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
 
 #%%[markdown]
@@ -437,7 +440,7 @@ print(vdem_2000s_grouped_df.dtypes) # As intended, all variables are floating va
 print(vdem_2000s_df.dtypes)
 #%%
 
-vdem_2000s_grouped_df['demo_index'] = vdem_2000s_grouped_df['demo_index'].astype(int) # change 'democracy_index' to integer
+vdem_2000s_grouped_df['demo_index'] = vdem_2000s_grouped_df['demo_index'].astype(float) # change 'democracy_index' to float
 vdem_2000s_grouped_df['geo_rgn_geo'] = vdem_2000s_grouped_df['geo_rgn_geo'].astype(int) 
 vdem_2000s_grouped_df['geo_reg_polc_g'] = vdem_2000s_grouped_df['geo_reg_polc_g'].astype(int)  
 vdem_2000s_grouped_df['geo_reg_polc_g6c'] = vdem_2000s_grouped_df['geo_reg_polc_g6c'].astype(int) 
@@ -450,8 +453,8 @@ vdem_2000s_grouped_df['c_coup_attp'] = vdem_2000s_grouped_df['c_coup_attp'].asty
 
 print(vdem_2000s_grouped_df.dtypes)
 """
-The goal of the data cleaning process is to prepare the dataset ready for further modeling and analysis. Starting with a checking for null values, it then replaces them with the appropriate values, looks for duplicate records, and identifies outliers. The Tukey method is used by the code to find outliers in all numerical columns.
-The EDA procedure seeks to investigate the data and comprehend its properties. Data types are examined, made changes as necessary. The distribution of the variables, their correlations, and any additional relevant information are next checked.
+The goal of the data cleaning process is to prepare the dataset ready for further modeling and analysis. Starting with a checking for null values, it then replaces them with the appropriate values, looks for duplicate records, and identifies outliers. The Tukey method is used by the code to find outliers in all numerical columns.
+The EDA procedure seeks to investigate the data and comprehend its properties. Data types are examined, made changes as necessary. The distribution of the variables, their correlations, and any additional relevant information are next checked.
 Overall, the code offers a thorough EDA and data cleaning process that aids in getting the dataset ready for analysis and modeling.
 """
 #%%
@@ -475,9 +478,15 @@ vdem_2000s_grouped_df.shape
 # ## EDA
 
 
-# %% work on stat summary for demo_index variable here!
+# %% measuing normality of demo_index in grouped vdem df
 
+demo_index_grouped = tuple(vdem_2000s_grouped_df['demo_index'])
 
+sns.displot(x=demo_index_grouped, bins=20)
+
+#%% Boxplot
+
+sns.boxplot(x="country_name", y="demo_index", data=vdem_2000s_grouped_df)
 
 #%% Initial time-series line plot
 
@@ -486,6 +495,20 @@ vdem_2000s_df['year'] = vdem_2000s_df['year'].astype(int)
 vdem_2000s_df_sample = vdem_2000s_df.sample(n=5, replace=False)
 
 sns.lineplot(data=vdem_2000s_df_sample, x='year', y='democracy_index', hue='country_name')
+
+#%% Scatterplot
+
+cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
+g = sns.relplot(
+    data=vdem_2000s_df,
+    x='democracy_index', y='e_peedgini',
+    hue='year', size='e_gdppc',
+    palette=cmap, sizes=(10,200),
+)
+g.set(xscale="log", yscale="log")
+g.ax.xaxis.grid(True, "minor", linewidth=.25)
+g.ax.yaxis.grid(True, "minor", linewidth=.25)
+g.despine(left=True, bottom=True)
 
 #%% Another time-series line plot attempt
 
@@ -511,7 +534,14 @@ def update(year):
 
 # Creating animation
 animation = FuncAnimation(fig, update, frames=range(2000,2022, 1), repeat=True)
-plt.show()
+
+# saving animation as a GIF
+writer = ani.PillowWriter(fps=1,
+                                metadata=dict(artist='Me'),
+                                bitrate=1800)
+animation.save('bubble.gif', writer=writer)
+
+plt.show() # animation won't move here, have to open it in your working directory to see GIF
 
 # %% Bubble plot animation (attempt #2)
 
@@ -534,6 +564,11 @@ def animate(i):
 
 ani = animation.FuncAnimation(fig, animate, repeat=True,
                               frames=vdem_2000s_df['year'] - 1, interval=50)
+
+writer = animation.PillowWriter(fps=15,
+                                metadata=dict(artist='Me'),
+                                bitrate=1800)
+ani.save('bubble.gif', writer=writer)
 
 plt.show()
 
