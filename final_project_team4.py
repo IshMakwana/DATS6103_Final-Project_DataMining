@@ -503,7 +503,37 @@ g = sns.relplot(
     data=vdem_2000s_df,
     x='democracy_index', y='e_peedgini',
     hue='year', size='e_gdppc',
-    palette=cmap, sizes=(10,200),
+    palette=cmap, sizes=(10,500),
+)
+g.set(xscale="log", yscale="log")
+g.ax.xaxis.grid(True, "minor", linewidth=.25)
+g.ax.yaxis.grid(True, "minor", linewidth=.25)
+g.despine(left=True, bottom=True)
+
+#%% Scatterplot 2
+
+cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
+g = sns.relplot(
+    data=vdem_2000s_df,
+    x='democracy_index', y='e_total_resources_income_pc',
+    hue='e_regionpol_6C', size='year',
+    palette=cmap, sizes=(10,500),
+)
+g.set(xscale="log", yscale="log")
+g.ax.xaxis.grid(True, "minor", linewidth=.25)
+g.ax.yaxis.grid(True, "minor", linewidth=.25)
+g.despine(left=True, bottom=True)
+
+#%% Scatterplot 3
+
+vdem_2000s_df['e_civil_war'] = vdem_2000s_df['e_civil_war'].astype(int)
+
+cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
+g = sns.relplot(
+    data=vdem_2000s_df,
+    x='democracy_index', y='e_gdppc',
+    hue='e_civil_war', size='year',
+    palette=cmap, sizes=(10,500),
 )
 g.set(xscale="log", yscale="log")
 g.ax.xaxis.grid(True, "minor", linewidth=.25)
