@@ -39,6 +39,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 import requests
 import io
 import zipfile
@@ -48,6 +49,7 @@ import gapminder
 import matplotlib.animation as ani
 from matplotlib.animation import FuncAnimation
 import plotly.express as px
+import random
 
 #%%
 # Import data sets from online
@@ -492,18 +494,28 @@ sns.boxplot(x="country_name", y="demo_index", data=vdem_2000s_grouped_df)
 
 vdem_2000s_df['year'] = vdem_2000s_df['year'].astype(int)
 
-vdem_2000s_df_sample = vdem_2000s_df.sample(n=5, replace=False)
+country_var = "country_name"
 
-sns.lineplot(data=vdem_2000s_df_sample, x='year', y='democracy_index', hue='country_name')
+sample_countries = random.sample(vdem_2000s_grouped_df[country_var].unique().tolist(), 3)
+
+vdem_2000s_grouped_df_subset = vdem_2000s_grouped_df[vdem_2000s_grouped_df[country_var].isin(sample_countries)]
+
+random_sample = list(vdem_2000s_grouped_df_subset['country_name'])
+random_sample.append('North Korea')
+random_sample.append('Denmark')
+
+vdem_2000s_df_samples = vdem_2000s_df[vdem_2000s_df['country_name'].isin(random_sample)]
+
+sns.lineplot(data=vdem_2000s_df_samples, x='year', y='democracy_index', hue='country_name')
 
 #%% Scatterplot
 
 cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
 g = sns.relplot(
     data=vdem_2000s_df,
-    x='democracy_index', y='e_peedgini',
-    hue='year', size='e_gdppc',
-    palette=cmap, sizes=(10,500),
+    x='democracy_index', y='e_civil_war',
+    size='',
+    palette=cmap,
 )
 g.set(xscale="log", yscale="log")
 g.ax.xaxis.grid(True, "minor", linewidth=.25)
@@ -530,9 +542,9 @@ vdem_2000s_df['e_civil_war'] = vdem_2000s_df['e_civil_war'].astype(int)
 
 cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
 g = sns.relplot(
-    data=vdem_2000s_df,
-    x='democracy_index', y='e_gdppc',
-    hue='e_civil_war', size='year',
+    data=vdem_2000s_grouped_df,
+    x='demo_index', y='eco_gdp_pc',
+    size='c_civil_war',
     palette=cmap, sizes=(10,500),
 )
 g.set(xscale="log", yscale="log")
@@ -575,8 +587,6 @@ plt.show() # animation won't move here, have to open it in your working director
 
 # %% Bubble plot animation (attempt #2)
 
-vdem_2000s_df.fillna(0, inplace=True)
-
 fig = px.scatter(vdem_2000s_df, x='democracy_index', y='e_peedgini', size='e_gdppc', color='country_name', animation_frame='year', range_x=[0, 1], range_y=[0, 100], log_x=True, hover_name='country_name', size_max=60)
 
 fig.show()
@@ -605,10 +615,27 @@ plt.show()
 #%%[markdown]
 # ### Basic EDA
 
+corr = vdem_2000s_grouped_df.corr() < -0.3
+
+mask = np.triu(np.ones_like(corr, dtype=bool))
+
+f, ax = plt.subplots(figsize=(11, 9))
+
+sns.heatmap(corr, annot=True, mask=mask, cmap=cmap, vmax=.3, center=0,
+            square=True, linewidths=.5, cbar_kws={"shrink": .5})
+
 #%%
+
+life_expect = vdem_2000s_grouped_df[['demo_lf_expcy(w)', 'demo_life_expcy']]
+
+vif = pd.DataFrame()
+vif["VIF Factor"] = [variance_inflation_factor(life_expect.values, i) for i in range(life_expect.shape[1])]
+vif["Variable"] = life_expect.columns
 
 #%%[markdown]
 # Interpreting the results of the basic EDA
+
+# Variables to test against average democracy index: GDP per capita, overall life expectancy, and average education.
 
 #%%[markdown]
 # ### Descriptive Statistics
