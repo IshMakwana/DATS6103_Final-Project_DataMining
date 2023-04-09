@@ -38,17 +38,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
-import statsmodels.api as sm
-from statsmodels.stats.outliers_influence import variance_inflation_factor
+# import statsmodels.api as sm
+# from statsmodels.stats.outliers_influence import variance_inflation_factor
 import requests
 import io
 import zipfile
 from io import StringIO
 from scipy.stats import shapiro
-import gapminder
+# import gapminder
 import matplotlib.animation as ani
 from matplotlib.animation import FuncAnimation
-import plotly.express as px
+# import plotly.express as px
 import random
 
 #%%
@@ -319,9 +319,12 @@ variable_names = ['country_name', 'country_id', 'demo_index', 'elec_demo_idx', '
                   'infra_radio(n)_sets', 'demo_frtly_rate', 'demo_ttl_popln', 'demo_urbzn_rate', 'demo_urbn_popln', 
                   'demo_lf_expcy(w)', 'demo_mrty(i)_rate', 'demo_life_expcy', 'demo_mrty(m)_rate', 'demo_ttl_popln_wb', 'c_civil_war', 
                   'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp']
+
 vdem_2000s_grouped_df.columns = variable_names
-print(vdem_2000s_grouped_df.shape)
-print(vdem_2000s_grouped_df.head())
+
+#%%
+# print(vdem_2000s_grouped_df.shape)
+# print(vdem_2000s_grouped_df.head())
 
 #%%[markdown]
 ## Step 7: Data Cleaning(drop null, drop duplicates, etc.)
@@ -378,18 +381,26 @@ def fill_na(df):
 
     return cleaned_df
 
-vdem_2000s_grouped_df = fill_na(df = vdem_2000s_grouped_df)
-vdem_2000s_df = fill_na(df = vdem_2000s_df)
 
+dataframes_list = [vdem_df, vdem_2000s_df, vdem_2000s_grouped_df]
 
-print(f"Count of null records in the dataset after cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
+for dataframe in dataframes_list:
+    print(f"Count of null records in the {dataframe} dataframe before cleaning: {dataframe.isnull().sum()}")
+    dataframe = fill_na(df = dataframe)
+    print(f"Count of null records in the {dataframe} dataframe after cleaning: {dataframe.isnull().sum()}")
+    # vdem_2000s_grouped_df = fill_na(df = vdem_2000s_grouped_df)
+    # vdem_2000s_df = fill_na(df = vdem_2000s_df)
+
 
 #%%[markdown]
 ### 7.2 Check - Duplicate records
 
 #%%
 # checking duplicated values on latest dataframe (vdem_2000s_grouped_df)
-print(f"Count of duplicated records in the dataset: {vdem_2000s_grouped_df.duplicated().sum()}")
+
+# checking duplicated values for all dataframes
+for dataframe in dataframes_list:
+    print(f"Count of duplicated records in the {dataframe} dataframe: {dataframe.duplicated().sum()}")
 
 #%%[markdown]
 ### 7.3 Check - Outliers
@@ -417,19 +428,23 @@ def identify_outliers_tukey(df, column):
     outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
     return outliers
 
-# identify outliers in all numeric columns using the Tukey method
-outliers_dict = {}
-for column in vdem_2000s_grouped_df.select_dtypes(include=np.number).columns:
-    outliers = identify_outliers_tukey(vdem_2000s_grouped_df, column)
-    if not outliers.empty:
-        outliers_dict[column] = outliers
+outliers_dict_list = []
 
-# print the outlier results from all columns
-if not outliers_dict:
-    print("No outliers found.")
-else:
-    for column, outliers in outliers_dict.items():
-        print(f"The outliers in column {column} are:\n{outliers}")
+for dataframe in dataframes_list:
+    # identify outliers in all numeric columns using the Tukey method
+    outliers_dict = {}
+    for column in dataframe.select_dtypes(include=np.number).columns:
+        outliers = identify_outliers_tukey(dataframe, column)
+        if not outliers.empty:
+            outliers_dict[column] = outliers
+
+    # print the outlier results from all columns
+    if not outliers_dict:
+        print("No outliers found.")
+    else:
+        for column, outliers in outliers_dict.items():
+            print(f"The outliers in column {column} are:\n{outliers}")
+    outliers_dict_list.append(outliers_dict)
         
 #%%[markdown]
 ## EDA
