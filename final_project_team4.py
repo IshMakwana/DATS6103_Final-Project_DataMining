@@ -512,18 +512,27 @@ sns.boxplot(x="country_name", y="demo_index", data=vdem_2000s_grouped_df)
 
 vdem_2000s_df['year'] = vdem_2000s_df['year'].astype(int)
 
-country_var = "country_name"
+random_sample = ['North Korea', 'Denmark']
 
-sample_countries = random.sample(vdem_2000s_grouped_df[country_var].unique().tolist(), 3)
+# Edge-case
+def get_random_n_countries(col: str, n : int, sample: list) -> list:
+    sample_countries = []
+    while True:
+        sample_countries = random.sample(vdem_2000s_grouped_df[country_var].unique().tolist(), n)
+        if any(sample_country in sample for sample_country in sample_countries):
+            continue
+        return sample_countries
+
+country_var = "country_name"
+sample_countries = get_random_n_countries(col = country_var, n = 3, sample = random_sample)
 
 vdem_2000s_grouped_df_subset = vdem_2000s_grouped_df[vdem_2000s_grouped_df[country_var].isin(sample_countries)]
 
-random_sample = list(vdem_2000s_grouped_df_subset['country_name'])
-random_sample.append('North Korea')
-random_sample.append('Denmark')
+random_sample.extend(list(vdem_2000s_grouped_df_subset['country_name']))
 
 vdem_2000s_df_samples = vdem_2000s_df[vdem_2000s_df['country_name'].isin(random_sample)]
 
+# Plot of 5 countries which illustrates limits and comparing metrics. 
 sns.lineplot(data=vdem_2000s_df_samples, x='year', y='democracy_index', hue='country_name')
 
 #%% Scatterplot
