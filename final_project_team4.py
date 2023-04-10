@@ -514,12 +514,22 @@ vdem_2000s_df['year'] = vdem_2000s_df['year'].astype(int)
 
 random_sample = ['North Korea', 'Denmark']
 
-# Edge-case
+# Edge-case for randome sampling
 def get_random_n_countries(col: str, n : int, sample: list) -> list:
-    sample_countries = []
+    """
+    This function is used to extract 3 random country names from dataframe
+    
+    Keyword arguments:
+    col : column name (country_name)
+    n: number of countries to extract
+    sample : A list contains 2 countries as max and min limits
+    """
+    
+    sample_countries = [] # Empty list to store n random country names
     while True:
         sample_countries = random.sample(vdem_2000s_grouped_df[country_var].unique().tolist(), n)
-        if any(sample_country in sample for sample_country in sample_countries):
+
+        if any(sample_country in sample for sample_country in sample_countries): # if country already exists in list, re-loop
             continue
         return sample_countries
 
