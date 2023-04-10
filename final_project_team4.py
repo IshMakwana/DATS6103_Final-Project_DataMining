@@ -38,17 +38,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
-# import statsmodels.api as sm
-# from statsmodels.stats.outliers_influence import variance_inflation_factor
+import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 import requests
 import io
 import zipfile
 from io import StringIO
 from scipy.stats import shapiro
-# import gapminder
+import gapminder
 import matplotlib.animation as ani
 from matplotlib.animation import FuncAnimation
-# import plotly.express as px
+import plotly.express as px
 import random
 
 #%%
@@ -84,7 +84,7 @@ VDem.head()
 VDem.shape
 
 #%%[markdown]
-# ## Data Cleaning and Preparation
+# ## Data Pre-Processing
 
 """
 Variables of interest (38 in totall): original variables in the dataset 
@@ -149,6 +149,7 @@ Variables of interest (38 in totall): original variables in the dataset
 #%%
 # Step 1: Create subset containing only the columns of interest (38 variables)
 # Create a list containing the names of the variables you want to select
+
 variables = [
     "country_name",
     "country_id",
@@ -192,15 +193,19 @@ variables = [
 
 # Select the desired columns from the DataFrame
 vdem_df = VDem.loc[:, variables]
+
 # Check the shape of the new DataFrame
 print(vdem_df.shape)
+
 vdem_df.head()
 
 #%%
 # Step 2: Create a new democracy index column at right to country_id column from 5 democracy variables
 # Calculate the mean of the five democracy variables for each row
+
 vdem_df['democracy_index'] = vdem_df[['v2x_polyarchy', 'v2x_libdem', 'v2x_partipdem', 
                                       'v2x_delibdem', 'v2x_egaldem']].mean(axis=1)
+
 # Move the new 'democracy_index' column to the right of the 'country_id' column
 columns = list(vdem_df.columns)
 columns.insert(columns.index("year") + 1, columns.pop(columns.index("democracy_index")))
@@ -213,6 +218,7 @@ vdem_df.head()
 #%% 
 # Step 3: Create subset containing only 2000s in year column
 # Create a new DataFrame containing only the rows from 2000 onwards
+
 vdem_2000s_df = vdem_df.loc[vdem_df["year"] >= 2000]
 
 # Check the shape of the new DataFrame
@@ -243,7 +249,7 @@ vdem_2000s_grouped_df.head()
 
 #%%[markdown]
 ### Dataframe variables we created so far(Step 1-4):
-# 
+
 """
 VDem: original data set
 # 
@@ -328,10 +334,6 @@ variable_names = ['country_name', 'country_id', 'demo_index', 'elec_demo_idx', '
 
 vdem_2000s_grouped_df.columns = variable_names
 
-#%%
-# print(vdem_2000s_grouped_df.shape)
-# print(vdem_2000s_grouped_df.head())
-
 #%%[markdown]
 ## Step 7: Data Cleaning(drop null, drop duplicates, etc.)
 
@@ -361,11 +363,6 @@ def mean_median_imputation(column : pd.Series):
         # print(f'The distribution of {column} is skewed (p={p})')
         return column.median()
 
-
-# Checking null values on latest dataframe (vdem_2000s_grouped_df) 
-# [Ask team members to check which dataframe needs to be cleaned]
-
-# print(f"Count of null records in the dataset before cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
 
 def fill_na(df):
     """
@@ -403,8 +400,6 @@ print(f"Count of null records in the dataframe after cleaning: {vdem_2000s_group
 ### 7.2 Check - Duplicate records
 
 #%%
-# checking duplicated values on latest dataframe (vdem_2000s_grouped_df)
-
 # checking duplicated values for both the dataframes 'vdem_2000s_df' & 'vdem_2000s_grouped_df'
 print(f"Count of duplicated records in the 'vdem_2000s_df' dataframe: {vdem_2000s_df.duplicated().sum()}")
 print(f"Count of duplicated records in the 'vdem_2000s_grouped_df' dataframe: {vdem_2000s_grouped_df.duplicated().sum()}")
@@ -454,9 +449,6 @@ for dataframe in dataframes_list:
             print(f"The outliers in column {column} are:\n{outliers}")
     outliers_dict_list.append(outliers_dict)
         
-#%%[markdown]
-## EDA
-
 #%%
 # Step 8: check data type (and change if necessary)
 
@@ -477,6 +469,7 @@ vdem_2000s_grouped_df['c_suc_coup_attp'] = vdem_2000s_grouped_df['c_suc_coup_att
 vdem_2000s_grouped_df['c_coup_attp'] = vdem_2000s_grouped_df['c_coup_attp'].astype(int) 
 
 print(vdem_2000s_grouped_df.dtypes)
+
 """
 The goal of the data cleaning process is to prepare the dataset ready for further modeling and analysis. Starting with a checking for null values, it then replaces them with the appropriate values, looks for duplicate records, and identifies outliers. The Tukey method is used by the code to find outliers in all numerical columns.
 The EDA procedure seeks to investigate the data and comprehend its properties. Data types are examined, made changes as necessary. The distribution of the variables, their correlations, and any additional relevant information are next checked.
@@ -487,6 +480,7 @@ Overall, the code offers a thorough EDA and data cleaning process that aids in g
 summary = vdem_2000s_df.describe()
 print(summary) #This will print summary statistics of vdem_2000s_df dataframe
 summary_grouped = vdem_2000s_grouped_df.describe()
+
 print(summary_grouped) #This will print summary statistics of vdem_2000s_grouped_df dataframe
 
 #An overview of the dataframe's columns, including their names, data types, and non-null count.
