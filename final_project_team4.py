@@ -199,11 +199,13 @@ vdem_df.head()
 #%%
 # Step 2: Create a new democracy index column at right to country_id column from 5 democracy variables
 # Calculate the mean of the five democracy variables for each row
-vdem_df['democracy_index'] = vdem_df[['v2x_polyarchy', 'v2x_libdem', 'v2x_partipdem', 'v2x_delibdem', 'v2x_egaldem']].mean(axis=1)
+vdem_df['democracy_index'] = vdem_df[['v2x_polyarchy', 'v2x_libdem', 'v2x_partipdem', 
+                                      'v2x_delibdem', 'v2x_egaldem']].mean(axis=1)
 # Move the new 'democracy_index' column to the right of the 'country_id' column
 columns = list(vdem_df.columns)
 columns.insert(columns.index("year") + 1, columns.pop(columns.index("democracy_index")))
 vdem_df = vdem_df[columns]
+
 # Check the shape of the new DataFrame
 print(vdem_df.shape)
 vdem_df.head()
@@ -212,6 +214,7 @@ vdem_df.head()
 # Step 3: Create subset containing only 2000s in year column
 # Create a new DataFrame containing only the rows from 2000 onwards
 vdem_2000s_df = vdem_df.loc[vdem_df["year"] >= 2000]
+
 # Check the shape of the new DataFrame
 print(vdem_2000s_df.shape)
 vdem_2000s_df.head()
@@ -221,6 +224,9 @@ vdem_2000s_df.head()
 
 # Set 'country_id' and 'country_name' as a multi-level index
 vdem_2000s_df_indexed = vdem_2000s_df.set_index(['country_name', 'country_id'])
+
+# Setting the name of the dataframe as same as its variable name
+vdem_2000s_df_indexed.Name = "vdem_2000s_df_indexed"
 
 # Group by 'country_id' and 'country_name', and aggregate the mean
 vdem_2000s_grouped_df = vdem_2000s_df_indexed.groupby(['country_name', 'country_id']).agg("mean")
@@ -359,7 +365,7 @@ def mean_median_imputation(column : pd.Series):
 # Checking null values on latest dataframe (vdem_2000s_grouped_df) 
 # [Ask team members to check which dataframe needs to be cleaned]
 
-print(f"Count of null records in the dataset before cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
+# print(f"Count of null records in the dataset before cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
 
 def fill_na(df):
     """
@@ -382,15 +388,16 @@ def fill_na(df):
     return cleaned_df
 
 
-dataframes_list = [vdem_df, vdem_2000s_df, vdem_2000s_grouped_df]
+# Cleaning data for vdem_2000s_df dataframe
+print(f"Count of null records in the dataframe before cleaning: {vdem_2000s_df.isnull().sum()}")
+vdem_2000s_df = fill_na(df = vdem_2000s_df)
+print(f"Count of null records in the dataframe after cleaning: {vdem_2000s_df.isnull().sum()}")
+    
 
-for dataframe in dataframes_list:
-    print(f"Count of null records in the {dataframe} dataframe before cleaning: {dataframe.isnull().sum()}")
-    dataframe = fill_na(df = dataframe)
-    print(f"Count of null records in the {dataframe} dataframe after cleaning: {dataframe.isnull().sum()}")
-    # vdem_2000s_grouped_df = fill_na(df = vdem_2000s_grouped_df)
-    # vdem_2000s_df = fill_na(df = vdem_2000s_df)
-
+# Cleaning data for vdem_2000s_grouped_df dataframe
+print(f"Count of null records in the dataframe before cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
+vdem_2000s_grouped_df = fill_na(df = vdem_2000s_grouped_df)
+print(f"Count of null records in the dataframe after cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
 
 #%%[markdown]
 ### 7.2 Check - Duplicate records
@@ -398,9 +405,9 @@ for dataframe in dataframes_list:
 #%%
 # checking duplicated values on latest dataframe (vdem_2000s_grouped_df)
 
-# checking duplicated values for all dataframes
-for dataframe in dataframes_list:
-    print(f"Count of duplicated records in the {dataframe} dataframe: {dataframe.duplicated().sum()}")
+# checking duplicated values for both the dataframes 'vdem_2000s_df' & 'vdem_2000s_grouped_df'
+print(f"Count of duplicated records in the 'vdem_2000s_df' dataframe: {vdem_2000s_df.duplicated().sum()}")
+print(f"Count of duplicated records in the 'vdem_2000s_grouped_df' dataframe: {vdem_2000s_grouped_df.duplicated().sum()}")
 
 #%%[markdown]
 ### 7.3 Check - Outliers
@@ -430,6 +437,7 @@ def identify_outliers_tukey(df, column):
 
 outliers_dict_list = []
 
+dataframes_list = [vdem_2000s_df, vdem_2000s_grouped_df]
 for dataframe in dataframes_list:
     # identify outliers in all numeric columns using the Tukey method
     outliers_dict = {}
@@ -484,6 +492,7 @@ print(summary_grouped) #This will print summary statistics of vdem_2000s_grouped
 #An overview of the dataframe's columns, including their names, data types, and non-null count.
 vdem_2000s_df.info()
 vdem_2000s_grouped_df.info()
+
 #The dimensions of the dataframe
 vdem_2000s_df.shape
 vdem_2000s_grouped_df.shape
@@ -529,7 +538,6 @@ cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
 g = sns.relplot(
     data=vdem_2000s_df,
     x='democracy_index', y='e_civil_war',
-    size='',
     palette=cmap,
 )
 g.set(xscale="log", yscale="log")
