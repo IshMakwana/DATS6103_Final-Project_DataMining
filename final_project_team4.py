@@ -52,6 +52,7 @@ import plotly.express as px
 import random
 import plotly.graph_objs as go
 import pandas as pd
+import geopandas
 
 #%%
 # Import data sets from online
@@ -190,7 +191,9 @@ variables = [
     "e_miinteco",
     "e_miinterc",
     "e_pt_coup",
-    "e_pt_coup_attempts"
+    "e_pt_coup_attempts",
+    "v2smpardom",
+
 ]
 
 # Select the desired columns from the DataFrame
@@ -332,7 +335,7 @@ variable_names = ['country_name', 'country_id', 'demo_index', 'elec_demo_idx', '
                   'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 
                   'infra_radio(n)_sets', 'demo_frtly_rate', 'demo_ttl_popln', 'demo_urbzn_rate', 'demo_urbn_popln', 
                   'demo_lf_expcy(w)', 'demo_mrty(i)_rate', 'demo_life_expcy', 'demo_mrty(m)_rate', 'demo_ttl_popln_wb', 'c_civil_war', 
-                  'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp']
+                  'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp', 'party_dissem']
 
 vdem_2000s_grouped_df.columns = variable_names
 
@@ -743,6 +746,26 @@ ani.save('bubble.gif', writer=writer)
 
 plt.show()
 
+#%% map of geopolitical regions
+
+vdem_2000s_grouped_df_names = pd.DataFrame()
+
+vdem_2000s_grouped_df_names['name'] = vdem_2000s_grouped_df['country_name']
+vdem_2000s_grouped_df_names['region'] = vdem_2000s_grouped_df['geo_reg_polc_g6c']
+
+world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
+world = world[(world.pop_est>0) & (world.name!="Antarctica")]
+country_shapes = world[['geometry', 'iso_a3']]
+country_names = world[['name', 'iso_a3']]
+
+vdem_2000s_grouped_map = country_shapes.merge(country_names, on='iso_a3')
+vdem_2000s_grouped_map2 = vdem_2000s_grouped_map.merge(vdem_2000s_grouped_df_names, on='name')
+
+ax = vdem_2000s_grouped_map2.plot(column='region')
+ax.set_axis_off()
+
+ax.plot()
+
 #%%[markdown]
 # ### Basic EDA
 
@@ -811,3 +834,5 @@ vif
 
 #%%[markdown]
 # ## References
+
+# %%
