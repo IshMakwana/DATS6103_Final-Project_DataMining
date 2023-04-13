@@ -50,6 +50,8 @@ import matplotlib.animation as ani
 from matplotlib.animation import FuncAnimation
 import plotly.express as px
 import random
+import plotly.graph_objs as go
+import pandas as pd
 
 #%%
 # Import data sets from online
@@ -491,6 +493,30 @@ vdem_2000s_grouped_df.info()
 vdem_2000s_df.shape
 vdem_2000s_grouped_df.shape
 
+#%% New dataframe grouping countries by region (politico-geographic)
+
+# Set 'country_id' and 'country_name' as a multi-level index
+vdem_2000s_df_poli_geo = vdem_2000s_df.set_index(['e_regionpol_6C', 'year'])
+
+# Setting the name of the dataframe as same as its variable name
+vdem_2000s_df_poli_geo.Name = "vdem_2000s_df_poli_geo"
+
+# Group by 'country_id' and 'country_name', and aggregate the mean
+vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.groupby(['e_regionpol_6C', 'year']).agg("mean")
+
+# Reset the index, so 'country_name' becomes a column again
+vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.reset_index()
+
+# renaming regions to show the full name
+vdem_2000s_df_poli_geo['e_regionpol_6C'] = vdem_2000s_df_poli_geo['e_regionpol_6C'].replace({1: 'Eastern Europe and Central Asia', 2: 'Latin America and the Caribbean', 3: 'Middle East and North Africa', 4:'Sub-Saharan Africa', 5: 'Western Europe, North America, and Oceania', 6: 'Asia and Pacific'})
+
+# renaming column because 'e_regionpol_6C' is really annoying to type out each type
+vdem_2000s_df_poli_geo.rename(columns={'e_regionpol_6C': 'region'}, inplace=True)
+
+# Display the combined DataFrame
+print(vdem_2000s_df_poli_geo.shape)
+vdem_2000s_df_poli_geo.head()
+
 #%%
 # Step 9: Test 2 (If anything goes wrong, just go back and check Step 5)
 
@@ -503,10 +529,12 @@ vdem_2000s_grouped_df.shape
 demo_index_grouped = tuple(vdem_2000s_grouped_df['demo_index'])
 
 sns.displot(x=demo_index_grouped, bins=20)
+plt.show()
 
 #%% Boxplot
 
-sns.boxplot(x="country_name", y="demo_index", data=vdem_2000s_grouped_df)
+sns.boxplot(data=vdem_2000s_df_poli_geo, x="democracy_index", y="region", dodge=False)
+plt.show()
 
 #%% Initial time-series line plot
 
@@ -544,6 +572,75 @@ vdem_2000s_df_samples = vdem_2000s_df[vdem_2000s_df['country_name'].isin(random_
 
 # Plot of 5 countries which illustrates limits and comparing metrics. 
 sns.lineplot(data=vdem_2000s_df_samples, x='year', y='democracy_index', hue='country_name')
+plt.show()
+
+# %% Small multiple time series
+
+East_Euro_Central_Asia = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 1]
+LatAm_Caribbean = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 2]
+Mid_East_North_Africa = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 3]
+Sub_Saharan_Africa = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 4]
+West_Euro_NA_Oceania = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 5]
+Asia_Pacific = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 6]
+
+# Create a figure with six subplots
+fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(12, 10))
+
+# Plot the data on the first subplot
+axes[0,0].scatter(East_Euro_Central_Asia['year'], East_Euro_Central_Asia['democracy_index'])
+axes[0,0].set_title('East_Euro_Central_Asia')
+
+# Plot the data on the second subplot
+axes[0,1].scatter(LatAm_Caribbean['year'], LatAm_Caribbean['democracy_index'])
+axes[0,1].set_title('LatAm_Caribbean')
+
+# Plot the data on the third subplot
+axes[0,2].scatter(Mid_East_North_Africa['year'], Mid_East_North_Africa['democracy_index'])
+axes[0,2].set_title('Mid_East_North_Africa')
+
+# Plot the data on the fourth subplot
+axes[1,0].scatter(Sub_Saharan_Africa['year'], Sub_Saharan_Africa['democracy_index'])
+axes[1,0].set_title('Sub_Saharan_Africa')
+
+# Plot the data on the fith subplot
+axes[1,1].scatter(West_Euro_NA_Oceania['year'], West_Euro_NA_Oceania['democracy_index'])
+axes[1,1].set_title('West_Euro_NA_Oceania')
+
+# Plot the data on the sixth subplot
+axes[1,2].scatter(Asia_Pacific['year'], Asia_Pacific['democracy_index'])
+axes[1,2].set_title('Asia_Pacific')
+
+# show plot
+plt.show()
+
+# %% Time series by politico-geographic region
+
+sns.set_context("paper")
+sns.relplot(data=vdem_2000s_df_poli_geo, x='year', y='democracy_index', hue='region', kind='line')
+plt.show()
+
+#%% 3d time series plot
+
+fig = go.Figure(data=[go.Scatter3d(
+    x=vdem_2000s_df_poli_geo['year'],
+    y=vdem_2000s_df_poli_geo['democracy_index'],
+    z=vdem_2000s_df_poli_geo['e_pefeliex'],
+    mode='markers',
+    marker=dict(
+        size=12,
+        color=vdem_2000s_df_poli_geo['year'],
+        opacity=0.8
+    )
+)])
+
+fig.update_layout(scene=dict(
+                    xaxis_title='Year',
+                    yaxis_title='Democracy Index',
+                    zaxis_title='Life Expectancy (f)'),
+                  width=700,
+                  margin=dict(r=20, b=10, l=10, t=10))
+
+fig.show()
 
 #%% Scatterplot
 
@@ -557,6 +654,9 @@ g.set(xscale="log", yscale="log")
 g.ax.xaxis.grid(True, "minor", linewidth=.25)
 g.ax.yaxis.grid(True, "minor", linewidth=.25)
 g.despine(left=True, bottom=True)
+
+plt.show()
+
 
 #%% Scatterplot 2
 
@@ -572,29 +672,24 @@ g.ax.xaxis.grid(True, "minor", linewidth=.25)
 g.ax.yaxis.grid(True, "minor", linewidth=.25)
 g.despine(left=True, bottom=True)
 
+plt.show()
+
 #%% Scatterplot 3
 
 vdem_2000s_df['e_civil_war'] = vdem_2000s_df['e_civil_war'].astype(int)
 
-cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
 g = sns.relplot(
-    data=vdem_2000s_grouped_df,
-    x='demo_index', y='eco_gdp_pc',
-    size='c_civil_war',
-    palette=cmap, sizes=(10,500),
+    data=vdem_2000s_df,
+    x='democracy_index', y='e_gdppc',
+    hue='e_civil_war', hue_order=[0, 1],
+    size='year', sizes=(10,50),
+    palette="muted", alpha=.5,
 )
-g.set(xscale="log", yscale="log")
 g.ax.xaxis.grid(True, "minor", linewidth=.25)
 g.ax.yaxis.grid(True, "minor", linewidth=.25)
 g.despine(left=True, bottom=True)
 
-#%% Another time-series line plot attempt
-
-ax = plt.figure().add_subplot(projection='3d')
-
-x = vdem_2000s_df['year']
-y = vdem_2000s_df['democracy_index']
-ax.plot(x, y, zs=0, zdir='z')
+plt.show()
 
 #%% Bubble plot animation (attempt #1)
 
@@ -660,13 +755,17 @@ f, ax = plt.subplots(figsize=(11, 9))
 sns.heatmap(corr, annot=True, mask=mask, cmap=cmap, vmax=.3, center=0,
             square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
+plt.show()
+
 #%%
 
-life_expect = vdem_2000s_grouped_df[['demo_lf_expcy(w)', 'demo_life_expcy']]
+life_expect = vdem_2000s_grouped_df[['demo_mrty(m)_rate', 'demo_mrty(i)_rate']]
 
 vif = pd.DataFrame()
 vif["VIF Factor"] = [variance_inflation_factor(life_expect.values, i) for i in range(life_expect.shape[1])]
 vif["Variable"] = life_expect.columns
+
+vif
 
 #%%[markdown]
 # Interpreting the results of the basic EDA
