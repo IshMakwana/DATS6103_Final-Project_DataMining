@@ -665,21 +665,28 @@ fig.show()
 
 #%% Scatterplot
 
+# The cmap variable defines the color palette used for the plot.
 cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
 g = sns.relplot(
     data=vdem_2000s_df,
     x='democracy_index', y='e_civil_war',
     palette=cmap,
 )
+# The set() function is used to set the x-axis and y-axis scales to logarithmic scales.
 g.set(xscale="log", yscale="log")
+# The grid() function is used to add minor gridlines to the plot.
 g.ax.xaxis.grid(True, "minor", linewidth=.25)
 g.ax.yaxis.grid(True, "minor", linewidth=.25)
+# The despine() function is used to remove the spines on the left and bottom sides of the plot.
 g.despine(left=True, bottom=True)
 
 plt.show()
 
 
 #%% Scatterplot 2
+# This scatterplot helps in visualizing the relationship between democracy index, total resources income per capita, region, and year.
+# The x-axis represents the democracy index, the y-axis represents total resources income per capita, and the size of the dots represents the year. The color of the dots represents the region.
+# The size of the dots adds an additional layer of information by showing how the data changes over time. The use of different colors helps to distinguish the different regions, making it easier to see if there are any regional patterns in the data.
 
 cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
 g = sns.relplot(
@@ -696,9 +703,12 @@ g.despine(left=True, bottom=True)
 plt.show()
 
 #%% Scatterplot 3
+# This scatterplot shows the relationship between democracy index and GDP per capita, with points colored by the presence or absence of civil war (0 for no civil war, 1 for civil war) and sized by year.
 
+# convert the e_civil_war column from a boolean to an integer using astype(int).
 vdem_2000s_df['e_civil_war'] = vdem_2000s_df['e_civil_war'].astype(int)
 
+# We size the points by year, with smaller points representing earlier years and larger points representing later years. The color palette is set to "muted" and the transparency of the points is set to 0.5. 
 g = sns.relplot(
     data=vdem_2000s_df,
     x='democracy_index', y='e_gdppc',
