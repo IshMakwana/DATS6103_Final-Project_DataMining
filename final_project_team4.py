@@ -860,6 +860,18 @@ else:
 # The interpretation of these results depends on the direction and strength of the correlations/relationships. A significant correlation between the average democracy index and GDP per capita indicates that as GDP per capita increases, the average democracy index tends to increase as well. This could suggest that economic development is associated with increased political freedoms and democratic governance.
 # A significant linear relationship between the average democracy index and the variables of interest suggests that there is a predictable pattern in the relationship between the two variables. For example, as the level of education increases, the average democracy index tends to increase as well. Similarly, as life expectancy increases, the average democracy index tends to increase. This could suggest that there are underlying factors, such as education and health, that contribute to the development of democratic governance.
 
+#%% 
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+
+# ANOVA test
+model = ols('demo_index ~ C(geo_rgn_geo)', data=vdem_2000s_grouped_df).fit()
+aov_table = sm.stats.anova_lm(model, typ=2)
+print(aov_table)
+
+# Multiple Regression
+model = ols('demo_index ~ eco_gdp_pc + demo_life_expcy + edu_avg + geo_rgn_geo', data=vdem_2000s_grouped_df).fit()
+print(model.summary())
 #%%[markdown]
 # ### Correlation Analysis
 
