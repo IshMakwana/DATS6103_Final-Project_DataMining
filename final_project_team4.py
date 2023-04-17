@@ -722,7 +722,9 @@ g.despine(left=True, bottom=True)
 
 plt.show()
 
+
 #%% Bubble plot animation (attempt #1)
+# The  Bubble plot shows the relationship between democracy index and income inequality (measured by the Palma ratio) across different countries in the V-Dem dataset. The size of each bubble represents the country's GDP per capita, and the color represents the country name.
 
 fig, ax = plt.subplots(figsize=(10,6))
 sns.set(style="whitegrid")
@@ -748,18 +750,24 @@ animation.save('bubble.gif', writer=writer)
 plt.show() # animation won't move here, have to open it in your working directory to see GIF
 
 #%% map of geopolitical regions
+# creating a choropleth map of the geopolitical regions using the geopandas library.
 
+# First createing a new dataframe called vdem_2000s_grouped_df_names with two columns: name and region, which contain the country names and their corresponding geopolitical region codes respectively.
 vdem_2000s_grouped_df_names = pd.DataFrame()
 
 vdem_2000s_grouped_df_names['name'] = vdem_2000s_grouped_df['country_name']
 vdem_2000s_grouped_df_names['region'] = vdem_2000s_grouped_df['geo_reg_polc_g6c']
 
+# Loading the world map using the naturalearth_lowres dataset and filters out Antarctica and countries with a population estimate of zero.
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
 world = world[(world.pop_est>0) & (world.name!="Antarctica")]
+# Creating two new dataframes: country_shapes containing the geometry of each country and its ISO3 code, and country_names containing the name of each country and its ISO3 code.
 country_shapes = world[['geometry', 'iso_a3']]
 country_names = world[['name', 'iso_a3']]
 
+# Then merging the country_shapes and country_names dataframes on the ISO3 code to get a new dataframe vdem_2000s_grouped_map that contains both the geometry and the name of each country. 
 vdem_2000s_grouped_map = country_shapes.merge(country_names, on='iso_a3')
+# Merging this dataframe with the vdem_2000s_grouped_df_names dataframe on the country name to get a new dataframe vdem_2000s_grouped_map2 that contains the geometry, name, and region code of each country.
 vdem_2000s_grouped_map2 = vdem_2000s_grouped_map.merge(vdem_2000s_grouped_df_names, on='name')
 
 ax = vdem_2000s_grouped_map2.plot(column='region')
@@ -769,9 +777,11 @@ ax.plot()
 
 #%%[markdown]
 # ### Basic EDA
+# A heatmap of the correlation matrix for the vdem_2000s_grouped_df dataframe, highlighting cells where the correlation coefficient is less than -0.3.
 
 corr = vdem_2000s_grouped_df.corr() < -0.3
 
+# A mask is then created using the np.triu() function to exclude the upper triangle of the heatmap, as it is redundant due to symmetry.
 mask = np.triu(np.ones_like(corr, dtype=bool))
 
 f, ax = plt.subplots(figsize=(11, 9))
@@ -782,10 +792,12 @@ sns.heatmap(corr, annot=True, mask=mask, cmap=cmap, vmax=.3, center=0,
 plt.show()
 
 #%%
+# Calculating the Variance Inflation Factor (VIF) for the columns 'demo_mrty(m)_rate' and 'demo_mrty(i)_rate' in the vdem_2000s_grouped_df dataframe. 
 
 life_expect = vdem_2000s_grouped_df[['demo_mrty(m)_rate', 'demo_mrty(i)_rate']]
 
 vif = pd.DataFrame()
+# Creating a new dataframe life_expect that contains only the columns of interest.
 vif["VIF Factor"] = [variance_inflation_factor(life_expect.values, i) for i in range(life_expect.shape[1])]
 vif["Variable"] = life_expect.columns
 
@@ -793,6 +805,7 @@ vif
 
 #%%[markdown]
 # Interpreting the results of the basic EDA
+# 
 
 # Variables to test against average democracy index: GDP per capita, overall life expectancy, and average education.
 
