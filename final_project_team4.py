@@ -56,6 +56,8 @@ import random
 import plotly.graph_objs as go
 import pandas as pd
 import geopandas
+from scipy.stats import pearsonr
+import statsmodels.api as sm
 
 #%%
 # Import data sets from online
@@ -824,14 +826,39 @@ print(df.describe())
 
 #%%[markdown]
 # Interpreting the results of the descriptive statistics
+# The above descriptive statistics show the count, mean, standard deviation, minimum, maximum, and quartile values of the variables of interest: democracy index, GDP per capita, life expectancy, and average education.
+# The demo_index variable has a mean of 0.41 with a standard deviation of 0.24, indicating that the average democracy index across all countries in the dataset is moderate. The minimum value of 0.05 indicates that there are some countries with very low democracy scores, while the maximum value of 0.86 indicates that there are some countries with very high democracy scores.
+# The eco_gdp_pc variable has a mean of 14.96 with a standard deviation of 16.37, indicating that there is a wide range of GDP per capita values across the countries in the dataset. The minimum value of 0 indicates that there are some countries with very low levels of economic development, while the maximum value of 84.57 indicates that there are some countries with very high levels of economic development.
+# The demo_life_expcy variable has a mean of 68.50 with a standard deviation of 14.23, indicating that the life expectancy across the countries in the dataset is moderate. The minimum value of 0 indicates that there are some countries with very low life expectancy, while the maximum value of 83.53 indicates that there are some countries with very high life expectancy.
+# The edu_avg variable has a mean of 5.76 with a standard deviation of 4.39, indicating that the average education level across the countries in the dataset is moderate. The minimum value of 0 indicates that there are some countries with very low levels of education, while the maximum value of 13.24 indicates that there are some countries with very high levels of education.
+#  
 
 #%%[markdown]
 # ### Hypothesis Testing(Correlation, Regression, etc.)
+
+# Correlation
+corr, p_value = pearsonr(df['demo_index'], df['eco_gdp_pc'])
+if p_value < 0.05:
+    print("There is a significant correlation between the average democracy index and GDP per capita.")
+else:
+    print("There is no significant correlation between the average democracy index and GDP per capita.")
+
+# Linear regression
+X = df[['eco_gdp_pc', 'demo_life_expcy', 'edu_avg']]
+X = sm.add_constant(X)
+y = df['demo_index']
+model = sm.OLS(y, X).fit()
+if model.f_pvalue < 0.05:
+    print("There is a significant linear relationship between the average democracy index and the variables of interest.")
+else:
+    print("There is no significant linear relationship between the average democracy index and the variables of interest.")
 
 #%%
 
 #%%[markdown]
 # Interpreting the results of the hypothesis testing
+# The interpretation of these results depends on the direction and strength of the correlations/relationships. A significant correlation between the average democracy index and GDP per capita indicates that as GDP per capita increases, the average democracy index tends to increase as well. This could suggest that economic development is associated with increased political freedoms and democratic governance.
+# A significant linear relationship between the average democracy index and the variables of interest suggests that there is a predictable pattern in the relationship between the two variables. For example, as the level of education increases, the average democracy index tends to increase as well. Similarly, as life expectancy increases, the average democracy index tends to increase. This could suggest that there are underlying factors, such as education and health, that contribute to the development of democratic governance.
 
 #%%[markdown]
 # ### Correlation Analysis
