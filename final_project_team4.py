@@ -59,6 +59,8 @@ import geopandas
 
 #%%
 # Import data sets from online
+# The code creates a subset of the VDem DataFrame that includes 38 variables of interest. The names of the variables are stored in a list called variables. The code selects the desired columns from the original DataFrame using the .loc[] method and stores the resulting subset in a new DataFrame called vdem_df. 
+
 def getDFfromZip(url):
     """ Return the data frame from a csv file in a zip file
     Parameters:
@@ -272,6 +274,8 @@ vdem_2000s_grouped_df: combine the datasets by country (Combine multiple years i
 # Step 5: Test 1 (If anything goes wrong, just go back and check Step 1)
 
 #%%[markdown]
+# We are defining a set of variables of interest for your analysis. You have defined the independent variables which include various measures of democracy such as the electoral, liberal, participatory, deliberative, and egalitarian democracy indices. The dependent variables include measures of education, geography, economy, natural resources wealth, infrastructure, demography, and conflict.
+
 '''
 # # Variables of interest
 country_name: str
@@ -330,7 +334,7 @@ conflict_successful_coup_attempts: int # Number of successful coup attempts in a
 conflict_coup_attempts: int # Number of coups attempts in a year
 '''
 #%%
-# Step 6:  change variable name
+# Step 6:  changing variable names
 variable_names = ['country_name', 'country_id', 'demo_index', 'elec_demo_idx', 'lib_demo_idx', 
                   'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 
                   'geo_area', 'geo_rgn_geo', 'geo_reg_polc_g', 'geo_reg_polc_g6c', 'eco_exports', 
@@ -343,7 +347,7 @@ variable_names = ['country_name', 'country_id', 'demo_index', 'elec_demo_idx', '
 vdem_2000s_grouped_df.columns = variable_names
 
 #%%[markdown]
-## Step 7: Data Cleaning(drop null, drop duplicates, etc.)
+## Step 7: Data Cleaning(drop null values, replacing the null values,  drop duplicates rows, etc.)
 
 #%%[markdown]
 ### 7.1 Check - Identifying and replacing null values
@@ -416,6 +420,7 @@ print(f"Count of duplicated records in the 'vdem_2000s_grouped_df' dataframe: {v
 ### 7.3 Check - Outliers
 
 #%%
+# Handling outliers 
 def identify_outliers_tukey(df, column):
     """
     Identifying outliers in tukey method using IQR (Inter-Quartile range)
@@ -458,7 +463,7 @@ for dataframe in dataframes_list:
     outliers_dict_list.append(outliers_dict)
         
 #%%
-# Step 8: check data type (and change if necessary)
+# Step 8: checking data types (and change if necessary)
 
 print(vdem_2000s_grouped_df.dtypes) # As intended, all variables are floating values.
 
@@ -499,7 +504,7 @@ vdem_2000s_grouped_df.info()
 vdem_2000s_df.shape
 vdem_2000s_grouped_df.shape
 
-#%% New dataframe grouping countries by region (politico-geographic)
+#%% New dataframe grouping countries by region (political-geographic)
 
 # Set 'country_id' and 'country_name' as a multi-level index
 vdem_2000s_df_poli_geo = vdem_2000s_df.set_index(['e_regionpol_6C', 'year'])
