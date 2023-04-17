@@ -50,6 +50,9 @@ import matplotlib.animation as ani
 from matplotlib.animation import FuncAnimation
 import plotly.express as px
 import random
+import plotly.graph_objs as go
+import pandas as pd
+import geopandas
 
 #%%
 # Import data sets from online
@@ -188,7 +191,9 @@ variables = [
     "e_miinteco",
     "e_miinterc",
     "e_pt_coup",
-    "e_pt_coup_attempts"
+    "e_pt_coup_attempts",
+    "v2smpardom",
+
 ]
 
 # Select the desired columns from the DataFrame
@@ -330,7 +335,7 @@ variable_names = ['country_name', 'country_id', 'demo_index', 'elec_demo_idx', '
                   'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 
                   'infra_radio(n)_sets', 'demo_frtly_rate', 'demo_ttl_popln', 'demo_urbzn_rate', 'demo_urbn_popln', 
                   'demo_lf_expcy(w)', 'demo_mrty(i)_rate', 'demo_life_expcy', 'demo_mrty(m)_rate', 'demo_ttl_popln_wb', 'c_civil_war', 
-                  'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp']
+                  'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp', 'party_dissem']
 
 vdem_2000s_grouped_df.columns = variable_names
 
@@ -375,8 +380,8 @@ def fill_na(df):
     Returns:
     cleaned_df : Clean dataframe
     """
-    fill_null_0 = lambda col: col.fillna(0) if col.dtype in ['float64', 'int64'] else col.fillna(method='ffill')
-    df = df.apply(fill_null_0)
+    # fill_null_0 = lambda col: col.fillna(0) if col.dtype in ['float64', 'int64'] else col.fillna(method='ffill')
+    # df = df.apply(fill_null_0)
 
     # Replacing null values with appropriate value (either mean or median)
     fill_null_imputation = lambda col: col.fillna(mean_median_imputation(column = col)) if col.dtype in ['float64', 'int64'] else col.fillna(method='ffill')
@@ -491,22 +496,47 @@ vdem_2000s_grouped_df.info()
 vdem_2000s_df.shape
 vdem_2000s_grouped_df.shape
 
+#%% New dataframe grouping countries by region (politico-geographic)
+
+# Set 'country_id' and 'country_name' as a multi-level index
+vdem_2000s_df_poli_geo = vdem_2000s_df.set_index(['e_regionpol_6C', 'year'])
+
+# Setting the name of the dataframe as same as its variable name
+vdem_2000s_df_poli_geo.Name = "vdem_2000s_df_poli_geo"
+
+# Group by 'country_id' and 'country_name', and aggregate the mean
+vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.groupby(['e_regionpol_6C', 'year']).agg("mean")
+
+# Reset the index, so 'country_name' becomes a column again
+vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.reset_index()
+
+# renaming regions to show the full name
+vdem_2000s_df_poli_geo['e_regionpol_6C'] = vdem_2000s_df_poli_geo['e_regionpol_6C'].replace({1: 'Eastern Europe and Central Asia', 2: 'Latin America and the Caribbean', 3: 'Middle East and North Africa', 4:'Sub-Saharan Africa', 5: 'Western Europe, North America, and Oceania', 6: 'Asia and Pacific'})
+
+# renaming column because 'e_regionpol_6C' is really annoying to type out each type
+vdem_2000s_df_poli_geo.rename(columns={'e_regionpol_6C': 'region'}, inplace=True)
+
+# Display the combined DataFrame
+print(vdem_2000s_df_poli_geo.shape)
+vdem_2000s_df_poli_geo.head()
+
 #%%
 # Step 9: Test 2 (If anything goes wrong, just go back and check Step 5)
-
-#%%[markdown]
-# ## EDA
 
 
 # %% measuing normality of demo_index in grouped vdem df
 
 demo_index_grouped = tuple(vdem_2000s_grouped_df['demo_index'])
 
-sns.displot(x=demo_index_grouped, bins=20)
+sns.displot(x = demo_index_grouped, bins = 20)
+plt.show()
 
 #%% Boxplot
 
-sns.boxplot(x="country_name", y="demo_index", data=vdem_2000s_grouped_df)
+sns.boxplot(data = vdem_2000s_df_poli_geo, 
+            x = "democracy_index", y = "region", 
+            dodge = False)
+plt.show()
 
 #%% Initial time-series line plot
 
@@ -534,7 +564,9 @@ def get_random_n_countries(col: str, n : int, sample: list) -> list:
         return sample_countries
 
 country_var = "country_name"
-sample_countries = get_random_n_countries(col = country_var, n = 3, sample = random_sample)
+sample_countries = get_random_n_countries(col = country_var, 
+                                          n = 3, 
+                                          sample = random_sample)
 
 vdem_2000s_grouped_df_subset = vdem_2000s_grouped_df[vdem_2000s_grouped_df[country_var].isin(sample_countries)]
 
@@ -544,6 +576,83 @@ vdem_2000s_df_samples = vdem_2000s_df[vdem_2000s_df['country_name'].isin(random_
 
 # Plot of 5 countries which illustrates limits and comparing metrics. 
 sns.lineplot(data=vdem_2000s_df_samples, x='year', y='democracy_index', hue='country_name')
+plt.show()
+
+# %% Small multiple time series
+
+East_Euro_Central_Asia = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 1]
+LatAm_Caribbean = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 2]
+Mid_East_North_Africa = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 3]
+Sub_Saharan_Africa = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 4]
+West_Euro_NA_Oceania = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 5]
+Asia_Pacific = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 6]
+
+# Create a figure with six subplots
+fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(12, 10))
+
+# Plot the data on the first subplot
+axes[0,0].scatter(East_Euro_Central_Asia['year'], 
+                  East_Euro_Central_Asia['democracy_index'])
+axes[0,0].set_title('East_Euro_Central_Asia')
+
+# Plot the data on the second subplot
+axes[0,1].scatter(LatAm_Caribbean['year'], 
+                  LatAm_Caribbean['democracy_index'])
+axes[0,1].set_title('LatAm_Caribbean')
+
+# Plot the data on the third subplot
+axes[0,2].scatter(Mid_East_North_Africa['year'], 
+                  Mid_East_North_Africa['democracy_index'])
+axes[0,2].set_title('Mid_East_North_Africa')
+
+# Plot the data on the fourth subplot
+axes[1,0].scatter(Sub_Saharan_Africa['year'], 
+                  Sub_Saharan_Africa['democracy_index'])
+axes[1,0].set_title('Sub_Saharan_Africa')
+
+# Plot the data on the fith subplot
+axes[1,1].scatter(West_Euro_NA_Oceania['year'], 
+                  West_Euro_NA_Oceania['democracy_index'])
+axes[1,1].set_title('West_Euro_NA_Oceania')
+
+# Plot the data on the sixth subplot
+axes[1,2].scatter(Asia_Pacific['year'], 
+                  Asia_Pacific['democracy_index'])
+axes[1,2].set_title('Asia_Pacific')
+
+# show plot
+plt.show()
+
+# %% Time series by politico-geographic region
+
+sns.set_context("paper")
+sns.relplot(data = vdem_2000s_df_poli_geo, 
+            x = 'year', y='democracy_index', 
+            hue='region', kind='line')
+plt.show()
+
+#%% 3d time series plot
+
+fig = go.Figure(data=[go.Scatter3d(
+    x=vdem_2000s_df_poli_geo['year'],
+    y=vdem_2000s_df_poli_geo['democracy_index'],
+    z=vdem_2000s_df_poli_geo['e_pefeliex'],
+    mode='markers',
+    marker=dict(
+        size=12,
+        color=vdem_2000s_df_poli_geo['year'],
+        opacity=0.8
+    )
+)])
+
+fig.update_layout(scene=dict(
+                    xaxis_title='Year',
+                    yaxis_title='Democracy Index',
+                    zaxis_title='Life Expectancy (f)'),
+                  width=700,
+                  margin=dict(r=20, b=10, l=10, t=10))
+
+fig.show()
 
 #%% Scatterplot
 
@@ -557,6 +666,9 @@ g.set(xscale="log", yscale="log")
 g.ax.xaxis.grid(True, "minor", linewidth=.25)
 g.ax.yaxis.grid(True, "minor", linewidth=.25)
 g.despine(left=True, bottom=True)
+
+plt.show()
+
 
 #%% Scatterplot 2
 
@@ -572,29 +684,24 @@ g.ax.xaxis.grid(True, "minor", linewidth=.25)
 g.ax.yaxis.grid(True, "minor", linewidth=.25)
 g.despine(left=True, bottom=True)
 
+plt.show()
+
 #%% Scatterplot 3
 
 vdem_2000s_df['e_civil_war'] = vdem_2000s_df['e_civil_war'].astype(int)
 
-cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
 g = sns.relplot(
-    data=vdem_2000s_grouped_df,
-    x='demo_index', y='eco_gdp_pc',
-    size='c_civil_war',
-    palette=cmap, sizes=(10,500),
+    data=vdem_2000s_df,
+    x='democracy_index', y='e_gdppc',
+    hue='e_civil_war', hue_order=[0, 1],
+    size='year', sizes=(10,50),
+    palette="muted", alpha=.5,
 )
-g.set(xscale="log", yscale="log")
 g.ax.xaxis.grid(True, "minor", linewidth=.25)
 g.ax.yaxis.grid(True, "minor", linewidth=.25)
 g.despine(left=True, bottom=True)
 
-#%% Another time-series line plot attempt
-
-ax = plt.figure().add_subplot(projection='3d')
-
-x = vdem_2000s_df['year']
-y = vdem_2000s_df['democracy_index']
-ax.plot(x, y, zs=0, zdir='z')
+plt.show()
 
 #%% Bubble plot animation (attempt #1)
 
@@ -621,52 +728,49 @@ animation.save('bubble.gif', writer=writer)
 
 plt.show() # animation won't move here, have to open it in your working directory to see GIF
 
-# %% Bubble plot animation (attempt #2)
+#%% map of geopolitical regions
 
-fig = px.scatter(vdem_2000s_df, x='democracy_index', y='e_peedgini', size='e_gdppc', color='country_name', animation_frame='year', range_x=[0, 1], range_y=[0, 100], log_x=True, hover_name='country_name', size_max=60)
+vdem_2000s_grouped_df_names = pd.DataFrame()
 
-fig.show()
+vdem_2000s_grouped_df_names['name'] = vdem_2000s_grouped_df['country_name']
+vdem_2000s_grouped_df_names['region'] = vdem_2000s_grouped_df['geo_reg_polc_g6c']
 
-#%% Bubble plot animation (attempt #3)
+world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
+world = world[(world.pop_est>0) & (world.name!="Antarctica")]
+country_shapes = world[['geometry', 'iso_a3']]
+country_names = world[['name', 'iso_a3']]
 
-fig, ax = plt.subplots()
+vdem_2000s_grouped_map = country_shapes.merge(country_names, on='iso_a3')
+vdem_2000s_grouped_map2 = vdem_2000s_grouped_map.merge(vdem_2000s_grouped_df_names, on='name')
 
-scat = ax.scatter(1,0)
-x = vdem_2000s_df['democracy_index']
+ax = vdem_2000s_grouped_map2.plot(column='region')
+ax.set_axis_off()
 
-def animate(i):
-    scat.set_offsets((x[i], 0))
-    return scat,
-
-ani = animation.FuncAnimation(fig, animate, repeat=True,
-                              frames=vdem_2000s_df['year'] - 1, interval=50)
-
-writer = animation.PillowWriter(fps=15,
-                                metadata=dict(artist='Me'),
-                                bitrate=1800)
-ani.save('bubble.gif', writer=writer)
-
-plt.show()
+ax.plot()
 
 #%%[markdown]
 # ### Basic EDA
 
-corr = vdem_2000s_grouped_df.corr() < -0.3
+corr = vdem_2000s_grouped_df.corr().abs() >= 0.7
 
 mask = np.triu(np.ones_like(corr, dtype=bool))
 
 f, ax = plt.subplots(figsize=(11, 9))
 
-sns.heatmap(corr, annot=True, mask=mask, cmap=cmap, vmax=.3, center=0,
-            square=True, linewidths=.5, cbar_kws={"shrink": .5})
+sns.heatmap(corr, annot = True, mask = mask, cmap = cmap, vmax = .3, center = 0,
+            square = True, linewidths = .5, cbar_kws = {"shrink": .5})
+
+plt.show()
 
 #%%
 
-life_expect = vdem_2000s_grouped_df[['demo_lf_expcy(w)', 'demo_life_expcy']]
+life_expect = vdem_2000s_grouped_df[['demo_mrty(m)_rate', 'demo_mrty(i)_rate']]
 
 vif = pd.DataFrame()
 vif["VIF Factor"] = [variance_inflation_factor(life_expect.values, i) for i in range(life_expect.shape[1])]
 vif["Variable"] = life_expect.columns
+
+vif
 
 #%%[markdown]
 # Interpreting the results of the basic EDA
@@ -700,7 +804,53 @@ vif["Variable"] = life_expect.columns
 #%%[markdown]
 # ## Model Building
 
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import LabelEncoder
+
+# create a label encoder object
+le = LabelEncoder()
+
+# encode the "country_name" column as numerical values
+vdem_2000s_grouped_df['country_encoded'] = le.fit_transform(vdem_2000s_grouped_df['country_name'])
+
+# drop the original "country_name" column
+vdem_2000s_grouped_df.drop('country_name', 
+                           axis = 1, 
+                           inplace = True)
+
+# Define the features and target
+y = vdem_2000s_grouped_df['demo_index']
+X = vdem_2000s_grouped_df.drop(['demo_index'], axis=1)
+
+
 #%%
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                    test_size = 0.5, 
+                                                    random_state = 42)
+
+# Create the random forest regressor
+rf = RandomForestRegressor(n_estimators = 100, random_state = 42)
+
+# Fit the model to the training data
+rf.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = rf.predict(X_test)
+
+# Calculate the mean squared error of the predictions
+mse = mean_squared_error(y_test, y_pred)
+
+print("Random Forest MSE: {:.3f}".format(mse))
+
+#%%[markdown]
+### Model interpretation
+# The mean squared error (MSE) for a random forest model is showing as 0.0, it indicates that the model 
+# is overfitting the data. In other words, the model is memorizing the training data instead of learning 
+# the underlying patterns and relationships in the data.
 
 #%%[markdown]
 # ## Result
@@ -712,3 +862,5 @@ vif["Variable"] = life_expect.columns
 
 #%%[markdown]
 # ## References
+
+# %%
