@@ -804,14 +804,22 @@ vif["Variable"] = life_expect.columns
 vif
 
 #%%[markdown]
-# Interpreting the results of the basic EDA
+## Interpreting the results of the basic EDA
+# The basic EDA has generated a correlation matrix between the different variables in vdem_2000s_grouped_df. The heatmap shows the strength and direction of the correlation between different pairs of variables.
+# The green shades with 1 written in the heatmap indicate a stronger positive correlation between the variables.
+# The light blue shades with 0 in the heatmap indicate a stronger negative correlation between the variables.
 # 
 
 # Variables to test against average democracy index: GDP per capita, overall life expectancy, and average education.
 
 #%%[markdown]
 # ### Descriptive Statistics
+print(vdem_2000s_grouped_df.columns)
+# Select variables of interest
+df = vdem_2000s_grouped_df[['demo_index', 'eco_gdp_pc', 'demo_life_expcy', 'edu_avg']]
 
+# Print descriptive statistics
+print(df.describe())
 #%%
 
 #%%[markdown]
