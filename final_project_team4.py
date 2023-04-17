@@ -535,22 +535,25 @@ vdem_2000s_df_poli_geo.head()
 # ## EDA
 
 
-# %% measuing normality of demo_index in grouped vdem df
-
+# %% 
+# Creating a plot to visualize the distribution of the 'demo_index' variable in the grouped vdem_2000s_grouped_df dataframe.
 demo_index_grouped = tuple(vdem_2000s_grouped_df['demo_index'])
 
 sns.displot(x=demo_index_grouped, bins=20)
 plt.show()
 
 #%% Boxplot
+# The boxplot allows us to compare the distribution of democracy index across regions, as well as identify any potential outliers. It can also help us to identify if there are any significant differences in the median democracy index among different regions.
 
 sns.boxplot(data=vdem_2000s_df_poli_geo, x="democracy_index", y="region", dodge=False)
 plt.show()
 
 #%% Initial time-series line plot
 
+# Set the 'year' column of the 'vdem_2000s_df' dataframe to an int data type. 
 vdem_2000s_df['year'] = vdem_2000s_df['year'].astype(int)
 
+# a list of sample countries to use it as input.
 random_sample = ['North Korea', 'Denmark']
 
 # Edge-case for randome sampling
@@ -573,19 +576,24 @@ def get_random_n_countries(col: str, n : int, sample: list) -> list:
         return sample_countries
 
 country_var = "country_name"
+# A function 'get_random_n_countries' that takes a column name, a number of countries to extract, and a list of sample countries as input. This function is used to extract three random country names from the dataframe that are not in the sample countries list.
 sample_countries = get_random_n_countries(col = country_var, n = 3, sample = random_sample)
 
+# Select a subset of the 'vdem_2000s_grouped_df' dataframe that contains only the rows corresponding to the randomly selected countries.
 vdem_2000s_grouped_df_subset = vdem_2000s_grouped_df[vdem_2000s_grouped_df[country_var].isin(sample_countries)]
 
+# It adds these country names to the 'random_sample' list. 
 random_sample.extend(list(vdem_2000s_grouped_df_subset['country_name']))
 
+# Select a subset of the 'vdem_2000s_df' dataframe that contains only the rows corresponding to the countries in the 'random_sample' list.
 vdem_2000s_df_samples = vdem_2000s_df[vdem_2000s_df['country_name'].isin(random_sample)]
 
-# Plot of 5 countries which illustrates limits and comparing metrics. 
+# Create a line plot of 5 countries which illustrates limits and comparing metrics. 
 sns.lineplot(data=vdem_2000s_df_samples, x='year', y='democracy_index', hue='country_name')
 plt.show()
 
 # %% Small multiple time series
+# Creating a figure with six subplots, each showing a scatterplot of democracy index versus year for a different geographical region. The data for each subplot is filtered from the original vdem_2000s_df dataframe based on the value of e_regionpol_6C column.
 
 East_Euro_Central_Asia = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 1]
 LatAm_Caribbean = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 2]
@@ -625,12 +633,14 @@ axes[1,2].set_title('Asia_Pacific')
 plt.show()
 
 # %% Time series by politico-geographic region
+# A line plot of democracy index over time for each politico-geographic region in the dataset 
+# It will be useful for visualizing how democracy index has changed over time for different politico-geographic regions.
 
 sns.set_context("paper")
 sns.relplot(data=vdem_2000s_df_poli_geo, x='year', y='democracy_index', hue='region', kind='line')
 plt.show()
 
-#%% 3d time series plot
+#%% 3D time series Scatter plot
 
 fig = go.Figure(data=[go.Scatter3d(
     x=vdem_2000s_df_poli_geo['year'],
