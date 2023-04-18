@@ -53,7 +53,9 @@ VDem.head()
 VDem.shape
 
 #%% Import data seets from local (World Bank; World Development Indicators) and reformat
-WorldBank_df = pd.read_csv("dataset/WorldBank.csv")
+url2 = "https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/WorldBank.csv"
+
+WorldBank_df = pd.read_csv(url2)
 
 """ Variables of Interest(19):
 Infrastracture
