@@ -809,42 +809,99 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import LabelEncoder
 
-# create a label encoder object
-le = LabelEncoder()
+def country_name_encoded(df : pd.DataFrame, col : str) -> pd.DataFrame:
+    # create a label encoder object
+    le = LabelEncoder()
 
-# encode the "country_name" column as numerical values
-vdem_2000s_grouped_df['country_encoded'] = le.fit_transform(vdem_2000s_grouped_df['country_name'])
+    # encode the "country_name" column as numerical values
+    df['country_encoded'] = le.fit_transform(df[col])
 
-# drop the original "country_name" column
-vdem_2000s_grouped_df.drop('country_name', 
-                           axis = 1, 
-                           inplace = True)
+    # drop the original "country_name" column
+    df.drop(col, 
+            axis = 1, 
+            inplace = True)
+    
+    return df
 
-# Define the features and target
-y = vdem_2000s_grouped_df['demo_index']
-X = vdem_2000s_grouped_df.drop(['demo_index'], axis=1)
+# function for model building and mse
+def random_forest_model(df : pd.DataFrame, target_col : str) -> float:
+    """Function builds random forest model with vdem_2000s dataframe which splits
+    data into train and test and returns RMSE value of the model.
 
+    Keyword arguments:
+    df -- A pandas dataframe of v-dem-2000s
+
+    Return value:
+    RMSE : A float value which represents root mean square error of R.F model
+    """
+    if 'country_encoded' not in df.columns:
+        df = country_name_encoded(df, col = 'country_name')
+
+    # Define the features and target
+    y = df[target_col]
+    X = df.drop([target_col], axis=1)
+
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                        test_size = 0.2, 
+                                                        random_state = 42)
+
+    print(len(X_train), len(X_test))
+
+    # Create the random forest regressor
+    rf = RandomForestRegressor(n_estimators = 100, random_state = 42)
+
+    # Fit the model to the training data
+    rf.fit(X_train, y_train)
+
+    # Make predictions on the testing data
+    y_pred = rf.predict(X_test)
+
+    # Calculate the mean squared error of the predictions
+    mse = mean_squared_error(y_test, y_pred)
+
+    # print("Random Forest MSE: {:.3f}".format(mse))
+    return mse
+
+target_variable = "democracy_index"
+mse = random_forest_model(vdem_2000s_df, target_col = target_variable)
+print(print("Random Forest MSE: {:.3f}".format(mse)))
 
 #%%
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                    test_size = 0.5, 
-                                                    random_state = 42)
+# create a label encoder object
+# le = LabelEncoder()
 
-# Create the random forest regressor
-rf = RandomForestRegressor(n_estimators = 100, random_state = 42)
+# # encode the "country_name" column as numerical values
+# vdem_2000s_grouped_df['country_encoded'] = le.fit_transform(vdem_2000s_grouped_df['country_name'])
 
-# Fit the model to the training data
-rf.fit(X_train, y_train)
+# # drop the original "country_name" column
+# vdem_2000s_grouped_df.drop('country_name', 
+#                            axis = 1, 
+#                            inplace = True)
 
-# Make predictions on the testing data
-y_pred = rf.predict(X_test)
+# # Define the features and target
+# y = vdem_2000s_grouped_df['demo_index']
+# X = vdem_2000s_grouped_df.drop(['demo_index'], axis=1)
 
-# Calculate the mean squared error of the predictions
-mse = mean_squared_error(y_test, y_pred)
+# # Split the data into training and testing sets
+# X_train, X_test, y_train, y_test = train_test_split(X, y, 
+#                                                     test_size = 0.5, 
+#                                                     random_state = 42)
 
-print("Random Forest MSE: {:.3f}".format(mse))
+# # Create the random forest regressor
+# rf = RandomForestRegressor(n_estimators = 100, random_state = 42)
+
+# # Fit the model to the training data
+# rf.fit(X_train, y_train)
+
+# # Make predictions on the testing data
+# y_pred = rf.predict(X_test)
+
+# # Calculate the mean squared error of the predictions
+# mse = mean_squared_error(y_test, y_pred)
+
+# print("Random Forest MSE: {:.3f}".format(mse))
 
 #%%[markdown]
 ### Model interpretation
