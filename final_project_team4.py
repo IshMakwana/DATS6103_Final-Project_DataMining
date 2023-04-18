@@ -19,8 +19,6 @@ more than just holding elections. In order to measure these characteristics, the
 project separates democracy into five high-level principles: electoral, liberal, participatory, 
 deliberative, and and egalitarian, and collects data to measure these principles.
 """
-
-
 #%%[markdown]
 ## Data Mining Project-Team4
 ## Project Title: 
@@ -87,7 +85,6 @@ VDem.shape
 
 #%%[markdown]
 # ## Data Pre-Processing
-
 """
 Variables of interest (38 in totall): original variables in the dataset 
 
@@ -149,9 +146,7 @@ Variables of interest (38 in totall): original variables in the dataset
 """
 
 #%%
-# Step 1: Create subset containing only the columns of interest (38 variables)
-# Create a list containing the names of the variables you want to select
-
+# Create a list containing the names of the variables we are interested in
 variables = [
     "country_name",
     "country_id",
@@ -192,35 +187,25 @@ variables = [
     "e_pt_coup",
     "e_pt_coup_attempts"
 ]
-
-# Select the desired columns from the DataFrame
 vdem_df = VDem.loc[:, variables]
-
-# Check the shape of the new DataFrame
 print(vdem_df.shape)
-
 vdem_df.head()
-
 #%%
-# Step 2: Create a new democracy index column at right to country_id column from 5 democracy variables
+# Create a new democracy index column at right to country_id column from 5 democracy variables
 # Calculate the mean of the five democracy variables for each row
-
 vdem_df['democracy_index'] = vdem_df[['v2x_polyarchy', 'v2x_libdem', 'v2x_partipdem', 
-                                      'v2x_delibdem', 'v2x_egaldem']].mean(axis=1)
+                                    'v2x_delibdem', 'v2x_egaldem']].mean(axis=1)
 
 # Move the new 'democracy_index' column to the right of the 'country_id' column
 columns = list(vdem_df.columns)
 columns.insert(columns.index("year") + 1, columns.pop(columns.index("democracy_index")))
 vdem_df = vdem_df[columns]
 
-# Check the shape of the new DataFrame
 print(vdem_df.shape)
 vdem_df.head()
-
 #%% 
-# Step 3: Create subset containing only 2000s in year column
+# Create subset containing only 2000s in year column
 # Create a new DataFrame containing only the rows from 2000 onwards
-
 vdem_2000s_df = vdem_df.loc[vdem_df["year"] >= 2000]
 
 # Check the shape of the new DataFrame
@@ -228,30 +213,56 @@ print(vdem_2000s_df.shape)
 vdem_2000s_df.head()
 
 #%%
-# Step 4: Combine the datasets by country (Combine multiple years into one and remove year column)
+# Check the number of missing values in each column
+vdem_2000s_df.isnull().sum()
 
+# Replace missing values in v2x_libdem and v2x_partipdem with the mean of the column where have same country_id 
+vdem_2000s_df["v2x_libdem"] = vdem_2000s_df.groupby("country_id")["v2x_libdem"].transform(lambda x: x.fillna(x.mean()))
+vdem_2000s_df["v2x_partipdem"] = vdem_2000s_df.groupby("country_id")["v2x_partipdem"].transform(lambda x: x.fillna(x.mean()))
+
+# Inspection of the missing values in e_peaveduc
+education = vdem_2000s_df.loc[vdem_2000s_df["e_peaveduc"].isnull(), ["country_name", "country_id", "year", "e_peaveduc"]]
+
+# Inspect of the missing value in e_area
+area = vdem_2000s_df.loc[vdem_2000s_df["e_area"].isnull(), ["country_name", "country_id", "year", "e_area"]]
+
+
+#%%
+# Combine the datasets by country (Combine multiple years into one and remove year column)
 # Set 'country_id' and 'country_name' as a multi-level index
 vdem_2000s_df_indexed = vdem_2000s_df.set_index(['country_name', 'country_id'])
-
 # Setting the name of the dataframe as same as its variable name
 vdem_2000s_df_indexed.Name = "vdem_2000s_df_indexed"
-
 # Group by 'country_id' and 'country_name', and aggregate the mean
 vdem_2000s_grouped_df = vdem_2000s_df_indexed.groupby(['country_name', 'country_id']).agg("mean")
-
 # Reset the index, so 'country_name' becomes a column again
 vdem_2000s_grouped_df = vdem_2000s_grouped_df.reset_index()
-
 # Remove the 'year' column
 vdem_2000s_grouped_df = vdem_2000s_grouped_df.drop(columns=["year"])
-
 # Display the combined DataFrame
 print(vdem_2000s_grouped_df.shape)
 vdem_2000s_grouped_df.head()
 
+#%% Combine the datasets by political region (Combine multiple years into one and remove year column) 
+# Set 'country_id' and 'country_name' as a multi-level index
+vdem_2000s_df_poli_geo = vdem_2000s_df.set_index(['e_regionpol_6C', 'year'])
+# Setting the name of the dataframe as same as its variable name
+vdem_2000s_df_poli_geo.Name = "vdem_2000s_df_indexed_poli_geo"
+# Group by 'country_id' and 'country_name', and aggregate the mean
+vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.groupby(['e_regionpol_6C', 'year']).agg("mean")
+# Reset the index, so 'country_name' becomes a column again
+vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.reset_index()
+# renaming regions to show the full name
+vdem_2000s_df_poli_geo['e_regionpol_6C'] = vdem_2000s_df_poli_geo['e_regionpol_6C'].replace({1: 'Eastern Europe and Central Asia', 2: 'Latin America and the Caribbean', 3: 'Middle East and North Africa', 4:'Sub-Saharan Africa', 5: 'Western Europe, North America, and Oceania', 6: 'Asia and Pacific'})
+# renaming column because 'e_regionpol_6C' is really annoying to type out each type
+vdem_2000s_df_poli_geo.rename(columns={'e_regionpol_6C': 'region'}, inplace=True)
+# Remove the 'county_id' column
+vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.drop(columns=["country_id"])
+# Display the combined DataFrame
+print(vdem_2000s_df_poli_geo.shape)
+vdem_2000s_df_poli_geo.head()
 #%%[markdown]
-### Dataframe variables we created so far(Step 1-4):
-
+### Dataframe variables we created so far:
 """
 VDem: original data set
 # 
@@ -260,82 +271,21 @@ vdem_df: subset containing only the columns of interest (38 variables) + democra
 vdem_2000s_df: subset containing only 2000s in year column
 # 
 vdem_2000s_grouped_df: combine the datasets by country (Combine multiple years into one and remove year column)
+#
+vdem_2000s_df_poli_geo: combine the datasets by political region (Combine multiple years into one and remove year column)
 """
-
 #%%
-# Step 5: Test 1 (If anything goes wrong, just go back and check Step 1)
-
-#%%[markdown]
-'''
-# # Variables of interest
-country_name: str
-country_id: int
-year: int
-
-# Independent variables
-v2x_polyarchy: int # Electoral democracy index
-v2x_libdem: int # Liberal democracy index
-v2x_partipdem: int # Participatory democracy index
-v2x_delibdem: int # Deliberative democracy index
-v2x_egaldem: int # Egalitarian democracy index
-
-# Dependent variables - Education
-edu_avg_years: float # The average years of education among citizens older than 15
-edu_inequality: float # Education inequality (Gini coefficient)
-
-# Dependent variables - Geography
-geo_area: float # Area of the country (km2)
-geo_region_geographic: int # Region (geographic)
-geo_region_politico_geographic: int # Region (politico-geographic)
-geo_region_politico_geographic_6C: int # Region (politico-geographic 6-category)
-
-# Dependent variables - Economic
-econ_exports: float # the total value of a country's exports
-econ_imports: float # the total value of a country's imports
-econ_gdp: float # GDP
-econ_gdp_per_capita: float # GDP per capita
-econ_annual_inflation_rate: float # Annual inflation rate
-econ_population: float # Population
-
-# Dependent variables - Natural Resources Wealth
-natres_total_fuel_income_per_capita: float # the real value of a country's petroleum, coal, and natural gas production
-natres_total_oil_income_per_capita: float # the real value of a country's petroleum production
-natres_total_resources_income_per_capita: float # the real value of a country's petroleum, coal, natural gas, and mineral production
-
-# Dependent variables - Infrastructure
-infra_num_radio_sets: int # the number of radio sets
-
-# Dependent variables - Demography
-demo_fertility_rate: float # the fertility rate
-demo_total_population: int # the total population (in thousands)
-demo_urbanization_rate: float # the urbanization rate
-demo_urban_population: int # the urban population (in thousands)
-demo_life_expectancy_women: float # the life expectancy at birth among women
-demo_infant_mortality_rate: float # the infant mortality rate
-demo_life_expectancy: float # the life expectancy
-demo_maternal_mortality_rate: float # the maternal mortality rate
-demo_total_population_wb: int # the total population (in thousands)
-
-# Dependent variables - Conflict
-conflict_civil_war: bool # Was there a civil war?
-conflict_international_armed_conflict: bool # Did the country participate in an international armed conflict?
-conflict_internal_armed_conflict: bool # Did the country experience an internal armed conflict?
-conflict_successful_coup_attempts: int # Number of successful coup attempts in a year
-conflict_coup_attempts: int # Number of coups attempts in a year
-'''
-#%%
-# Step 6:  change variable name
+# Change variable name
 variable_names = ['country_name', 'country_id', 'demo_index', 'elec_demo_idx', 'lib_demo_idx', 
-                  'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 
-                  'geo_area', 'geo_rgn_geo', 'geo_reg_polc_g', 'geo_reg_polc_g6c', 'eco_exports', 
-                  'eco_imports', 'eco_gdp', 'eco_gdp_pc', 'eco_a_ifl_rate', 'eco_popln', 
-                  'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 
-                  'infra_radio(n)_sets', 'demo_frtly_rate', 'demo_ttl_popln', 'demo_urbzn_rate', 'demo_urbn_popln', 
-                  'demo_lf_expcy(w)', 'demo_mrty(i)_rate', 'demo_life_expcy', 'demo_mrty(m)_rate', 'demo_ttl_popln_wb', 'c_civil_war', 
-                  'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp']
+                'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 
+                'geo_area', 'geo_rgn_geo', 'geo_reg_polc_g', 'geo_reg_polc_g6c', 'eco_exports', 
+                'eco_imports', 'eco_gdp', 'eco_gdp_pc', 'eco_a_ifl_rate', 'eco_popln', 
+                'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 
+                'infra_radio(n)_sets', 'demo_frtly_rate', 'demo_ttl_popln', 'demo_urbzn_rate', 'demo_urbn_popln', 
+                'demo_lf_expcy(w)', 'demo_mrty(i)_rate', 'demo_life_expcy', 'demo_mrty(m)_rate', 'demo_ttl_popln_wb', 'c_civil_war', 
+                'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp']
 
 vdem_2000s_grouped_df.columns = variable_names
-
 #%%[markdown]
 ## Step 7: Data Cleaning(drop null, drop duplicates, etc.)
 
@@ -493,33 +443,6 @@ vdem_2000s_grouped_df.info()
 vdem_2000s_df.shape
 vdem_2000s_grouped_df.shape
 
-#%% New dataframe grouping countries by region (politico-geographic)
-
-# Set 'country_id' and 'country_name' as a multi-level index
-vdem_2000s_df_poli_geo = vdem_2000s_df.set_index(['e_regionpol_6C', 'year'])
-
-# Setting the name of the dataframe as same as its variable name
-vdem_2000s_df_poli_geo.Name = "vdem_2000s_df_poli_geo"
-
-# Group by 'country_id' and 'country_name', and aggregate the mean
-vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.groupby(['e_regionpol_6C', 'year']).agg("mean")
-
-# Reset the index, so 'country_name' becomes a column again
-vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.reset_index()
-
-# renaming regions to show the full name
-vdem_2000s_df_poli_geo['e_regionpol_6C'] = vdem_2000s_df_poli_geo['e_regionpol_6C'].replace({1: 'Eastern Europe and Central Asia', 2: 'Latin America and the Caribbean', 3: 'Middle East and North Africa', 4:'Sub-Saharan Africa', 5: 'Western Europe, North America, and Oceania', 6: 'Asia and Pacific'})
-
-# renaming column because 'e_regionpol_6C' is really annoying to type out each type
-vdem_2000s_df_poli_geo.rename(columns={'e_regionpol_6C': 'region'}, inplace=True)
-
-# Display the combined DataFrame
-print(vdem_2000s_df_poli_geo.shape)
-vdem_2000s_df_poli_geo.head()
-
-#%%
-# Step 9: Test 2 (If anything goes wrong, just go back and check Step 5)
-
 #%%[markdown]
 # ## EDA
 
@@ -637,8 +560,8 @@ fig.update_layout(scene=dict(
                     xaxis_title='Year',
                     yaxis_title='Democracy Index',
                     zaxis_title='Life Expectancy (f)'),
-                  width=700,
-                  margin=dict(r=20, b=10, l=10, t=10))
+                    width=700,
+                    margin=dict(r=20, b=10, l=10, t=10))
 
 fig.show()
 
