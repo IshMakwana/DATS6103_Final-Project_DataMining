@@ -188,10 +188,78 @@ def fillna(df):
 
     return df
 
-#%%
+#%% Fill missing values
 new_df_2 = fillna(new_df)
 new_df_2.isnull().sum()
 print(new_df_2.shape)
 #%% Export the dataset as a new CSV file
 # new_df_2.to_csv('dataset/vdem_worldBank.csv', index=False)
-# %%
+#%% EDA
+vdem_worldBank_df = pd.read_csv('dataset/vdem_worldBank.csv')
+#%% Basic Information
+# Data Types, Data Structure, number of rows and columns, and missing values
+print(vdem_worldBank_df.info())
+# Descriptive Statistics
+print(vdem_worldBank_df.describe())
+
+#%% Outliers
+num_cols = ['democracy_index','v2x_polyarchy', 'v2x_libdem',          
+            'v2x_partipdem', 'v2x_delibdem','v2x_egaldem', 'e_regionpol_6C', 'AccessToCleanCooking','AdolescentFertility', 'AgriForestFishValueAdded', 'CO2Emissions','ExportsOfGoodsAndServices', 'FertilityRate','ForeignDirectInvestment','GDP', 'GDPGrowth', 'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+# Create a new DataFrame containing only the numeric columns
+df_subset = vdem_worldBank_df[num_cols]
+# Create a boxplot for each numeric column
+sns.boxplot(data=df_subset, orient="h", palette="Set2")
+#%% Distribution of the variables
+sns.set_style('darkgrid')
+
+# Loop through columns and create histograms
+for col in num_cols:
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.histplot(data=new_df, x=col, kde=True, ax=ax)
+    ax.set_title(col.capitalize(), fontsize=14)
+    ax.set_xlabel(col.capitalize(), fontsize=12)
+    ax.set_ylabel('Count', fontsize=12)
+    plt.show()
+    
+#%%  Correlation Matrix (Linearity)
+cor_mat = vdem_worldBank_df.iloc[:, 3:].corr()
+# Generate a mask for the upper triangle
+mask = np.triu(np.ones_like(cor_mat, dtype=bool))
+f, ax = plt.subplots(figsize=(11, 9))
+cmap = sns.diverging_palette(230, 20, as_cmap=True)
+sns.heatmap(cor_mat, mask=mask, cmap=cmap, vmax=.3, center=0,
+            square=True, linewidths=.5, cbar_kws={"shrink": .5})
+
+#%% Bubble Plot
+var_independent = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
+            'AgriForestFishValueAdded', 'CO2Emissions','ExportsOfGoodsAndServices', 'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+
+# Group by country_name and calculate the mean for each feature
+df_mean = vdem_worldBank_df.groupby('country_name')[var_independent + ['democracy_index']].mean()
+df_mean = df_mean.reset_index()
+df_mean['e_regionpol_6C'] = df_mean['e_regionpol_6C'].astype(int)
+
+features = ['AccessToCleanCooking','AdolescentFertility', 
+            'AgriForestFishValueAdded', 'CO2Emissions','ExportsOfGoodsAndServices', 'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+
+countries = ['United States', 'China', 'India', 'Brazil', 'Japan']
+
+colors = sns.color_palette('bright', n_colors=len(df_mean['e_regionpol_6C'].unique()))
+
+for feature in features:
+    sns.set_style('whitegrid')
+    plt.figure(figsize=(10, 8))
+    sns.scatterplot(x='democracy_index', y=feature, size='GDP', sizes=(100, 12000), alpha=0.5, hue='e_regionpol_6C', palette=colors, data=df_mean, legend=False)
+    sns.regplot(x='democracy_index', y=feature, data=df_mean, scatter=False, color='black')
+    plt.title('Democracy Index vs. ' + feature)
+
+    plt.show()
+#%% Multicollinearity (VIF test)
+X = vdem_worldBank_df[features]
+
+vif = pd.DataFrame()
+vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+
+print(vif)
+
+#%% Relationship between the variables and democracy index 
