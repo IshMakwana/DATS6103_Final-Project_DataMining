@@ -390,6 +390,7 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error as MAE
 from sklearn.metrics import mean_squared_log_error as MSLE
 from sklearn.metrics import median_absolute_error as MedAE
+from sklearn.tree import plot_tree
 
 # Instantiate dt
 dt = DecisionTreeRegressor(max_depth=4, min_samples_leaf=0.1, random_state=3)
@@ -400,6 +401,11 @@ print("MSE: {}".format(MSE(y_test, y_pred)))
 print("MAE: {}".format(MAE(y_test, y_pred)))
 print("MSLE: {}".format(MSLE(y_test, y_pred)))
 print("MedAE: {}".format(MedAE(y_test, y_pred)))
+
+# Plot the tree graph
+plt.figure(figsize=(10, 8))
+plot_tree(dt, feature_names=X_train.columns, filled=True, rounded=True)
+plt.show()
 
 # Plot the feature importances
 importances = pd.Series(data=dt.feature_importances_, index=X.columns)
@@ -424,6 +430,7 @@ plt.show()
 # Overall, while the model is not perfect, it appears to have some predictive power and is likely to be useful in some applications. However, further analysis and testing may be necessary to fully evaluate its performance.
 #%% Random Forest Model
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import plot_tree
 
 # Instantiate rf
 rt = RandomForestRegressor(n_estimators=25, random_state=2)
@@ -501,6 +508,12 @@ print("MSE: {}".format(MSE(y_test, y_pred)))
 print("MAE: {}".format(MAE(y_test, y_pred)))
 print("MSLE: {}".format(MSLE(y_test, y_pred)))
 print("MedAE: {}".format(MedAE(y_test, y_pred)))
+
+# Plot Tree Graph
+plt.figure(figsize=(20, 10))
+plot_tree(rf_best.estimators_[0], feature_names=X_train.columns, filled=True, rounded=True)
+plt.show()
+
 
 # Plot the feature importances
 importances = pd.Series(data=rf_best.feature_importances_, index=X.columns)
