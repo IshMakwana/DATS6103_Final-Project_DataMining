@@ -452,3 +452,100 @@ plt.show()
 
 #%% [markdown] Interpreting the results of the random forest model
 # The random forest model has a high R^2 value of 0.9434, which means that it can explain 94.34% of the variance in the target variable. The MSE (mean squared error) value is very low at 0.0033, indicating that the model's predictions are very close to the actual values. The MAE (mean absolute error) value is also low at 0.037, which means that the average difference between the predicted and actual values is small. The MSLE (mean squared logarithmic error) value is low at 0.0018, which indicates that the model is making accurate predictions across the entire range of target values. The MedAE (median absolute error) value is also low at 0.0219, which means that half of the absolute errors are smaller than this value. Overall, these results suggest that the random forest model is a good fit for the data and is making accurate predictions.
+
+#%% [markdown] Compare the results of the regression tree and random forest models
+# To compare the performance of the regression tree and random forest models, we can look at the evaluation metrics such as R-squared (R^2), mean squared error (MSE), mean absolute error (MAE), mean squared logarithmic error (MSLE), and median absolute error (MedAE). We can also compare the feature importances of the models.
+
+# From the evaluation metrics, we can see that the random forest model outperforms the regression tree model on all metrics. The R^2 value of the random forest model is 0.9434, which is much higher than the R^2 value of the regression tree model (0.5426). The MSE, MAE, MSLE, and MedAE values of the random forest model are also lower than those of the regression tree model, indicating that the random forest model is making more accurate predictions.
+
+# We can also compare the feature importances of the two models. The feature importances of the random forest model are generally higher than those of the regression tree model, indicating that the random forest model is able to better capture the relationships between the features and the target variable.
+
+# Overall, the random forest model appears to be a better choice for this dataset as it outperforms the regression tree model on all evaluation metrics and has higher feature importances.
+
+#%% Refining the random forest model
+# Hyperparameter tuning
+# GridSearchCV
+from sklearn.model_selection import GridSearchCV
+
+# Define parameter grid
+param_grid = {
+    'n_estimators': [25, 50, 75],
+    'max_depth': [2, 4, 6, None],
+    'min_samples_leaf': [0.1, 0.2, 0.3]
+}
+
+# Instantiate rf
+rf = RandomForestRegressor(random_state=2)
+
+# Instantiate grid_rf
+grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5)
+
+# Fit GridSearchCV to the data
+grid_search.fit(X_train, y_train)
+
+# Print best parameters
+print("Best parameters: ", grid_search.best_params_)
+
+# Use best parameters to fit the model
+rf_best = RandomForestRegressor(n_estimators=grid_search.best_params_            
+                                ['n_estimators'], 
+                                max_depth=grid_search.best_params_['max_depth'], 
+                                min_samples_leaf=grid_search.best_params_['min_samples_leaf'], 
+                                random_state=2)
+rf_best.fit(X_train, y_train)
+y_pred = rf_best.predict(X_test)
+
+# Evaluate the model
+print("R^2: {}".format(r2_score(y_test, y_pred)))
+print("MSE: {}".format(MSE(y_test, y_pred)))
+print("MAE: {}".format(MAE(y_test, y_pred)))
+print("MSLE: {}".format(MSLE(y_test, y_pred)))
+print("MedAE: {}".format(MedAE(y_test, y_pred)))
+
+# Plot the feature importances
+importances = pd.Series(data=rf_best.feature_importances_, index=X.columns)
+importances_sorted = importances.sort_values()
+importances_sorted.plot(kind='barh', color='lightgreen')
+plt.title('Features Importances')
+plt.show()
+
+# Plot the test set with the decision boundary
+plt.figure(figsize=(10, 8))
+plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c=y_test, s=20, cmap='RdYlGn')
+plt.title('Test set')
+plt.xlabel('GDP')
+plt.ylabel('GDP Growth')
+plt.show()
+
+#%% [markdown] Interpreting the results of the refined random forest model
+# After refining the random forest model using GridSearchCV, the R^2 value decreased to 0.5205, indicating that the model's ability to explain the variance in the target variable has decreased. The MSE value increased to 0.0283, indicating that the average squared difference between the predicted and actual values has increased. The MAE value increased to 0.1358, indicating that the average absolute difference between the predicted and actual values has also increased.
+
+# The MSLE value of 0.0149 indicates that the model's error is distributed logarithmically, with smaller errors being more common than larger ones. The MedAE value of 0.1146 indicates that the median absolute error is higher than the previous model.
+
+# Overall, while the refined random forest model has a lower performance than the previous one, it is still making relatively accurate predictions. Further analysis and testing may be necessary to fully evaluate its performance.
+
+#%% [markdown] Results
+# - The random forest model has a high R^2 value of 0.9434, which means that it can explain 94.34% of the variance in the target variable.
+# - The MSE (mean squared error) value is very low at 0.0033, indicating that the model's predictions are very close to the actual values.
+# - The MAE (mean absolute error) value is also low at 0.037, which means that the average difference between the predicted and actual values is small.
+# - The MSLE (mean squared logarithmic error) value is low at 0.0018, which indicates that the model is making accurate predictions across the entire range of target values.
+# - The MedAE (median absolute error) value is also low at 0.0219, which means that half of the absolute errors are smaller than this value.
+# - Overall, these results suggest that the random forest model is a good fit for the data and is making accurate predictions.
+
+#%% [markdown] Discussion
+# Limitations
+# - The dataset is relatively small, with only 4000 observations. This may limit the model's ability to generalize to new data.
+# - The model was trained and tested on the same dataset. This may lead to overfitting, where the model performs well on the training data but poorly on new data.
+# - The model was trained and tested on several different years. This may lead to temporal leakage, where the model is able to make accurate predictions because it has access to data from the future.
+
+# Future work
+# - Collect more data to increase the size of the dataset.
+# - Split the dataset into training and testing sets using a time-based split.
+# - Train the model on data from previous years and test it on data from the current year.
+# - Use a different model, such as a neural network, to see if it can make more accurate predictions.
+# - Use a different set of features to see if the model can make more accurate predictions.
+# - Use a different set of hyperparameters to see if the model can make more accurate predictions.
+# - Use a different evaluation metric to see if the model can make more accurate predictions.
+
+#%% [markdown] Conclusion
+# In this project, we used a random forest model to predict the democracy score of a country based on its socio-economic factors. The model was able to achieve an R^2 value of 0.9434, indicating that it can explain 94.34% of the variance in the target variable. The model's predictions were also very accurate, with the MSE, MAE, MSLE, and MedAE values all being very low.
