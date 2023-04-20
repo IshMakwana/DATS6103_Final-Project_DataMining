@@ -57,39 +57,50 @@ import geopandas
 from scipy.stats import pearsonr
 import statsmodels.api as sm
 
+
+#%% 
+# Import data sets from Github repository
+# The code creates a DataFrame that includes 38 variables of interest. The names of the variables are stored in a list called variables. The code selects the desired columns from the original DataFrame using the .loc[] method and stores the resulting subset in a new DataFrame called WorldBank_df. 
+import pandas as pd
+
+url = 'https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/vdem_worldBank.csv'
+WorldBank_df= pd.read_csv(url)
+print(WorldBank_df.head(5))
+
 #%%
 # Import data sets from online
 # The code creates a subset of the VDem DataFrame that includes 38 variables of interest. The names of the variables are stored in a list called variables. The code selects the desired columns from the original DataFrame using the .loc[] method and stores the resulting subset in a new DataFrame called vdem_df. 
 
-def getDFfromZip(url):
-    """ Return the data frame from a csv file in a zip file
-    Parameters:
-        url(str): url of the zip file
-    Returns:
-        df(pandas.DataFrame): data frame of the csv file
-    """
-    response = requests.get(url) # Send a request to download the file
-    
-    if response.status_code == 200: # Check if the request was successful
-        # Read the zip file from the response
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zip_file:
-            # Find the CSV file within the zip file
-            for file in zip_file.namelist():
-                if file.endswith(".csv"):
-                    # Read the CSV file into a pandas DataFrame
-                    df = pd.read_csv(zip_file.open(file))                    
-                    print(df.shape)      
-                    return df
-            # If the CSV file was not found, return None
-            return None
-    else: 
-        print("Failed to download the dataset.")
-        return None
 
-url = "https://v-dem.net/media/datasets/V-Dem-CY-FullOthers_csv_v13.zip"
-VDem = getDFfromZip(url)
-VDem.head()
-VDem.shape
+# def getDFfromZip(url):
+#     """ Return the data frame from a csv file in a zip file
+#     Parameters:
+#         url(str): url of the zip file
+#     Returns:
+#         df(pandas.DataFrame): data frame of the csv file
+#     """
+#     response = requests.get(url) # Send a request to download the file
+    
+#     if response.status_code == 200: # Check if the request was successful
+#         # Read the zip file from the response
+#         with zipfile.ZipFile(io.BytesIO(response.content)) as zip_file:
+#             # Find the CSV file within the zip file
+#             for file in zip_file.namelist():
+#                 if file.endswith(".csv"):
+#                     # Read the CSV file into a pandas DataFrame
+#                     df = pd.read_csv(zip_file.open(file))                    
+#                     print(df.shape)      
+#                     return df
+#             # If the CSV file was not found, return None
+#             return None
+#     else: 
+#         print("Failed to download the dataset.")
+#         return None
+
+# url = "https://v-dem.net/media/datasets/V-Dem-CY-FullOthers_csv_v13.zip"
+# VDem = getDFfromZip(url)
+# VDem.head()
+# VDem.shape
 
 #%%[markdown]
 # ## Data Pre-Processing

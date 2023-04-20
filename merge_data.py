@@ -19,41 +19,52 @@ from matplotlib.animation import FuncAnimation
 import plotly.express as px
 import random
 import plotly.graph_objs as go
-#%% Import data sets from online (V-Dem)
-def getDFfromZip(url):
-    """ Return the data frame from a csv file in a zip file
-    Parameters:
-        url(str): url of the zip file
-    Returns:
-        df(pandas.DataFrame): data frame of the csv file
-    """
-    response = requests.get(url) # Send a request to download the file
-    
-    if response.status_code == 200: # Check if the request was successful
-        # Read the zip file from the response
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zip_file:
-            # Find the CSV file within the zip file
-            for file in zip_file.namelist():
-                if file.endswith(".csv"):
-                    # Read the CSV file into a pandas DataFrame
-                    df = pd.read_csv(zip_file.open(file))                    
-                    print(df.shape)      
-                    return df
-            # If the CSV file was not found, return None
-            return None
-    else: 
-        print("Failed to download the dataset.")
-        return None
 
-url = "https://v-dem.net/media/datasets/V-Dem-CY-FullOthers_csv_v13.zip"
-VDem = getDFfromZip(url)
-VDem.head()
-VDem.shape
+
+#%% 
+
+import pandas as pd
+
+url = 'https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/vdem_worldBank.csv'
+WorldBank_df= pd.read_csv(url)
+print(df.head(5))
+
+#%%
+
+# def getDFfromZip(url):
+#     """ Return the data frame from a csv file in a zip file
+#     Parameters:
+#         url(str): url of the zip file
+#     Returns:
+#         df(pandas.DataFrame): data frame of the csv file
+#     """
+#     response = requests.get(url) # Send a request to download the file
+    
+#     if response.status_code == 200: # Check if the request was successful
+#         # Read the zip file from the response
+#         with zipfile.ZipFile(io.BytesIO(response.content)) as zip_file:
+#             # Find the CSV file within the zip file
+#             for file in zip_file.namelist():
+#                 if file.endswith(".csv"):
+#                     # Read the CSV file into a pandas DataFrame
+#                     df = pd.read_csv(zip_file.open(file))                    
+#                     print(df.shape)      
+#                     return df
+#             # If the CSV file was not found, return None
+#             return None
+#     else: 
+#         print("Failed to download the dataset.")
+#         return None
+
+# url = "https://v-dem.net/media/datasets/V-Dem-CY-FullOthers_csv_v13.zip"
+# VDem = getDFfromZip(url)
+# VDem.head()
+# VDem.shape
 
 #%% Import data seets from local (World Bank; World Development Indicators) and reformat
-url2 = "https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/WorldBank.csv"
+# url2 = "https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/WorldBank.csv"
 
-WorldBank_df = pd.read_csv(url2)
+# WorldBank_df = pd.read_csv(url2)
 
 """ Variables of Interest(19):
 Infrastracture
