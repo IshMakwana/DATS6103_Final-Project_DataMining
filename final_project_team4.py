@@ -298,7 +298,7 @@ vdem_worldBank_poli_region_grouped.describe()
 poli_region_dict = {1: 'Eastern_Europe_and_Central_Asia', 
                     2: 'Latin_America_and_the_Caribbean', 
                     3: 'Middle_East_and_North_Africa', 
-                    4:'Sub-Saharan_Africa', 
+                    4: 'Sub-Saharan_Africa', 
                     5: 'Western_Europe_North_America_and_Oceania', 
                     6: 'Asia_and_Pacific'}
 
@@ -382,67 +382,80 @@ for col in num_cols:
 
 #%%
 #%% Boxplot
-# The boxplot allows us to compare the distribution of democracy index across regions, as well as identify any potential outliers. It can also help us to identify if there are any significant differences in the median democracy index among different regions.
+# The boxplot allows us to compare the distribution of democracy index across regions, as well as 
+# identify any potential outliers. It can also help us to identify if there are any significant differences in the median democracy index among different regions.
 
-sns.boxplot(data= vdem_worldBank_df, x="e_regionpol_6C", y="democracy_index", dodge=False)
+sns.boxplot(data = vdem_worldBank_df, 
+            y = "democracy_index", 
+            x = "e_regionpol_6C", dodge=False)
 plt.show()
 
-#%% Initial time-series line plot
+# #%% Initial time-series line plot
 
-# Set the 'year' column of the 'vdem_worldbank_df' dataframe to an int data type. 
-vdem_worldBank_poli_region_grouped['year'] = vdem_worldBank_poli_region_grouped['year'].astype(int)
+# # Set the 'year' column of the 'vdem_worldbank_df' dataframe to an int data type. 
+# vdem_worldBank_poli_region_grouped['year'] = vdem_worldBank_poli_region_grouped['year'].astype(int)
 
-# a list of sample countries to use it as input.
-random_sample = ['North Korea', 'Denmark']
+# # a list of sample countries to use it as input.
+# random_sample = ['North Korea', 'Denmark']
 
-# Edge-case for randome sampling
-def get_random_n_countries(col: str, n : int, sample: list) -> list:
-    """
-    This function is used to extract 3 random country names from dataframe
+# #%%
+# print(vdem_worldBank_poli_region_grouped.columns)
+
+# #%%
+# # Edge-case for randome sampling
+# def get_random_n_countries(col: str, n : int, sample: list) -> list:
+#     """
+#     This function is used to extract 3 random country names from dataframe
     
-    Keyword arguments:
-    col : column name (country_name)
-    n: number of countries to extract
-    sample : A list contains 2 countries as max and min limits
-    """
+#     Keyword arguments:
+#     col : column name (country_name)
+#     n: number of countries to extract
+#     sample : A list contains 2 countries as max and min limits
+#     """
     
-    sample_countries = [] # Empty list to store n random country names
-    while True:
-        sample_countries = random.sample(vdem_worldBank_poli_region_grouped[country_var].unique().tolist(), n)
+#     sample_countries = [] # Empty list to store n random country names
+#     while True:
+#         sample_countries = random.sample(vdem_worldBank_df[country_var].unique().tolist(), n)
 
-        if any(sample_country in sample for sample_country in sample_countries): # if country already exists in list, re-loop
-            continue
-        return sample_countries
+#         if any(sample_country in sample for sample_country in sample_countries): # if country already exists in list, re-loop
+#             continue
+#         return sample_countries
 
-country_var = "country_name"
-# A function 'get_random_n_countries' that takes a column name, a number of countries to extract, and a list of sample countries as input. This function is used to extract three random country names from the dataframe that are not in the sample countries list.
-sample_countries = get_random_n_countries(col = country_var, n = 3, sample = random_sample)
+# country_var = "country_name"
+# # A function 'get_random_n_countries' that takes a column name, a number of countries to extract, and a list of sample countries as input. This function is used to extract three random country names from the dataframe that are not in the sample countries list.
+# sample_countries = get_random_n_countries(col = country_var, n = 3, 
+#                                           sample = random_sample)
 
-# Select a subset of the 'vdem_worldbank_poli_region_grouped' dataframe that contains only the rows corresponding to the randomly selected countries.
-vdem_worldbank_poli_region_grouped_subset = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped[country_var].isin(sample_countries)]
+# # Select a subset of the 'vdem_worldbank_poli_region_grouped' dataframe that contains only the rows corresponding to the randomly selected countries.
+# # vdem_worldbank_poli_region_grouped_subset = vdem_worldBank_df[vdem_worldBank_df[country_var].isin(sample_countries)]
 
-# It adds these country names to the 'random_sample' list. 
-random_sample.extend(list(vdem_worldbank_poli_region_grouped_subset['country_name']))
+# # It adds these country names to the 'random_sample' list. 
+# random_sample.extend(list(vdem_worldBank_df['country_name']))
 
-# Select a subset of the 'vdem_worldbank_df' dataframe that contains only the rows corresponding to the countries in the 'random_sample' list.
-vdem_worldbank_df_samples = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['country_name'].isin(random_sample)]
+# # Select a subset of the 'vdem_worldbank_df' dataframe that contains only the rows corresponding to the countries in the 'random_sample' list.
+# vdem_worldbank_df_samples = vdem_worldBank_df[vdem_worldBank_df['country_name'].isin(random_sample)]
 
-# Create a line plot of 5 countries which illustrates limits and comparing metrics. 
-sns.lineplot(data=vdem_worldbank_df_samples, x='year', y='democracy_index', hue='country_name')
-plt.show()
+# # Create a line plot of 5 countries which illustrates limits and comparing metrics. 
+# sns.lineplot(data = vdem_worldbank_df_samples, 
+#              x='year', y='democracy_index', 
+#              hue='country_name')
+# plt.show()
 
 # %% Small multiple time series
-# Creating a figure with six subplots, each showing a scatterplot of democracy index versus year for a different geographical region. The data for each subplot is filtered from the original vdem_worldbank_df dataframe based on the value of e_regionpol_6C column.
+# Creating a figure with six subplots, each showing a scatterplot of democracy index versus year for a different geographical region. 
+# The data for each subplot is filtered from the original vdem_worldbank_df dataframe based on the value of e_regionpol_6C column.
 
-East_Euro_Central_Asia = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 1]
-LatAm_Caribbean = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 2]
-Mid_East_North_Africa = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 3]
-Sub_Saharan_Africa = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 4]
-West_Euro_NA_Oceania = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 5]
-Asia_Pacific = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 6]
+East_Euro_Central_Asia = vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C'] == 1]
+LatAm_Caribbean = vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C'] == 2]
+Mid_East_North_Africa = vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C'] == 3]
+Sub_Saharan_Africa = vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C'] == 4]
+West_Euro_NA_Oceania = vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C'] == 5]
+Asia_Pacific = vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C'] == 6]
 
 # Create a figure with six subplots
-fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(12, 10))
+fig, axes = plt.subplots(ncols=3, 
+                         nrows=2, 
+                         figsize=(12, 10))
 
 # Plot the data on the first subplot
 axes[0,0].scatter(East_Euro_Central_Asia['year'], East_Euro_Central_Asia['democracy_index'])
@@ -476,19 +489,21 @@ plt.show()
 # It will be useful for visualizing how democracy index has changed over time for different politico-geographic regions.
 
 sns.set_context("paper")
-sns.relplot(data=vdem_worldBank_poli_region_grouped, x='year', y='democracy_index', hue='region', kind='line')
+sns.relplot(data = vdem_worldBank_df, 
+            x = 'year', y = 'democracy_index', 
+            hue =  'e_regionpol_6C', kind = 'line')
 plt.show()
 
 #%% 3D time series Scatter plot
 
 fig = go.Figure(data=[go.Scatter3d(
-    x=vdem_worldBank_poli_region_grouped['year'],
-    y=vdem_worldBank_poli_region_grouped['democracy_index'],
-    z=vdem_worldBank_poli_region_grouped['e_pefeliex'],
+    x=vdem_worldBank_df['year'],
+    y=vdem_worldBank_df['democracy_index'],
+    z=vdem_worldBank_df['LifeExpectancy'],
     mode='markers',
     marker=dict(
         size=12,
-        color=vdem_worldBank_poli_region_grouped['year'],
+        color=vdem_worldBank_df['e_regionpol_6C'],
         opacity=0.8
     )
 )])
@@ -502,68 +517,93 @@ fig.update_layout(scene=dict(
 
 fig.show()
 
-#%% Scatterplot
 
-# The cmap variable defines the color palette used for the plot.
-cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
-g = sns.relplot(
-    data=vdem_worldBank_df,
-    x='democracy_index', y='e_civil_war',
-    palette=cmap,
-)
-# The set() function is used to set the x-axis and y-axis scales to logarithmic scales.
-g.set(xscale="log", yscale="log")
-# The grid() function is used to add minor gridlines to the plot.
-g.ax.xaxis.grid(True, "minor", linewidth=.25)
-g.ax.yaxis.grid(True, "minor", linewidth=.25)
-# The despine() function is used to remove the spines on the left and bottom sides of the plot.
-g.despine(left=True, bottom=True)
+#%%
+# Alternate 3-d scatter plot
 
-plt.show()
+fig = px.scatter_3d(vdem_worldBank_df, 
+                    x='year', 
+                    y='democracy_index', 
+                    z='LifeExpectancy',
+              size='democracy_index',
+              color='e_regionpol_6C',
+              color_continuous_scale='reds',
+              opacity=0.7)
+
+fig.update_layout(scene=dict(
+                    xaxis_title='Year',
+                    yaxis_title='Democracy Index',
+                    zaxis_title='Life Expectancy'),
+                    width=700,
+                    margin=dict(r=20, b=10, l=10, t=10))
+
+fig.show()
+
+# #%% Scatterplot
+
+# # The cmap variable defines the color palette used for the plot.
+# cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
+# g = sns.relplot(
+#     data = vdem_worldBank_df,
+#     x = 'democracy_index', 
+#     y = 'e_civil_war',
+#     palette=cmap,
+# )
+# # The set() function is used to set the x-axis and y-axis scales to logarithmic scales.
+# g.set(xscale="log", yscale="log")
+# # The grid() function is used to add minor gridlines to the plot.
+# g.ax.xaxis.grid(True, "minor", linewidth=.25)
+# g.ax.yaxis.grid(True, "minor", linewidth=.25)
+# # The despine() function is used to remove the spines on the left and bottom sides of the plot.
+# g.despine(left=True, bottom=True)
+
+# plt.show()
 
 
-#%% Scatterplot 2
-# This scatterplot helps in visualizing the relationship between democracy index, total resources income per capita, region, and year.
-# The x-axis represents the democracy index, the y-axis represents total resources income per capita, and the size of the dots represents the year. The color of the dots represents the region.
-# The size of the dots adds an additional layer of information by showing how the data changes over time. The use of different colors helps to distinguish the different regions, making it easier to see if there are any regional patterns in the data.
+# #%% Scatterplot 2
+# # This scatterplot helps in visualizing the relationship between democracy index, total resources income per capita, region, and year.
+# # The x-axis represents the democracy index, the y-axis represents total resources income per capita, and the size of the dots represents the year. The color of the dots represents the region.
+# # The size of the dots adds an additional layer of information by showing how the data changes over time. The use of different colors helps to distinguish the different regions, making it easier to see if there are any regional patterns in the data.
 
-cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
-g = sns.relplot(
-    data=vdem_worldBank_df,
-    x='democracy_index', y='e_total_resources_income_pc',
-    hue='e_regionpol_6C', size='year',
-    palette=cmap, sizes=(10,500),
-)
-g.set(xscale="log", yscale="log")
-g.ax.xaxis.grid(True, "minor", linewidth=.25)
-g.ax.yaxis.grid(True, "minor", linewidth=.25)
-g.despine(left=True, bottom=True)
+# cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
+# g = sns.relplot(
+#     data=vdem_worldBank_df,
+#     x='democracy_index', y='e_total_resources_income_pc',
+#     hue='e_regionpol_6C', size='year',
+#     palette=cmap, sizes=(10,500),
+# )
+# g.set(xscale="log", yscale="log")
+# g.ax.xaxis.grid(True, "minor", linewidth=.25)
+# g.ax.yaxis.grid(True, "minor", linewidth=.25)
+# g.despine(left=True, bottom=True)
 
-plt.show()
+# plt.show()
 
-#%% Scatterplot 3
-# This scatterplot shows the relationship between democracy index and GDP per capita, with points colored by the presence or absence of civil war (0 for no civil war, 1 for civil war) and sized by year.
+# #%% Scatterplot 3
+# # This scatterplot shows the relationship between democracy index and GDP per capita, with points colored by the presence or absence of civil war (0 for no civil war, 1 for civil war) and sized by year.
 
-# convert the e_civil_war column from a boolean to an integer using astype(int).
-vdem_worldBank_df['e_civil_war'] = vdem_worldBank_df['e_civil_war'].astype(int)
+# # convert the e_civil_war column from a boolean to an integer using astype(int).
+# vdem_worldBank_df['e_civil_war'] = vdem_worldBank_df['e_civil_war'].astype(int)
 
-# We size the points by year, with smaller points representing earlier years and larger points representing later years. The color palette is set to "muted" and the transparency of the points is set to 0.5. 
-g = sns.relplot(
-    data=vdem_worldBank_df,
-    x='democracy_index', y='e_gdppc',
-    hue='e_civil_war', hue_order=[0, 1],
-    size='year', sizes=(10,50),
-    palette="muted", alpha=.5,
-)
-g.ax.xaxis.grid(True, "minor", linewidth=.25)
-g.ax.yaxis.grid(True, "minor", linewidth=.25)
-g.despine(left=True, bottom=True)
+# # We size the points by year, with smaller points representing earlier years and larger points representing later years. The color palette is set to "muted" and the transparency of the points is set to 0.5. 
+# g = sns.relplot(
+#     data=vdem_worldBank_df,
+#     x='democracy_index', y='e_gdppc',
+#     hue='e_civil_war', hue_order=[0, 1],
+#     size='year', sizes=(10,50),
+#     palette="muted", alpha=.5,
+# )
+# g.ax.xaxis.grid(True, "minor", linewidth=.25)
+# g.ax.yaxis.grid(True, "minor", linewidth=.25)
+# g.despine(left=True, bottom=True)
 
-plt.show()
+# plt.show()
 
 
 #%% Bubble plot animation (attempt #1)
-# The  Bubble plot shows the relationship between democracy index and income inequality (measured by the Palma ratio) across different countries in the V-Dem dataset. The size of each bubble represents the country's GDP per capita, and the color represents the country name.
+# The  Bubble plot shows the relationship between democracy index and income 
+# inequality (measured by the Palma ratio) across different countries in the V-Dem dataset. 
+# The size of each bubble represents the country's GDP per capita, and the color represents the country name.
 
 fig, ax = plt.subplots(figsize=(10,6))
 sns.set(style="whitegrid")
@@ -574,19 +614,63 @@ def update(year):
 
     # Updating plot
     ax.clear()
-    sns.scatterplot(x='democracy_index', y='e_peedgini', data=vdem_worldBank_df, size='e_gdppc', hue='country_name', sizes=(20, 2000), ax=ax)
+    sns.scatterplot(y = 'democracy_index', 
+                    x = 'PrimarySchoolEnrollment', 
+                    data = vdem_worldBank_df, 
+                    size='GNIPerCapita', hue='country_name', 
+                    sizes=(20, 2000), ax=ax)
+    
     plt.title('Year: ' + str(year))
 
 # Creating animation
-animation = FuncAnimation(fig, update, frames=range(2000,2022, 1), repeat=True)
+animation = FuncAnimation(fig, 
+                          update, 
+                          frames=range(2000,2022, 1), 
+                          repeat=True)
 
 # saving animation as a GIF
 writer = ani.PillowWriter(fps=1,
-                                metadata=dict(artist='Me'),
-                                bitrate=1800)
+                        metadata=dict(artist='Me'),
+                        bitrate=1800)
 animation.save('bubble.gif', writer=writer)
 
 plt.show() # animation won't move here, have to open it in your working directory to see GIF
+
+
+#%%
+# Without size variable of GNIPerCapita
+
+fig, ax = plt.subplots(figsize=(10,6))
+sns.set(style="whitegrid")
+
+def update(year):
+    # Filter data by year
+    data_year = vdem_worldBank_df[vdem_worldBank_df['year'] == year]
+
+    # Updating plot
+    ax.clear()
+    sns.scatterplot(y = 'democracy_index', 
+                    x = 'PrimarySchoolEnrollment', 
+                    data = vdem_worldBank_df, 
+                    hue = 'country_name', 
+                    sizes=(20, 2000), ax=ax)
+    
+    plt.title('Year: ' + str(year))
+
+# Creating animation
+animation = FuncAnimation(fig, 
+                          update, 
+                          frames=range(2000,2022, 1), 
+                          repeat=True)
+
+# saving animation as a GIF
+writer = ani.PillowWriter(fps=1,
+                        metadata=dict(artist='Me'),
+                        bitrate=1800)
+animation.save('bubble.gif', writer=writer)
+
+plt.show() # animation won't move here, have to open it in your working directory to see GIF
+
 
 #%% map of geopolitical regions
 # creating a choropleth map of the geopolitical regions using the geopandas library.
@@ -618,14 +702,14 @@ ax.plot()
 # ### Basic EDA
 # A heatmap of the correlation matrix for the vdem_worldbank_poli_region_grouped dataframe, highlighting cells where the correlation coefficient is less than -0.3.
 
-corr = vdem_worldBank_poli_region_grouped.corr() < -0.3
+corr = vdem_worldBank_poli_region_grouped.corr() < abs(0.6)
 
 # A mask is then created using the np.triu() function to exclude the upper triangle of the heatmap, as it is redundant due to symmetry.
 mask = np.triu(np.ones_like(corr, dtype=bool))
 
 f, ax = plt.subplots(figsize=(11, 9))
 
-sns.heatmap(corr, annot=True, mask=mask, cmap=cmap, vmax=.3, center=0,
+sns.heatmap(corr, annot=True, mask=mask, cmap = cmap, vmax=.3, center=0,
             square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
 plt.show()
