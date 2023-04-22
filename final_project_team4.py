@@ -361,7 +361,7 @@ sns.boxplot(data = df_subset, orient = "h", palette = "Set2")
 #%% Distribution of the variables(with time series)
 sns.set_style('darkgrid')
 
-# Loop through columns and create histograms
+# Loop through columns and create a histogram for each of the numeric columns in the dataframe. 
 for col in num_cols:
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.histplot(data=vdem_worldBank_df, x=col, kde=True, ax=ax)
@@ -369,6 +369,10 @@ for col in num_cols:
     ax.set_xlabel(col.capitalize(), fontsize=12)
     ax.set_ylabel('Count', fontsize=12)
     plt.show()
+
+# A histogram is a graphical representation of the distribution of data, where data values are grouped 
+# into bins and the height of each bin represents the number of data values that fall within that bin.
+
 #%% [markdown] Interpreting the results of the distribution plots
 # The distributions of the numerical variables in the dataset have varying degrees of skewness. Some of the variables such as foreign direct investment, GDP growth rate, net migration, and population growth rate exhibit normal distribution, while others like adolescent fertility, CO2 emissions, and mortality rate are right-skewed. Democracy index, V-Dem scores, access to clean cooking, and mobile subscriptions are binomially distributed. Understanding the distribution of the variables can help in selecting appropriate statistical methods and interpreting the results accurately.
 
@@ -411,6 +415,57 @@ sns.boxplot(data = vdem_worldBank_df,
             y = "democracy_index", 
             x = "e_regionpol_6C", dodge=False)
 plt.show()
+
+# #%% Initial time-series line plot
+
+# # Set the 'year' column of the 'vdem_worldbank_df' dataframe to an int data type. 
+# vdem_worldBank_poli_region_grouped['year'] = vdem_worldBank_poli_region_grouped['year'].astype(int)
+
+# # a list of sample countries to use it as input.
+# random_sample = ['North Korea', 'Denmark']
+
+# #%%
+# print(vdem_worldBank_poli_region_grouped.columns)
+
+# #%%
+# # Edge-case for randome sampling
+# def get_random_n_countries(col: str, n : int, sample: list) -> list:
+#     """
+#     This function is used to extract 3 random country names from dataframe
+    
+#     Keyword arguments:
+#     col : column name (country_name)
+#     n: number of countries to extract
+#     sample : A list contains 2 countries as max and min limits
+#     """
+    
+#     sample_countries = [] # Empty list to store n random country names
+#     while True:
+#         sample_countries = random.sample(vdem_worldBank_df[country_var].unique().tolist(), n)
+
+#         if any(sample_country in sample for sample_country in sample_countries): # if country already exists in list, re-loop
+#             continue
+#         return sample_countries
+
+# country_var = "country_name"
+# # A function 'get_random_n_countries' that takes a column name, a number of countries to extract, and a list of sample countries as input. This function is used to extract three random country names from the dataframe that are not in the sample countries list.
+# sample_countries = get_random_n_countries(col = country_var, n = 3, 
+#                                           sample = random_sample)
+
+# # Select a subset of the 'vdem_worldbank_poli_region_grouped' dataframe that contains only the rows corresponding to the randomly selected countries.
+# # vdem_worldbank_poli_region_grouped_subset = vdem_worldBank_df[vdem_worldBank_df[country_var].isin(sample_countries)]
+
+# # It adds these country names to the 'random_sample' list. 
+# random_sample.extend(list(vdem_worldBank_df['country_name']))
+
+# # Select a subset of the 'vdem_worldbank_df' dataframe that contains only the rows corresponding to the countries in the 'random_sample' list.
+# vdem_worldbank_df_samples = vdem_worldBank_df[vdem_worldBank_df['country_name'].isin(random_sample)]
+
+# # Create a line plot of 5 countries which illustrates limits and comparing metrics. 
+# sns.lineplot(data = vdem_worldbank_df_samples, 
+#              x='year', y='democracy_index', 
+#              hue='country_name')
+# plt.show()
 
 # %% Small multiple time series
 # Creating a figure with six subplots, each showing a scatterplot of democracy index versus year for a different geographical region. 
@@ -455,6 +510,7 @@ axes[1,2].set_title('Asia_Pacific')
 # show plot
 plt.show()
 
+
 # %% Time series by politico-geographic region
 # A line plot of democracy index over time for each politico-geographic region in the dataset 
 # It will be useful for visualizing how democracy index has changed over time for different politico-geographic regions.
@@ -468,29 +524,30 @@ sns.relplot(data = vdem_worldBank_df,
             hue =  'e_regionpol_6C', kind = 'line')
 plt.show()
 
+# The resulting plot will show how democracy index has changed over time for different politico-geographic regions.
 #%% Time series 2
-
+# Creating a line plot of life expectancy over time for each politico-geographic region in the dataset:
 sns.relplot(data = vdem_worldBank_df, 
             x = 'year', y = 'LifeExpectancy', 
             hue =  'e_regionpol_6C', kind = 'line')
 plt.show()
 
 #%% Time series 3
-
+# Creating a line plot of under-5 mortality rate over time for each politico-geographic region in the dataset.
 sns.relplot(data = vdem_worldBank_df, 
             x = 'year', y = 'Under5Mortality', 
             hue =  'e_regionpol_6C', kind = 'line')
 plt.show()
 
 #%% Time series 4
-
+# Creating a line plot of gross national income per capita over time for each politico-geographic region in the dataset.
 sns.relplot(data = vdem_worldBank_df, 
             x = 'year', y = 'GNIPerCapita', 
             hue =  'e_regionpol_6C', kind = 'line')
 plt.show()
 
 #%% Time series 5
-
+# The plot shows how primary school enrollment rates have changed over time for each politico-geographic region in the dataset.
 sns.relplot(data = vdem_worldBank_df, 
             x = 'year', y = 'PrimarySchoolEnrollment', 
             hue =  'e_regionpol_6C', kind = 'line')
