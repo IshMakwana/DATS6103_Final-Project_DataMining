@@ -63,35 +63,35 @@ import statsmodels.api as sm
 #The code creates a subset of the VDem DataFrame that includes 38 variables of interest. The names of the variables are stored in a list called variables. The code selects the desired columns from the original DataFrame using the .loc[] method and stores the resulting subset in a new DataFrame called vdem_df. 
 
 
-def getDFfromZip(url):
-    """ Return the data frame from a csv file in a zip file
-    Parameters:
-        url(str): url of the zip file
-    Returns:
-        df(pandas.DataFrame): data frame of the csv file
-    """
-    response = requests.get(url) # Send a request to download the file
+# def getDFfromZip(url):
+#     """ Return the data frame from a csv file in a zip file
+#     Parameters:
+#         url(str): url of the zip file
+#     Returns:
+#         df(pandas.DataFrame): data frame of the csv file
+#     """
+#     response = requests.get(url) # Send a request to download the file
     
-    if response.status_code == 200: # Check if the request was successful
-        # Read the zip file from the response
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zip_file:
-            # Find the CSV file within the zip file
-            for file in zip_file.namelist():
-                if file.endswith(".csv"):
-                    # Read the CSV file into a pandas DataFrame
-                    df = pd.read_csv(zip_file.open(file))                    
-                    print(df.shape)      
-                    return df
-            # If the CSV file was not found, return None
-            return None
-    else: 
-        print("Failed to download the dataset.")
-        return None
+#     if response.status_code == 200: # Check if the request was successful
+#         # Read the zip file from the response
+#         with zipfile.ZipFile(io.BytesIO(response.content)) as zip_file:
+#             # Find the CSV file within the zip file
+#             for file in zip_file.namelist():
+#                 if file.endswith(".csv"):
+#                     # Read the CSV file into a pandas DataFrame
+#                     df = pd.read_csv(zip_file.open(file))                    
+#                     print(df.shape)      
+#                     return df
+#             # If the CSV file was not found, return None
+#             return None
+#     else: 
+#         print("Failed to download the dataset.")
+#         return None
 
-url = "https://v-dem.net/media/datasets/V-Dem-CY-FullOthers_csv_v13.zip"
-VDem = getDFfromZip(url)
-VDem.head()
-VDem.shape
+# url = "https://v-dem.net/media/datasets/V-Dem-CY-FullOthers_csv_v13.zip"
+# VDem = getDFfromZip(url)
+# VDem.head()
+# VDem.shape
 
 #%%
 """ Variables of Interest(19):
@@ -126,125 +126,129 @@ Economy
 - Imports_of_goods_and_services_(%_of_GDP)
 """
 
-#%% Import data seets from local (World Bank; World Development Indicators) and reformat
-url2 = "https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/WorldBank.csv"
+# #%% Import data seets from local (World Bank; World Development Indicators) and reformat
+# url2 = "https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/WorldBank.csv"
 
-WorldBank_df = pd.read_csv(url2)
-WorldBank_df.head()
+# WorldBank_df = pd.read_csv(url2)
+# WorldBank_df.head()
 
-#%%
-# create a dictionary for c_id
-c_id_dict = WorldBank_df.set_index('c_id')['CountryName'].to_dict()
-droped_WorldBank_df = WorldBank_df.drop(['CountryName', 'SeriesName'], axis=1)
+# #%%
+# # create a dictionary for c_id
+# c_id_dict = WorldBank_df.set_index('c_id')['CountryName'].to_dict()
+# droped_WorldBank_df = WorldBank_df.drop(['CountryName', 'SeriesName'], axis=1)
 
-# Reshape the data frame
-new_WB_df = pd.melt(droped_WorldBank_df, id_vars=['c_id', 's_id'], var_name='year', value_name='value')
-new_WB_df['s_id'] = 's_id.' + new_WB_df['s_id'].astype(str)
-new_WB_df = new_WB_df.pivot(index=['c_id', 'year'], columns='s_id', values='value').reset_index()
+# # Reshape the data frame
+# new_WB_df = pd.melt(droped_WorldBank_df, id_vars=['c_id', 's_id'], var_name='year', value_name='value')
+# new_WB_df['s_id'] = 's_id.' + new_WB_df['s_id'].astype(str)
+# new_WB_df = new_WB_df.pivot(index=['c_id', 'year'], columns='s_id', values='value').reset_index()
 
-# reorder columns
-new_order = ['c_id', 'year', 's_id.1', 's_id.2', 's_id.3', 's_id.4', 's_id.5', 's_id.6', 's_id.7', 's_id.8', 's_id.9', 's_id.10', 's_id.11', 's_id.12', 's_id.13', 's_id.14', 's_id.15', 's_id.16', 's_id.17', 's_id.18', 's_id.19']
-new_WB_df = new_WB_df.reindex(columns=new_order)
+# # reorder columns
+# new_order = ['c_id', 'year', 's_id.1', 's_id.2', 's_id.3', 's_id.4', 's_id.5', 's_id.6', 's_id.7', 's_id.8', 's_id.9', 's_id.10', 's_id.11', 's_id.12', 's_id.13', 's_id.14', 's_id.15', 's_id.16', 's_id.17', 's_id.18', 's_id.19']
+# new_WB_df = new_WB_df.reindex(columns=new_order)
 
-# change column names based on s_id_dict
-new_colnames = {'c_id': 'c_id', 'year': 'year',
-            's_id.1': 'AccessToCleanCooking', 's_id.2': 'AdolescentFertility',
-            's_id.3': 'AgriForestFishValueAdded', 's_id.4': 'CO2Emissions',
-            's_id.5': 'ExportsOfGoodsAndServices', 's_id.6': 'FertilityRate',
-            's_id.7': 'ForeignDirectInvestment', 's_id.8': 'GDP',
-            's_id.9': 'GDPGrowth', 's_id.10': 'GNIPerCapita',
-            's_id.11': 'MeaslesImmunization', 's_id.12': 'ImportsOfGoodsAndServices',
-            's_id.13': 'LifeExpectancy', 's_id.14': 'MobileSubscriptions',
-            's_id.15': 'Under5Mortality', 's_id.16': 'NetMigration',
-            's_id.17': 'PopulationGrowth', 's_id.18': 'HIVPrevalence',
-            's_id.19': 'PrimarySchoolEnrollment'}
-new_WB_df = new_WB_df.rename(columns=new_colnames)
+# # change column names based on s_id_dict
+# new_colnames = {'c_id': 'c_id', 'year': 'year',
+#             's_id.1': 'AccessToCleanCooking', 's_id.2': 'AdolescentFertility',
+#             's_id.3': 'AgriForestFishValueAdded', 's_id.4': 'CO2Emissions',
+#             's_id.5': 'ExportsOfGoodsAndServices', 's_id.6': 'FertilityRate',
+#             's_id.7': 'ForeignDirectInvestment', 's_id.8': 'GDP',
+#             's_id.9': 'GDPGrowth', 's_id.10': 'GNIPerCapita',
+#             's_id.11': 'MeaslesImmunization', 's_id.12': 'ImportsOfGoodsAndServices',
+#             's_id.13': 'LifeExpectancy', 's_id.14': 'MobileSubscriptions',
+#             's_id.15': 'Under5Mortality', 's_id.16': 'NetMigration',
+#             's_id.17': 'PopulationGrowth', 's_id.18': 'HIVPrevalence',
+#             's_id.19': 'PrimarySchoolEnrollment'}
+# new_WB_df = new_WB_df.rename(columns=new_colnames)
 
-# remove "yr" from "year" column
-new_WB_df['year'] = new_WB_df['year'].str.replace('yr', '')
-# rename "values of c_id" column" bsed on c_id_dict
-new_WB_df['c_id'] = new_WB_df['c_id'].map(c_id_dict)
-new_WB_df = new_WB_df.rename(columns={'c_id': 'country_name'})
+# # remove "yr" from "year" column
+# new_WB_df['year'] = new_WB_df['year'].str.replace('yr', '')
+# # rename "values of c_id" column" bsed on c_id_dict
+# new_WB_df['c_id'] = new_WB_df['c_id'].map(c_id_dict)
+# new_WB_df = new_WB_df.rename(columns={'c_id': 'country_name'})
 
 #%% Create a list containing the names of the variables we are interested in
-variables = [
-    "country_name",
-    "country_id",
-    "year",
-    "v2x_polyarchy",
-    "v2x_libdem",
-    "v2x_partipdem",
-    "v2x_delibdem",
-    "v2x_egaldem",
-    "e_regionpol_6C",
-]
-vdem_df = VDem.loc[:, variables]
-print(vdem_df.shape)
-vdem_df.head()
+# variables = [
+#     "country_name",
+#     "country_id",
+#     "year",
+#     "v2x_polyarchy",
+#     "v2x_libdem",
+#     "v2x_partipdem",
+#     "v2x_delibdem",
+#     "v2x_egaldem",
+#     "e_regionpol_6C",
+# ]
+# vdem_df = VDem.loc[:, variables]
+# print(vdem_df.shape)
+# vdem_df.head()
 
 #%% Create a new democracy index column at right to country_id column from 5 democracy variables
-# Calculate the mean of the five democracy variables for each row
-vdem_df['democracy_index'] = vdem_df[['v2x_polyarchy', 'v2x_libdem', 'v2x_partipdem', 
-                                    'v2x_delibdem', 'v2x_egaldem']].mean(axis=1)
+# # Calculate the mean of the five democracy variables for each row
+# vdem_df['democracy_index'] = vdem_df[['v2x_polyarchy', 'v2x_libdem', 'v2x_partipdem', 
+#                                     'v2x_delibdem', 'v2x_egaldem']].mean(axis=1)
 
-# Move the new 'democracy_index' column to the right of the 'country_id' column
-columns = list(vdem_df.columns)
-columns.insert(columns.index("year") + 1, columns.pop(columns.index("democracy_index")))
-vdem_df = vdem_df[columns]
+# # Move the new 'democracy_index' column to the right of the 'country_id' column
+# columns = list(vdem_df.columns)
+# columns.insert(columns.index("year") + 1, columns.pop(columns.index("democracy_index")))
+# vdem_df = vdem_df[columns]
 
-print(vdem_df.shape)
-vdem_df.head()
+# print(vdem_df.shape)
+# vdem_df.head()
 
 #%% Create subset containing only 2000s in year column
-# Create a new DataFrame containing only the rows from 2000 onwards
-vdem_2000s_df = vdem_df.loc[vdem_df["year"] >= 2000]
-# Check the shape of the new DataFrame
-print(vdem_2000s_df.shape)
-vdem_2000s_df.head()
+# # Create a new DataFrame containing only the rows from 2000 onwards
+# vdem_worldbank_df = vdem_df.loc[vdem_df["year"] >= 2000]
+# # Check the shape of the new DataFrame
+# print(vdem_worldbank_df.shape)
+# vdem_worldbank_df.head()
 
-#%% Count the number of countries which are included in both vdem_2000s_df and new_WB_df
-number_of_countries = set(vdem_2000s_df["country_name"]).intersection(set(new_WB_df["country_name"]))
-number_of_countries
+#%% Count the number of countries which are included in both vdem_worldbank_df and new_WB_df
+# number_of_countries = set(vdem_worldbank_df["country_name"]).intersection(set(new_WB_df["country_name"]))
+# number_of_countries
 
 #%% Merge the two dataframes
-vdem_2000s_df['country_name'] = vdem_2000s_df['country_name'].replace('United States of America', 'United States')
-vdem_2000s_df.info()
-new_WB_df.info()
-new_WB_df['year'] = new_WB_df['year'].astype(int)
+# vdem_worldbank_df['country_name'] = vdem_worldbank_df['country_name'].replace('United States of America', 'United States')
+# vdem_worldbank_df.info()
+# new_WB_df.info()
+# new_WB_df['year'] = new_WB_df['year'].astype(int)
 
-new_df = pd.merge(vdem_2000s_df, new_WB_df, on=["country_name", "year"], how="inner")
+# new_df = pd.merge(vdem_worldbank_df, new_WB_df, on=["country_name", "year"], how="inner")
 # %% Drop the countries where don't have 22 years of data
-counts = new_df['country_name'].value_counts()
-not_22 = counts[counts != 22]
-countries = not_22.index.tolist() # only south sudan has less than 22 years of data
-new_df = new_df[~new_df['country_name'].isin(countries)]
+# counts = new_df['country_name'].value_counts()
+# not_22 = counts[counts != 22]
+# countries = not_22.index.tolist() # only south sudan has less than 22 years of data
+# new_df = new_df[~new_df['country_name'].isin(countries)]
 
 #%% Check and Handle Missing Values
-print(new_df.isnull().sum())
+# print(new_df.isnull().sum())
 
-# Fill null values by meadian among same country name.
-# If there is no value among same country name, fill them by median among same political region.
-# I chose median because the distribution of almost all variables was not normal distribute.
-def fillna(df):
-    # Fill NaN values by median among the same country name
-    df = df.groupby('country_name').apply(lambda x: x.fillna(x.median()))
+# # Fill null values by meadian among same country name.
+# # If there is no value among same country name, fill them by median among same political region.
+# # I chose median because the distribution of almost all variables was not normal distribute.
+# def fillna(df):
+#     # Fill NaN values by median among the same country name
+#     df = df.groupby('country_name').apply(lambda x: x.fillna(x.median()))
 
-    # Fill NaN values by median among the same political region if country median is not available
-    df = df.groupby('e_regionpol_6C').apply(lambda x: x.fillna(x.median()))
+#     # Fill NaN values by median among the same political region if country median is not available
+#     df = df.groupby('e_regionpol_6C').apply(lambda x: x.fillna(x.median()))
 
-    # Reformat the structure
-    df = df.reset_index(drop=True)
+#     # Reformat the structure
+#     df = df.reset_index(drop=True)
 
-    return df
+#     return df
 
 #%% Fill missing values
-new_df_2 = fillna(new_df)
-new_df_2.isnull().sum()
-print(new_df_2.shape)
+# new_df_2 = fillna(new_df)
+# new_df_2.isnull().sum()
+# print(new_df_2.shape)
 #%% Export the dataset as a new CSV file
 #new_df_2.to_csv('dataset/vdem_worldBank.csv', index=False)
 #%% EDA
-vdem_worldBank_df = pd.read_csv('dataset/vdem_worldBank.csv')
+
+url2 = "https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/vdem_worldBank.csv"
+
+vdem_worldBank_df = pd.read_csv(url2)
+
 #%% Basic Information (country time series)
 vdem_worldBank_df.head()
 #%% Data Types, Data Structure, number of rows and columns, and missing values (country time series)
@@ -315,274 +319,78 @@ print(f'Min democracy index: {round(min_demo_index, 2)}, Country: {vdem_worldBan
 print(f'Mean democracy index: {round(mean_demo_index, 2)}, Country: {closest_country}')
 #%% Outliers
 num_cols = ['democracy_index','v2x_polyarchy', 'v2x_libdem',          
-            'v2x_partipdem', 'v2x_delibdem','v2x_egaldem', 'e_regionpol_6C', 'AccessToCleanCooking','AdolescentFertility', 'AgriForestFishValueAdded', 'CO2Emissions','ExportsOfGoodsAndServices', 'FertilityRate','ForeignDirectInvestment','GDP', 'GDPGrowth', 'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+            'v2x_partipdem', 'v2x_delibdem','v2x_egaldem', 
+            'e_regionpol_6C', 'AccessToCleanCooking','AdolescentFertility', 
+            'AgriForestFishValueAdded', 'CO2Emissions','ExportsOfGoodsAndServices', 
+            'FertilityRate','ForeignDirectInvestment','GDP', 'GDPGrowth', 'GNIPerCapita', 
+            'MeaslesImmunization','ImportsOfGoodsAndServices', 'LifeExpectancy', 
+            'MobileSubscriptions','Under5Mortality', 'NetMigration', 'PopulationGrowth', 
+            'HIVPrevalence','PrimarySchoolEnrollment']
+
 # Create a new DataFrame containing only the numeric columns
 df_subset = vdem_worldBank_df[num_cols]
 # Create a boxplot for each numeric column
 sns.boxplot(data=df_subset, orient="h", palette="Set2")
-#%% 
-# Create subset containing only 2000s in year column
-# Create a new DataFrame containing only the rows from 2000 onwards
-vdem_2000s_df = vdem_df.loc[vdem_df["year"] >= 2000]
-
-# Check the shape of the new DataFrame
-print(vdem_2000s_df.shape)
-vdem_2000s_df.head()
-
-#%%
-# Check the number of missing values in each column
-vdem_2000s_df.isnull().sum()
-
-# Replace missing values in v2x_libdem and v2x_partipdem with the mean of the column where have same country_id 
-vdem_2000s_df["v2x_libdem"] = vdem_2000s_df.groupby("country_id")["v2x_libdem"].transform(lambda x: x.fillna(x.mean()))
-vdem_2000s_df["v2x_partipdem"] = vdem_2000s_df.groupby("country_id")["v2x_partipdem"].transform(lambda x: x.fillna(x.mean()))
-
-# Inspection of the missing values in e_peaveduc
-education = vdem_2000s_df.loc[vdem_2000s_df["e_peaveduc"].isnull(), ["country_name", "country_id", "year", "e_peaveduc"]]
-
-# Inspect of the missing value in e_area
-area = vdem_2000s_df.loc[vdem_2000s_df["e_area"].isnull(), ["country_name", "country_id", "year", "e_area"]]
-
-
-#%%
-# Combine the datasets by country (Combine multiple years into one and remove year column)
-# Set 'country_id' and 'country_name' as a multi-level index
-vdem_2000s_df_indexed = vdem_2000s_df.set_index(['country_name', 'country_id'])
-# Setting the name of the dataframe as same as its variable name
-vdem_2000s_df_indexed.Name = "vdem_2000s_df_indexed"
-# Group by 'country_id' and 'country_name', and aggregate the mean
-vdem_2000s_grouped_df = vdem_2000s_df_indexed.groupby(['country_name', 'country_id']).agg("mean")
-# Reset the index, so 'country_name' becomes a column again
-vdem_2000s_grouped_df = vdem_2000s_grouped_df.reset_index()
-# Remove the 'year' column
-vdem_2000s_grouped_df = vdem_2000s_grouped_df.drop(columns=["year"])
-# Display the combined DataFrame
-print(vdem_2000s_grouped_df.shape)
-vdem_2000s_grouped_df.head()
-
-#%% Combine the datasets by political region (Combine multiple years into one and remove year column) 
-# Set 'country_id' and 'country_name' as a multi-level index
-vdem_2000s_df_poli_geo = vdem_2000s_df.set_index(['e_regionpol_6C', 'year'])
-# Setting the name of the dataframe as same as its variable name
-vdem_2000s_df_poli_geo.Name = "vdem_2000s_df_indexed_poli_geo"
-# Group by 'country_id' and 'country_name', and aggregate the mean
-vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.groupby(['e_regionpol_6C', 'year']).agg("mean")
-# Reset the index, so 'country_name' becomes a column again
-vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.reset_index()
-# renaming regions to show the full name
-vdem_2000s_df_poli_geo['e_regionpol_6C'] = vdem_2000s_df_poli_geo['e_regionpol_6C'].replace({1: 'Eastern Europe and Central Asia', 2: 'Latin America and the Caribbean', 3: 'Middle East and North Africa', 4:'Sub-Saharan Africa', 5: 'Western Europe, North America, and Oceania', 6: 'Asia and Pacific'})
-# renaming column because 'e_regionpol_6C' is really annoying to type out each type
-vdem_2000s_df_poli_geo.rename(columns={'e_regionpol_6C': 'region'}, inplace=True)
-# Remove the 'county_id' column
-vdem_2000s_df_poli_geo = vdem_2000s_df_poli_geo.drop(columns=["country_id"])
-# Display the combined DataFrame
-print(vdem_2000s_df_poli_geo.shape)
-vdem_2000s_df_poli_geo.head()
-#%%[markdown]
-### Dataframe variables we created so far:
-"""
-VDem: original data set
-# 
-vdem_df: subset containing only the columns of interest (38 variables) + democracy index
-#  
-vdem_2000s_df: subset containing only 2000s in year column
-# 
-vdem_2000s_grouped_df: combine the datasets by country (Combine multiple years into one and remove year column)
-#
-vdem_2000s_df_poli_geo: combine the datasets by political region (Combine multiple years into one and remove year column)
-"""
-#%%
-# Change variable name
-variable_names = ['country_name', 'country_id', 'demo_index', 'elec_demo_idx', 'lib_demo_idx', 
-                  'parti_demo_idx', 'deli_demo_idx', 'ega_demo_idx', 'edu_avg', 'edu_ineql', 
-                  'geo_area', 'geo_rgn_geo', 'geo_reg_polc_g', 'geo_reg_polc_g6c', 'eco_exports', 
-                  'eco_imports', 'eco_gdp', 'eco_gdp_pc', 'eco_a_ifl_rate', 'eco_popln', 
-                  'n_ttl_fuel_income_pc', 'n_ttl_oil_income_pc', 'n_ttl_res_income_pc', 
-                  'infra_radio(n)_sets', 'demo_frtly_rate', 'demo_ttl_popln', 'demo_urbzn_rate', 'demo_urbn_popln', 
-                  'demo_lf_expcy(w)', 'demo_mrty(i)_rate', 'demo_life_expcy', 'demo_mrty(m)_rate', 'demo_ttl_popln_wb', 'c_civil_war', 
-                  'c_intnl_arm_c', 'c_intl_arm_c', 'c_suc_coup_attp', 'c_coup_attp', 'party_dissem']
-
-vdem_2000s_grouped_df.columns = variable_names
 
 #%%[markdown]
-## Step 7: Data Cleaning(drop null values, replacing the null values,  drop duplicates rows, etc.)
+# Merging code from merge_data file: 
 
-#%%[markdown]
-### 7.1 Check - Identifying and replacing null values
-def mean_median_imputation(column : pd.Series):
-    """
-    This code uses the shapiro() function from the scipy.stats module to perform the Shapiro-Wilk test, 
-    which is a statistical test used to determine if a set of data is normally distributed.
-    If normally distributed -> mean imputation
-    If data is skewed -> median imputation
+# %%
+#%% Distribution of the variables(with time series)
+sns.set_style('darkgrid')
 
-    Keyword arguments:
-    column : V-dem dataframe column of type - Pandas Series
+# Loop through columns and create histograms
+for col in num_cols:
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.histplot(data=vdem_worldBank_df, x=col, kde=True, ax=ax)
+    ax.set_title(col.capitalize(), fontsize=14)
+    ax.set_xlabel(col.capitalize(), fontsize=12)
+    ax.set_ylabel('Count', fontsize=12)
+    plt.show()
+#%% [markdown] Interpreting the results of the distribution plots
+# The distributions of the numerical variables in the dataset have varying degrees of skewness. Some of the variables such as foreign direct investment, GDP growth rate, net migration, and population growth rate exhibit normal distribution, while others like adolescent fertility, CO2 emissions, and mortality rate are right-skewed. Democracy index, V-Dem scores, access to clean cooking, and mobile subscriptions are binomially distributed. Understanding the distribution of the variables can help in selecting appropriate statistical methods and interpreting the results accurately.
 
-    Retuns:
-    mean/median : a floating number (mean/median) of the column
-    """
-
-    stat, p = shapiro(column)
-    alpha = 0.05
-    
-    if p >= alpha:
-        # print(f'The distribution of {column} is normal (p={p})')
-        return column.mean()
-    else:
-        # print(f'The distribution of {column} is skewed (p={p})')
-        return column.median()
-
-
-def fill_na(df):
-    """
-    This function replace the null values with mean or median value,
-    within in the dataframe and returns the cleaned dataframe
-
-    Keyword arguments:
-    df : V-dem dataframe 
-
-    Returns:
-    cleaned_df : Clean dataframe
-    """
-    fill_null_0 = lambda col: col.fillna(0) if col.dtype in ['float64', 'int64'] else col.fillna(method='ffill')
-    df = df.apply(fill_null_0)
-
-    # Replacing null values with appropriate value (either mean or median)
-    fill_null_imputation = lambda col: col.fillna(mean_median_imputation(column = col)) if col.dtype in ['float64', 'int64'] else col.fillna(method='ffill')
-    cleaned_df = df.apply(fill_null_imputation)
-
-    return cleaned_df
-
-
-# Cleaning data for vdem_2000s_df dataframe
-print(f"Count of null records in the dataframe before cleaning: {vdem_2000s_df.isnull().sum()}")
-vdem_2000s_df = fill_na(df = vdem_2000s_df)
-print(f"Count of null records in the dataframe after cleaning: {vdem_2000s_df.isnull().sum()}")
-    
-
-# Cleaning data for vdem_2000s_grouped_df dataframe
-print(f"Count of null records in the dataframe before cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
-vdem_2000s_grouped_df = fill_na(df = vdem_2000s_grouped_df)
-print(f"Count of null records in the dataframe after cleaning: {vdem_2000s_grouped_df.isnull().sum()}")
-
-#%%[markdown]
-### 7.2 Check - Duplicate records
+# Normal Distribution
+# - foreign direct investment
+# - GDP Growth Rate
+# - Net Migration
+# - Population Growth Rate
+# - Primary School Enrollment
+# Right Skewed Distribution
+# - Adolescent Fertility
+# - Agricultural, Forest, and Fish Value Added (% of GDP)
+# - CO2 Emissions (metric tons per capita)
+# - Exports of Goods and Services (% of GDP)
+# - Fertility Rate
+# - GDP (current US$)
+# - GNI per capita (current US$)
+# - Imports of Goods and Services (% of GDP)
+# - Mortality rate, under-5 (per 1,000 live births)
+# - HIV Prevalence (% of population ages 15-49)
+# Right Skewed Distribution
+# - Measles Immunization (% of children ages 12-23 months)
+# - Life Expectancy at Birth
+# Binomial Distribution
+# - Democracy Index
+# - V-Dem Polyarchy
+# - V-Dem liberal democracy
+# - V-Dem participatory democracy
+# - V-Dem deliberative democracy
+# - V-Dem egalitarian democracy
+# - Access to Clean Cooking (% of population)
+# - Mobile Subscriptions (per 100 people)
 
 #%%
-# checking duplicated values for both the dataframes 'vdem_2000s_df' & 'vdem_2000s_grouped_df'
-print(f"Count of duplicated records in the 'vdem_2000s_df' dataframe: {vdem_2000s_df.duplicated().sum()}")
-print(f"Count of duplicated records in the 'vdem_2000s_grouped_df' dataframe: {vdem_2000s_grouped_df.duplicated().sum()}")
-
-#%%[markdown]
-### 7.3 Check - Outliers
-
-#%%
-# Handling outliers 
-def identify_outliers_tukey(df, column):
-    """
-    Identifying outliers in tukey method using IQR (Inter-Quartile range)
-
-    Keyword arguments:
-    df : Pandas dataframe
-    column: Column name of the dataframe
-
-    Returns:
-    outliers: dictionary contains all outliers of numerical columns
-
-    """
-    # if df[column].dtype in ['float64', 'int64']:
-    q1 = df[column].quantile(0.25)
-    q3 = df[column].quantile(0.75)
-    iqr = q3 - q1
-    outlier_cutoff = 1.5 * iqr
-    lower_bound = q1 - outlier_cutoff
-    upper_bound = q3 + outlier_cutoff
-    outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
-    return outliers
-
-outliers_dict_list = []
-
-dataframes_list = [vdem_2000s_df, vdem_2000s_grouped_df]
-for dataframe in dataframes_list:
-    # identify outliers in all numeric columns using the Tukey method
-    outliers_dict = {}
-    for column in dataframe.select_dtypes(include=np.number).columns:
-        outliers = identify_outliers_tukey(dataframe, column)
-        if not outliers.empty:
-            outliers_dict[column] = outliers
-
-    # print the outlier results from all columns
-    if not outliers_dict:
-        print("No outliers found.")
-    else:
-        for column, outliers in outliers_dict.items():
-            print(f"The outliers in column {column} are:\n{outliers}")
-    outliers_dict_list.append(outliers_dict)
-        
-#%%
-# Step 8: checking data types (and change if necessary)
-
-print(vdem_2000s_grouped_df.dtypes) # As intended, all variables are floating values.
-
-print(vdem_2000s_df.dtypes)
-#%%
-
-vdem_2000s_grouped_df['demo_index'] = vdem_2000s_grouped_df['demo_index'].astype(float) # changing 'demo_index' to float
-vdem_2000s_grouped_df['geo_rgn_geo'] = vdem_2000s_grouped_df['geo_rgn_geo'].astype(int) # changing 'geo_rgn_geo' to int
-vdem_2000s_grouped_df['geo_reg_polc_g'] = vdem_2000s_grouped_df['geo_reg_polc_g'].astype(int) # changing 'geo_reg_polc_g' to int
-vdem_2000s_grouped_df['geo_reg_polc_g6c'] = vdem_2000s_grouped_df['geo_reg_polc_g6c'].astype(int) # changing 'geo_reg_polc_g6c' to int
-vdem_2000s_grouped_df['infra_radio(n)_sets'] = vdem_2000s_grouped_df['infra_radio(n)_sets'].astype(int) # changing 'infra_radio(n)_sets' to int
-vdem_2000s_grouped_df['demo_ttl_popln'] = vdem_2000s_grouped_df['demo_ttl_popln'].astype(int) # changing 'demo_ttl_popln' to int
-vdem_2000s_grouped_df['demo_urbn_popln'] = vdem_2000s_grouped_df['demo_urbn_popln'].astype(int) # changing 'demo_urbn_popln' to int
-vdem_2000s_grouped_df['demo_ttl_popln_wb'] = vdem_2000s_grouped_df['demo_ttl_popln_wb'].astype(int) # changing 'demo_ttl_popln_wb' to int
-vdem_2000s_grouped_df['c_suc_coup_attp'] = vdem_2000s_grouped_df['c_suc_coup_attp'].astype(int) # changing 'c_suc_coup_attp' to int
-vdem_2000s_grouped_df['c_coup_attp'] = vdem_2000s_grouped_df['c_coup_attp'].astype(int) # changing 'c_coup_attp' to int
-
-print(vdem_2000s_grouped_df.dtypes)
-
-"""
-The goal of the data cleaning process is to prepare the dataset ready for further modeling and analysis. Starting with a checking for null values, it then replaces them with the appropriate values, looks for duplicate records, and identifies outliers. The Tukey method is used by the code to find outliers in all numerical columns.
-The EDA procedure seeks to investigate the data and comprehend its properties. Data types are examined, made changes as necessary. The distribution of the variables, their correlations, and any additional relevant information are next checked.
-Overall, the code offers a thorough EDA and data cleaning process that aids in getting the dataset ready for analysis and modeling.
-"""
-#%%
-# A statistical summary of the numerical columns in the dataframe
-summary = vdem_2000s_df.describe()
-print(summary) #This will print summary statistics of vdem_2000s_df dataframe
-summary_grouped = vdem_2000s_grouped_df.describe()
-
-print(summary_grouped) #This will print summary statistics of vdem_2000s_grouped_df dataframe
-
-#An overview of the dataframe's columns, including their names, data types, and non-null count.
-vdem_2000s_df.info()
-vdem_2000s_grouped_df.info()
-
-#The dimensions of the dataframe
-vdem_2000s_df.shape
-vdem_2000s_grouped_df.shape
-
-#%%[markdown]
-# ## EDA
-
-
-# %% 
-# Creating a plot to visualize the distribution of the 'demo_index' variable in the grouped vdem_2000s_grouped_df dataframe.
-demo_index_grouped = tuple(vdem_2000s_grouped_df['demo_index'])
-
-sns.displot(x=demo_index_grouped, bins=20)
-plt.show()
-
 #%% Boxplot
 # The boxplot allows us to compare the distribution of democracy index across regions, as well as identify any potential outliers. It can also help us to identify if there are any significant differences in the median democracy index among different regions.
 
-sns.boxplot(data=vdem_2000s_df_poli_geo, x="democracy_index", y="region", dodge=False)
+sns.boxplot(data= vdem_worldBank_poli_region_grouped, x="democracy_index", y="region", dodge=False)
 plt.show()
 
 #%% Initial time-series line plot
 
-# Set the 'year' column of the 'vdem_2000s_df' dataframe to an int data type. 
-vdem_2000s_df['year'] = vdem_2000s_df['year'].astype(int)
+# Set the 'year' column of the 'vdem_worldbank_df' dataframe to an int data type. 
+vdem_worldBank_poli_region_grouped['year'] = vdem_worldBank_poli_region_grouped['year'].astype(int)
 
 # a list of sample countries to use it as input.
 random_sample = ['North Korea', 'Denmark']
@@ -600,7 +408,7 @@ def get_random_n_countries(col: str, n : int, sample: list) -> list:
     
     sample_countries = [] # Empty list to store n random country names
     while True:
-        sample_countries = random.sample(vdem_2000s_grouped_df[country_var].unique().tolist(), n)
+        sample_countries = random.sample(vdem_worldBank_poli_region_grouped[country_var].unique().tolist(), n)
 
         if any(sample_country in sample for sample_country in sample_countries): # if country already exists in list, re-loop
             continue
@@ -610,28 +418,28 @@ country_var = "country_name"
 # A function 'get_random_n_countries' that takes a column name, a number of countries to extract, and a list of sample countries as input. This function is used to extract three random country names from the dataframe that are not in the sample countries list.
 sample_countries = get_random_n_countries(col = country_var, n = 3, sample = random_sample)
 
-# Select a subset of the 'vdem_2000s_grouped_df' dataframe that contains only the rows corresponding to the randomly selected countries.
-vdem_2000s_grouped_df_subset = vdem_2000s_grouped_df[vdem_2000s_grouped_df[country_var].isin(sample_countries)]
+# Select a subset of the 'vdem_worldbank_poli_region_grouped' dataframe that contains only the rows corresponding to the randomly selected countries.
+vdem_worldbank_poli_region_grouped_subset = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped[country_var].isin(sample_countries)]
 
 # It adds these country names to the 'random_sample' list. 
-random_sample.extend(list(vdem_2000s_grouped_df_subset['country_name']))
+random_sample.extend(list(vdem_worldbank_poli_region_grouped_subset['country_name']))
 
-# Select a subset of the 'vdem_2000s_df' dataframe that contains only the rows corresponding to the countries in the 'random_sample' list.
-vdem_2000s_df_samples = vdem_2000s_df[vdem_2000s_df['country_name'].isin(random_sample)]
+# Select a subset of the 'vdem_worldbank_df' dataframe that contains only the rows corresponding to the countries in the 'random_sample' list.
+vdem_worldbank_df_samples = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['country_name'].isin(random_sample)]
 
 # Create a line plot of 5 countries which illustrates limits and comparing metrics. 
-sns.lineplot(data=vdem_2000s_df_samples, x='year', y='democracy_index', hue='country_name')
+sns.lineplot(data=vdem_worldbank_df_samples, x='year', y='democracy_index', hue='country_name')
 plt.show()
 
 # %% Small multiple time series
-# Creating a figure with six subplots, each showing a scatterplot of democracy index versus year for a different geographical region. The data for each subplot is filtered from the original vdem_2000s_df dataframe based on the value of e_regionpol_6C column.
+# Creating a figure with six subplots, each showing a scatterplot of democracy index versus year for a different geographical region. The data for each subplot is filtered from the original vdem_worldbank_df dataframe based on the value of e_regionpol_6C column.
 
-East_Euro_Central_Asia = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 1]
-LatAm_Caribbean = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 2]
-Mid_East_North_Africa = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 3]
-Sub_Saharan_Africa = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 4]
-West_Euro_NA_Oceania = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 5]
-Asia_Pacific = vdem_2000s_df[vdem_2000s_df['e_regionpol_6C'] == 6]
+East_Euro_Central_Asia = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 1]
+LatAm_Caribbean = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 2]
+Mid_East_North_Africa = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 3]
+Sub_Saharan_Africa = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 4]
+West_Euro_NA_Oceania = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 5]
+Asia_Pacific = vdem_worldBank_poli_region_grouped[vdem_worldBank_poli_region_grouped['e_regionpol_6C'] == 6]
 
 # Create a figure with six subplots
 fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(12, 10))
@@ -668,19 +476,19 @@ plt.show()
 # It will be useful for visualizing how democracy index has changed over time for different politico-geographic regions.
 
 sns.set_context("paper")
-sns.relplot(data=vdem_2000s_df_poli_geo, x='year', y='democracy_index', hue='region', kind='line')
+sns.relplot(data=vdem_worldBank_poli_region_grouped, x='year', y='democracy_index', hue='region', kind='line')
 plt.show()
 
 #%% 3D time series Scatter plot
 
 fig = go.Figure(data=[go.Scatter3d(
-    x=vdem_2000s_df_poli_geo['year'],
-    y=vdem_2000s_df_poli_geo['democracy_index'],
-    z=vdem_2000s_df_poli_geo['e_pefeliex'],
+    x=vdem_worldBank_poli_region_grouped['year'],
+    y=vdem_worldBank_poli_region_grouped['democracy_index'],
+    z=vdem_worldBank_poli_region_grouped['e_pefeliex'],
     mode='markers',
     marker=dict(
         size=12,
-        color=vdem_2000s_df_poli_geo['year'],
+        color=vdem_worldBank_poli_region_grouped['year'],
         opacity=0.8
     )
 )])
@@ -699,7 +507,7 @@ fig.show()
 # The cmap variable defines the color palette used for the plot.
 cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
 g = sns.relplot(
-    data=vdem_2000s_df,
+    data=vdem_worldBank_df,
     x='democracy_index', y='e_civil_war',
     palette=cmap,
 )
@@ -721,7 +529,7 @@ plt.show()
 
 cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
 g = sns.relplot(
-    data=vdem_2000s_df,
+    data=vdem_worldBank_df,
     x='democracy_index', y='e_total_resources_income_pc',
     hue='e_regionpol_6C', size='year',
     palette=cmap, sizes=(10,500),
@@ -737,11 +545,11 @@ plt.show()
 # This scatterplot shows the relationship between democracy index and GDP per capita, with points colored by the presence or absence of civil war (0 for no civil war, 1 for civil war) and sized by year.
 
 # convert the e_civil_war column from a boolean to an integer using astype(int).
-vdem_2000s_df['e_civil_war'] = vdem_2000s_df['e_civil_war'].astype(int)
+vdem_worldBank_df['e_civil_war'] = vdem_worldBank_df['e_civil_war'].astype(int)
 
 # We size the points by year, with smaller points representing earlier years and larger points representing later years. The color palette is set to "muted" and the transparency of the points is set to 0.5. 
 g = sns.relplot(
-    data=vdem_2000s_df,
+    data=vdem_worldBank_df,
     x='democracy_index', y='e_gdppc',
     hue='e_civil_war', hue_order=[0, 1],
     size='year', sizes=(10,50),
@@ -762,11 +570,11 @@ sns.set(style="whitegrid")
 
 def update(year):
     # Filter data by year
-    data_year = vdem_2000s_df[vdem_2000s_df['year'] == year]
+    data_year = vdem_worldBank_df[vdem_worldBank_df['year'] == year]
 
     # Updating plot
     ax.clear()
-    sns.scatterplot(x='democracy_index', y='e_peedgini', data=vdem_2000s_df, size='e_gdppc', hue='country_name', sizes=(20, 2000), ax=ax)
+    sns.scatterplot(x='democracy_index', y='e_peedgini', data=vdem_worldBank_df, size='e_gdppc', hue='country_name', sizes=(20, 2000), ax=ax)
     plt.title('Year: ' + str(year))
 
 # Creating animation
@@ -783,11 +591,11 @@ plt.show() # animation won't move here, have to open it in your working director
 #%% map of geopolitical regions
 # creating a choropleth map of the geopolitical regions using the geopandas library.
 
-# First createing a new dataframe called vdem_2000s_grouped_df_names with two columns: name and region, which contain the country names and their corresponding geopolitical region codes respectively.
-vdem_2000s_grouped_df_names = pd.DataFrame()
+# First createing a new dataframe called vdem_worldbank_poli_region_grouped_names with two columns: name and region, which contain the country names and their corresponding geopolitical region codes respectively.
+vdem_worldbank_poli_region_grouped_names = pd.DataFrame()
 
-vdem_2000s_grouped_df_names['name'] = vdem_2000s_grouped_df['country_name']
-vdem_2000s_grouped_df_names['region'] = vdem_2000s_grouped_df['geo_reg_polc_g6c']
+vdem_worldbank_poli_region_grouped_names['name'] = vdem_worldBank_poli_region_grouped['country_name']
+vdem_worldbank_poli_region_grouped_names['region'] = vdem_worldBank_poli_region_grouped['geo_reg_polc_g6c']
 
 # Loading the world map using the naturalearth_lowres dataset and filters out Antarctica and countries with a population estimate of zero.
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
@@ -798,8 +606,8 @@ country_names = world[['name', 'iso_a3']]
 
 # Then merging the country_shapes and country_names dataframes on the ISO3 code to get a new dataframe vdem_2000s_grouped_map that contains both the geometry and the name of each country. 
 vdem_2000s_grouped_map = country_shapes.merge(country_names, on='iso_a3')
-# Merging this dataframe with the vdem_2000s_grouped_df_names dataframe on the country name to get a new dataframe vdem_2000s_grouped_map2 that contains the geometry, name, and region code of each country.
-vdem_2000s_grouped_map2 = vdem_2000s_grouped_map.merge(vdem_2000s_grouped_df_names, on='name')
+# Merging this dataframe with the vdem_worldbank_poli_region_grouped_names dataframe on the country name to get a new dataframe vdem_2000s_grouped_map2 that contains the geometry, name, and region code of each country.
+vdem_2000s_grouped_map2 = vdem_2000s_grouped_map.merge(vdem_worldbank_poli_region_grouped_names, on='name')
 
 ax = vdem_2000s_grouped_map2.plot(column='region')
 ax.set_axis_off()
@@ -808,9 +616,9 @@ ax.plot()
 
 #%%[markdown]
 # ### Basic EDA
-# A heatmap of the correlation matrix for the vdem_2000s_grouped_df dataframe, highlighting cells where the correlation coefficient is less than -0.3.
+# A heatmap of the correlation matrix for the vdem_worldbank_poli_region_grouped dataframe, highlighting cells where the correlation coefficient is less than -0.3.
 
-corr = vdem_2000s_grouped_df.corr() < -0.3
+corr = vdem_worldBank_poli_region_grouped.corr() < -0.3
 
 # A mask is then created using the np.triu() function to exclude the upper triangle of the heatmap, as it is redundant due to symmetry.
 mask = np.triu(np.ones_like(corr, dtype=bool))
@@ -823,9 +631,9 @@ sns.heatmap(corr, annot=True, mask=mask, cmap=cmap, vmax=.3, center=0,
 plt.show()
 
 #%%
-# Calculating the Variance Inflation Factor (VIF) for the columns 'demo_mrty(m)_rate' and 'demo_mrty(i)_rate' in the vdem_2000s_grouped_df dataframe. 
+# Calculating the Variance Inflation Factor (VIF) for the columns 'demo_mrty(m)_rate' and 'demo_mrty(i)_rate' in the vdem_worldbank_poli_region_grouped dataframe. 
 
-life_expect = vdem_2000s_grouped_df[['demo_mrty(m)_rate', 'demo_mrty(i)_rate']]
+life_expect = vdem_worldBank_poli_region_grouped[['demo_mrty(m)_rate', 'demo_mrty(i)_rate']]
 
 vif = pd.DataFrame()
 # Creating a new dataframe life_expect that contains only the columns of interest.
@@ -836,7 +644,7 @@ vif
 
 #%%[markdown]
 ## Interpreting the results of the basic EDA
-# The basic EDA has generated a correlation matrix between the different variables in vdem_2000s_grouped_df. The heatmap shows the strength and direction of the correlation between different pairs of variables.
+# The basic EDA has generated a correlation matrix between the different variables in vdem_worldbank_poli_region_grouped. The heatmap shows the strength and direction of the correlation between different pairs of variables.
 # The green shades with 1 written in the heatmap indicate a stronger positive correlation between the variables.
 # The light blue shades with 0 in the heatmap indicate a stronger negative correlation between the variables.
 # 
@@ -845,9 +653,9 @@ vif
 
 #%%[markdown]
 # ### Descriptive Statistics
-print(vdem_2000s_grouped_df.columns)
+print(vdem_worldBank_poli_region_grouped.columns)
 # Select variables of interest
-df = vdem_2000s_grouped_df[['demo_index', 'eco_gdp_pc', 'demo_life_expcy', 'edu_avg']]
+df = vdem_worldBank_poli_region_grouped[['demo_index', 'eco_gdp_pc', 'demo_life_expcy', 'edu_avg']]
 
 # Print descriptive statistics
 print(df.describe())
@@ -861,68 +669,234 @@ print(df.describe())
 # The demo_life_expcy variable has a mean of 68.50 with a standard deviation of 14.23, indicating that the life expectancy across the countries in the dataset is moderate. The minimum value of 0 indicates that there are some countries with very low life expectancy, while the maximum value of 83.53 indicates that there are some countries with very high life expectancy.
 # The edu_avg variable has a mean of 5.76 with a standard deviation of 4.39, indicating that the average education level across the countries in the dataset is moderate. The minimum value of 0 indicates that there are some countries with very low levels of education, while the maximum value of 13.24 indicates that there are some countries with very high levels of education.
 #  
+#%%  Correlation Matrix (Linearity)
+cor_mat = vdem_worldBank_df[num_cols].corr()
+# Generate a mask for the upper triangle
+mask = np.triu(np.ones_like(cor_mat, dtype=bool))
+f, ax = plt.subplots(figsize=(11, 9))
+cmap = sns.diverging_palette(230, 20, as_cmap=True)
+sns.heatmap(cor_mat, mask=mask, cmap=cmap, vmax=.3, center=0,
+            square=True, linewidths=.5, cbar_kws={"shrink": .5}, fmt='.1g',annot=True)
+plt.title('Correlation matrix')
+plt.show()
+#%% [markdown] Interpreting the results of the correlation matrix
+# The correlation matrix shows the relationship between the democracy index and various factors. A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. In this case, the democracy index is positively correlated with measures of political and economic freedom, as well as access to education and healthcare. Conversely, the democracy index is negatively correlated with factors such as adolescent fertility and HIV prevalence. These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
 
-#%%[markdown]
-# ### Hypothesis Testing(Correlation, Regression, etc.)
+#%% Bubble Plot
+var_independent = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
+            'AgriForestFishValueAdded', 'CO2Emissions','ExportsOfGoodsAndServices', 'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
 
-# Correlation
-corr, p_value = pearsonr(df['demo_index'], df['eco_gdp_pc'])
-if p_value < 0.05:
-    print("There is a significant correlation between the average democracy index and GDP per capita.")
-else:
-    print("There is no significant correlation between the average democracy index and GDP per capita.")
+# Group by country_name and calculate the mean for each feature
+df_subset = vdem_worldBank_grouped_country[var_independent + ['democracy_index']]
+df_subset['e_regionpol_6C'] = df_subset['e_regionpol_6C'].astype(int)
 
-# Linear regression
-X = df[['eco_gdp_pc', 'demo_life_expcy', 'edu_avg']]
-X = sm.add_constant(X)
-y = df['demo_index']
-model = sm.OLS(y, X).fit()
-if model.f_pvalue < 0.05:
-    print("There is a significant linear relationship between the average democracy index and the variables of interest.")
-else:
-    print("There is no significant linear relationship between the average democracy index and the variables of interest.")
+features = ['AccessToCleanCooking','AdolescentFertility', 
+            'AgriForestFishValueAdded', 'CO2Emissions','ExportsOfGoodsAndServices', 'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
 
-#%%
+countries = ['United States', 'China', 'India', 'Brazil', 'Japan']
 
-#%%[markdown]
-# Interpreting the results of the hypothesis testing
-# The interpretation of these results depends on the direction and strength of the correlations/relationships. A significant correlation between the average democracy index and GDP per capita indicates that as GDP per capita increases, the average democracy index tends to increase as well. This could suggest that economic development is associated with increased political freedoms and democratic governance.
-# A significant linear relationship between the average democracy index and the variables of interest suggests that there is a predictable pattern in the relationship between the two variables. For example, as the level of education increases, the average democracy index tends to increase as well. Similarly, as life expectancy increases, the average democracy index tends to increase. This could suggest that there are underlying factors, such as education and health, that contribute to the development of democratic governance.
+colors = sns.color_palette('bright', n_colors=len(df_subset['e_regionpol_6C'].unique()))
 
-#%% 
-import statsmodels.api as sm
-from statsmodels.formula.api import ols
+for feature in features:
+    sns.set_style('whitegrid')
+    plt.figure(figsize=(10, 8))
+    sns.scatterplot(x='democracy_index', y=feature, size='GDP', sizes=(100, 12000), alpha=0.5, hue='e_regionpol_6C', palette=colors, data=df_subset, legend=False)
+    sns.regplot(x='democracy_index', y=feature, data=df_subset, scatter=False, color='black')
+    plt.title('Democracy Index vs. ' + feature)
 
-# ANOVA test
-model = ols('demo_index ~ C(geo_rgn_geo)', data=vdem_2000s_grouped_df).fit()
-aov_table = sm.stats.anova_lm(model, typ=2)
-print(aov_table)
+    plt.show()
 
-# Multiple Regression
-model = ols('demo_index ~ eco_gdp_pc + demo_life_expcy + edu_avg + geo_rgn_geo', data=vdem_2000s_grouped_df).fit()
-print(model.summary())
-#%%[markdown]
-# ### Correlation Analysis
+#%% [markdown] Interpreting the results of the bubble plot
+# Use some interesting plot
+#%% Time Series Analysis (By Political Region)
+plt.figure(figsize=(10, 8))
+sns.lineplot(x='year', y='democracy_index', data=vdem_worldBank_poli_region, hue='political_region', legend=True, linewidth=3)
+color_dict = {1: 'blue', 2: 'orange', 3: 'green', 4: 'red', 5: 'purple', 6: 'brown'}
+plt.scatter(x='year', y='democracy_index', data=vdem_worldBank_df, c=vdem_worldBank_df['e_regionpol_6C'].map(color_dict), s=5, alpha=0.2)
+plt.xlabel('Year')
+plt.ylabel('Democracy Index')
+plt.title('Democracy Index over Time')
+plt.show()
+#%% [markdown] Interpreting the results of the time series analysis
 
-#%%
+#%% Multicollinearity (VIF test)
+X = vdem_worldBank_df[features]
 
-#%%[markdown]
-# Interpreting the results of the correlation analysis
+vif = pd.DataFrame()
+vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
 
-#%%[markdown]
-# ## Model Building
+print(vif)
 
-#%%
+#%% [markdown] Model Building
+#%% Regression Tree Model
+# Split the data into training and test sets
+from sklearn.model_selection import train_test_split
+X = vdem_worldBank_df[features]
+y = vdem_worldBank_df['democracy_index']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+print("X_train shape:",X_train.shape)
+print("X_test shape:",X_test.shape)
+print("y_train shape:",y_train.shape)
+print("y_test shape:",y_test.shape)
 
-#%%[markdown]
-# ## Result
+# Import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error as MSE
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_absolute_error as MAE
+from sklearn.metrics import mean_squared_log_error as MSLE
+from sklearn.metrics import median_absolute_error as MedAE
+from sklearn.tree import plot_tree
 
-#%%[markdown]
-# ## Discussion (Limitations, Future Work, etc.)
-#%%[markdown]
-# ## Conclusion
+# Instantiate dt
+dt = DecisionTreeRegressor(max_depth=4, min_samples_leaf=0.1, random_state=3)
+dt.fit(X_train, y_train)
+y_pred = dt.predict(X_test)
+print("R^2: {}".format(r2_score(y_test, y_pred)))
+print("MSE: {}".format(MSE(y_test, y_pred)))
+print("MAE: {}".format(MAE(y_test, y_pred)))
+print("MSLE: {}".format(MSLE(y_test, y_pred)))
+print("MedAE: {}".format(MedAE(y_test, y_pred)))
 
-#%%[markdown]
-# ## References
+# Plot the tree graph
+plt.figure(figsize=(10, 8))
+plot_tree(dt, feature_names=X_train.columns, filled=True, rounded=True)
+plt.show()
 
-# %%
+# Plot the feature importances
+importances = pd.Series(data=dt.feature_importances_, index=X.columns)
+importances_sorted = importances.sort_values()
+importances_sorted.plot(kind='barh', color='lightgreen')
+plt.title('Features Importances')
+plt.show()
+
+# Plot the test set with the decision boundary
+plt.figure(figsize=(10, 8))
+plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c=y_test, s=20, cmap='RdYlGn')
+plt.title('Test set')
+plt.xlabel('GDP')
+plt.ylabel('GDP Growth')
+plt.show()
+
+#%% [markdown] Interpreting the results of the regression tree model
+# The result of the regression tree suggests that the model has moderate predictive power. The R^2 value of 0.54 indicates that the model explains 54% of the variance in the target variable. The MSE value of 0.027 suggests that the average squared difference between the predicted and actual values is relatively low. The MAE value of 0.126 suggests that the average absolute difference between the predicted and actual values is also relatively low.
+
+# The MSLE value of 0.014 indicates that the model's error is distributed logarithmically, with smaller errors being more common than larger ones. The MedAE value of 0.104 indicates that the median absolute error is relatively low, suggesting that the model is relatively consistent in its predictions.
+
+# Overall, while the model is not perfect, it appears to have some predictive power and is likely to be useful in some applications. However, further analysis and testing may be necessary to fully evaluate its performance.
+#%% Random Forest Model
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import plot_tree
+
+# Instantiate rf
+rt = RandomForestRegressor(n_estimators=25, random_state=2)
+rt.fit(X_train, y_train)
+y_pred = rt.predict(X_test)
+print("R^2: {}".format(r2_score(y_test, y_pred)))
+print("MSE: {}".format(MSE(y_test, y_pred)))
+print("MAE: {}".format(MAE(y_test, y_pred)))
+print("MSLE: {}".format(MSLE(y_test, y_pred)))
+print("MedAE: {}".format(MedAE(y_test, y_pred)))
+
+# Plot the feature importances
+importances = pd.Series(data=rt.feature_importances_, index=X.columns)
+importances_sorted = importances.sort_values()
+importances_sorted.plot(kind='barh', color='lightgreen')
+plt.title('Features Importances')
+plt.show()
+
+# Plot the test set with the decision boundary
+plt.figure(figsize=(10, 8))
+plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c=y_test, s=20, cmap='RdYlGn')
+plt.title('Test set')
+plt.xlabel('GDP')
+plt.ylabel('GDP Growth')
+plt.show()
+
+#%% [markdown] Interpreting the results of the random forest model
+# The random forest model has a high R^2 value of 0.9434, which means that it can explain 94.34% of the variance in the target variable. The MSE (mean squared error) value is very low at 0.0033, indicating that the model's predictions are very close to the actual values. The MAE (mean absolute error) value is also low at 0.037, which means that the average difference between the predicted and actual values is small. The MSLE (mean squared logarithmic error) value is low at 0.0018, which indicates that the model is making accurate predictions across the entire range of target values. The MedAE (median absolute error) value is also low at 0.0219, which means that half of the absolute errors are smaller than this value. Overall, these results suggest that the random forest model is a good fit for the data and is making accurate predictions.
+
+#%% [markdown] Compare the results of the regression tree and random forest models
+# To compare the performance of the regression tree and random forest models, we can look at the evaluation metrics such as R-squared (R^2), mean squared error (MSE), mean absolute error (MAE), mean squared logarithmic error (MSLE), and median absolute error (MedAE). We can also compare the feature importances of the models.
+
+# From the evaluation metrics, we can see that the random forest model outperforms the regression tree model on all metrics. The R^2 value of the random forest model is 0.9434, which is much higher than the R^2 value of the regression tree model (0.5426). The MSE, MAE, MSLE, and MedAE values of the random forest model are also lower than those of the regression tree model, indicating that the random forest model is making more accurate predictions.
+
+# We can also compare the feature importances of the two models. The feature importances of the random forest model are generally higher than those of the regression tree model, indicating that the random forest model is able to better capture the relationships between the features and the target variable.
+
+# Overall, the random forest model appears to be a better choice for this dataset as it outperforms the regression tree model on all evaluation metrics and has higher feature importances.
+
+#%% Refining the random forest model
+# Hyperparameter tuning
+# GridSearchCV
+from sklearn.model_selection import GridSearchCV
+
+# Define parameter grid
+param_grid = {
+    'n_estimators': [25, 50, 75],
+    'max_depth': [2, 4, 6, None],
+    'min_samples_leaf': [0.1, 0.2, 0.3]
+}
+
+# Instantiate rf
+rf = RandomForestRegressor(random_state=2)
+
+# Instantiate grid_rf
+grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5)
+
+# Fit GridSearchCV to the data
+grid_search.fit(X_train, y_train)
+
+# Print best parameters
+print("Best parameters: ", grid_search.best_params_)
+
+# Use best parameters to fit the model
+rf_best = RandomForestRegressor(n_estimators=grid_search.best_params_            
+                                ['n_estimators'], 
+                                max_depth=grid_search.best_params_['max_depth'], 
+                                min_samples_leaf=grid_search.best_params_['min_samples_leaf'], 
+                                random_state=2)
+rf_best.fit(X_train, y_train)
+y_pred = rf_best.predict(X_test)
+
+# Evaluate the model
+print("R^2: {}".format(r2_score(y_test, y_pred)))
+print("MSE: {}".format(MSE(y_test, y_pred)))
+print("MAE: {}".format(MAE(y_test, y_pred)))
+print("MSLE: {}".format(MSLE(y_test, y_pred)))
+print("MedAE: {}".format(MedAE(y_test, y_pred)))
+
+# Plot Tree Graph
+plt.figure(figsize=(20, 10))
+plot_tree(rf_best.estimators_[0], feature_names=X_train.columns, filled=True, rounded=True)
+plt.show()
+
+
+# Plot the feature importances
+importances = pd.Series(data=rf_best.feature_importances_, index=X.columns)
+importances_sorted = importances.sort_values()
+importances_sorted.plot(kind='barh', color='lightgreen')
+plt.title('Features Importances')
+plt.show()
+
+# Plot the test set with the decision boundary
+plt.figure(figsize=(10, 8))
+plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c=y_test, s=20, cmap='RdYlGn')
+plt.title('Test set')
+plt.xlabel('GDP')
+plt.ylabel('GDP Growth')
+plt.show()
+
+#%% [markdown] Interpreting the results of the refined random forest model
+# After refining the random forest model using GridSearchCV, the R^2 value decreased to 0.5205, indicating that the model's ability to explain the variance in the target variable has decreased. The MSE value increased to 0.0283, indicating that the average squared difference between the predicted and actual values has increased. The MAE value increased to 0.1358, indicating that the average absolute difference between the predicted and actual values has also increased.
+
+# The MSLE value of 0.0149 indicates that the model's error is distributed logarithmically, with smaller errors being more common than larger ones. The MedAE value of 0.1146 indicates that the median absolute error is higher than the previous model.
+
+# Overall, while the refined random forest model has a lower performance than the previous one, it is still making relatively accurate predictions. Further analysis and testing may be necessary to fully evaluate its performance.
+
+#%% [markdown] Results
+# - The random forest model has a high R^2 value of 0.9434, which means that it can explain 94.34% of the variance in the target variable.
+# - The MSE (mean squared error) value is very low at 0.0033, indicating that the model's predictions are very close to the actual values.
+# - The MAE (mean absolute error) value is also low at 0.037, which means that the average difference between the predicted and actual values is small.
+# - The MSLE (mean squared logarithmic error) value is low at 0.0018, which indicates that the model is making accurate predictions across the entire range of target values.
+# - The MedAE (median absolute error) value is also low at 0.0219, which means that half of the absolute errors are smaller than this value.
+# - Overall, these results suggest that the random forest model is a good fit for the data and is making accurate predictions.
