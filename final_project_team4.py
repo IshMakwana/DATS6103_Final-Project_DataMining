@@ -856,15 +856,22 @@ print("Mean R^2:", scores.mean())
 # Cross-validation can give a more precise assessment of the model's performance and aid in evaluating the model's performance on unknown data.
 
 
-#%% Random Forest Model
+#%%[markdown]
+## Ensembling methods
+# Random Forest Model
 
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.tree import plot_tree
 
 # Instantiate rf
-rf_model = RandomForestRegressor(n_estimators = 25, random_state = 2)
+rf_model = RandomForestRegressor(n_estimators = 25, 
+                                 random_state = 2)
+
 rf_model.fit(X_train, y_train)
 y_pred = rf_model.predict(X_test)
+
+# RF model evaluation metrics
+
 print("R^2: {}".format(r2_score(y_test, y_pred)))
 print("MSE: {}".format(MSE(y_test, y_pred)))
 print("MAE: {}".format(MAE(y_test, y_pred)))
@@ -887,18 +894,84 @@ plt.ylabel('GDP Growth')
 plt.show()
 
 #%% [markdown] Interpreting the results of the random forest model
-# The random forest model has a high R^2 value of 0.9434, which means that it can explain 94.34% of the variance in the target variable. The MSE (mean squared error) value is very low at 0.0033, indicating that the model's predictions are very close to the actual values. The MAE (mean absolute error) value is also low at 0.037, which means that the average difference between the predicted and actual values is small. The MSLE (mean squared logarithmic error) value is low at 0.0018, which indicates that the model is making accurate predictions across the entire range of target values. The MedAE (median absolute error) value is also low at 0.0219, which means that half of the absolute errors are smaller than this value. Overall, these results suggest that the random forest model is a good fit for the data and is making accurate predictions.
+# The random forest model has a high R^2 value of 0.9434, 
+#       which means that it can explain 94.34% of the variance in the target variable. 
+# The MSE (mean squared error) value is very low at 0.0033, indicating that the model's predictions 
+#      are very close to the actual values. 
+# The MAE (mean absolute error) value is also low at 0.037, which means that the average difference between the predicted and actual values is small. 
+# The MSLE (mean squared logarithmic error) value is low at 0.0018, which indicates that the model is making accurate predictions across the entire range of target values. 
+# The MedAE (median absolute error) value is also low at 0.0219, which means that half of the absolute errors are smaller than this value. 
+
+#%%
+## Gradient Boosting algorithm (Ensemble) to boost model accuracy and performance
+
+# Instantiate rf
+gb_model = GradientBoostingRegressor(n_estimators = 25, 
+                                     learning_rate = 0.1, 
+                                     random_state = 2)
+
+gb_model.fit(X_train, y_train)
+y_pred_gb = gb_model.predict(X_test)
+
+# Gradient Boosting model evaluation metrics
+
+print("R^2: {}".format(r2_score(y_test, y_pred_gb)))
+print("MSE: {}".format(MSE(y_test, y_pred_gb)))
+print("MAE: {}".format(MAE(y_test, y_pred_gb)))
+print("MSLE: {}".format(MSLE(y_test, y_pred_gb)))
+print("MedAE: {}".format(MedAE(y_test, y_pred_gb)))
+
+# Plot the feature importances
+importances = pd.Series(data = gb_model.feature_importances_, 
+                        index = X.columns)
+
+importances_sorted = importances.sort_values()
+importances_sorted.plot(kind = 'barh', color = 'lightgreen')
+plt.title('Features Importances (GB)')
+plt.show()
+
+# Plot the test set with the decision boundary
+plt.figure(figsize = (10, 8))
+plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c = y_test, s = 20, cmap = 'RdYlGn')
+plt.title('Test set')
+plt.xlabel('GDP')
+plt.ylabel('GDP Growth')
+plt.show()
+
+#%% [markdown] Interpreting the results of the Gradient Boosting model:
+
+# The gradient boosting model has a R^2 value of 0.7118, 
+#       which means that it can explain 71.18% of the variance in the target variable. 
+# The MSE (mean squared error) value is very low at 0.017, indicating that the model's predictions 
+#      are close to the actual values. 
+# The MAE (mean absolute error) value is also low at 0.107, which means that the average difference between the predicted and actual values is small. 
+# The MSLE (mean squared logarithmic error) value is low at 0.0092, which indicates that the model is making accurate predictions across the entire range of target values. 
+# The MedAE (median absolute error) value is also low at 0.0926, which means that half of the absolute errors are smaller than this value. 
+
+#%%[markdown]
+# Overall, these results suggest that the random forest model is a good fit over regression and gradient boosting models 
+#     for the data and is making accurate predictions with R^2 (R-squared) value of 94.3%.
 
 #%% [markdown] Compare the results of the regression tree and random forest models
-# To compare the performance of the regression tree and random forest models, we can look at the evaluation metrics such as R-squared (R^2), mean squared error (MSE), mean absolute error (MAE), mean squared logarithmic error (MSLE), and median absolute error (MedAE). We can also compare the feature importances of the models.
-
-# From the evaluation metrics, we can see that the random forest model outperforms the regression tree model on all metrics. The R^2 value of the random forest model is 0.9434, which is much higher than the R^2 value of the regression tree model (0.5426). The MSE, MAE, MSLE, and MedAE values of the random forest model are also lower than those of the regression tree model, indicating that the random forest model is making more accurate predictions.
-
-# We can also compare the feature importances of the two models. The feature importances of the random forest model are generally higher than those of the regression tree model, indicating that the random forest model is able to better capture the relationships between the features and the target variable.
-
-# Overall, the random forest model appears to be a better choice for this dataset as it outperforms the regression tree model on all evaluation metrics and has higher feature importances.
+# To compare the performance of the regression tree, gradient boosting and random forest models, 
+# we can look at the evaluation metrics such as: 
+#   R-squared (R^2), 
+#   mean squared error (MSE), 
+#   mean absolute error (MAE), 
+#   mean squared logarithmic error (MSLE), and 
+#   median absolute error (MedAE). 
+# We can also compare the feature importances of the models.
+# From the evaluation metrics, we can see that the random forest model outperforms the regression tree model and gradient boosting model on all metrics. 
+# The R^2 value of the random forest model is 0.9434, which is much higher than the R^2 value of the regression tree model (0.5426). 
+# The MSE, MAE, MSLE, and MedAE values of the random forest model are also lower than those of the regression tree and gradient boosting models, 
+#       indicating that the random forest model is making more accurate predictions.
+# We can also compare the feature importances of the two models: 
+#     The feature importances of the random forest model are generally higher than those of the regression tree & gradient boosting models, 
+#       indicating that the random forest model is able to better capture the relationships between the features and the target variable.
+# Overall, the random forest model appears to be a better choice for this dataset as it outperforms the regression tree and gradient boosting model on all evaluation metrics and has higher feature importances.
 
 #%% Refining the random forest model
+
 # Hyperparameter tuning
 # GridSearchCV
 from sklearn.model_selection import GridSearchCV
@@ -960,11 +1033,15 @@ plt.ylabel('GDP Growth')
 plt.show()
 
 #%% [markdown] Interpreting the results of the refined random forest model
-# After refining the random forest model using GridSearchCV, the R^2 value decreased to 0.5205, indicating that the model's ability to explain the variance in the target variable has decreased. The MSE value increased to 0.0283, indicating that the average squared difference between the predicted and actual values has increased. The MAE value increased to 0.1358, indicating that the average absolute difference between the predicted and actual values has also increased.
+# After refining the random forest model using GridSearchCV, 
+# the R^2 value decreased to 0.5205, indicating that the model's ability to explain the variance in the target variable has decreased. 
+# The MSE value increased to 0.0283, indicating that the average squared difference between the predicted and actual values has increased. 
+# The MAE value increased to 0.1358, indicating that the average absolute difference between the predicted and actual values has also increased.
+# The MSLE value of 0.0149 indicates that the model's error is distributed logarithmically, with smaller errors being more common than larger ones. 
+# The MedAE value of 0.1146 indicates that the median absolute error is higher than the previous model.
 
-# The MSLE value of 0.0149 indicates that the model's error is distributed logarithmically, with smaller errors being more common than larger ones. The MedAE value of 0.1146 indicates that the median absolute error is higher than the previous model.
-
-# Overall, while the refined random forest model has a lower performance than the previous one, it is still making relatively accurate predictions. Further analysis and testing may be necessary to fully evaluate its performance.
+# Overall, while the refined random forest model has a lower performance than the previous one, it is still making relatively accurate predictions. 
+# Further analysis and testing may be necessary to fully evaluate its performance.
 
 #%% [markdown] Results
 # - The random forest model has a high R^2 value of 0.9434, which means that it can explain 94.34% of the variance in the target variable.
