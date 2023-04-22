@@ -525,32 +525,8 @@ sns.relplot(data = vdem_worldBank_df,
             hue =  'e_regionpol_6C', kind = 'line')
 plt.show()
 
-#%% 3D time series Scatter plot
-
-fig = go.Figure(data=[go.Scatter3d(
-    x=vdem_worldBank_df['year'],
-    y=vdem_worldBank_df['democracy_index'],
-    z=vdem_worldBank_df['LifeExpectancy'],
-    mode='markers',
-    marker=dict(
-        size=12,
-        color=vdem_worldBank_df['e_regionpol_6C'],
-        opacity=0.8
-    )
-)])
-
-fig.update_layout(scene=dict(
-                    xaxis_title='Year',
-                    yaxis_title='Democracy Index',
-                    zaxis_title='Life Expectancy (f)'),
-                    width=700,
-                    margin=dict(r=20, b=10, l=10, t=10))
-
-fig.show()
-
-
 #%%
-# Alternate 3-d scatter plot
+# 3-d scatter plot
 
 fig = px.scatter_3d(vdem_worldBank_df, 
                     x='year', 
