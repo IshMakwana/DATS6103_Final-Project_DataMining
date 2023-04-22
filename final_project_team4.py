@@ -384,7 +384,7 @@ for col in num_cols:
 #%% Boxplot
 # The boxplot allows us to compare the distribution of democracy index across regions, as well as identify any potential outliers. It can also help us to identify if there are any significant differences in the median democracy index among different regions.
 
-sns.boxplot(data= vdem_worldBank_poli_region_grouped, x="democracy_index", y="region", dodge=False)
+sns.boxplot(data= vdem_worldBank_df, x="e_regionpol_6C", y="democracy_index", dodge=False)
 plt.show()
 
 #%% Initial time-series line plot
