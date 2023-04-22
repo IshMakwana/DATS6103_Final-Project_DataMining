@@ -748,7 +748,7 @@ vif
 # ### Descriptive Statistics
 print(vdem_worldBank_poli_region_grouped.columns)
 # Select variables of interest
-df = vdem_worldBank_poli_region_grouped[['demo_index', 'eco_gdp_pc', 'demo_life_expcy', 'edu_avg']]
+df = vdem_worldBank_df[['democracy_index', 'GNIPerCapita', 'LifeExpectancy', 'PrimarySchoolEnrollment']]
 
 # Print descriptive statistics
 print(df.describe())
