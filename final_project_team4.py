@@ -416,57 +416,6 @@ sns.boxplot(data = vdem_worldBank_df,
             x = "e_regionpol_6C", dodge=False)
 plt.show()
 
-# #%% Initial time-series line plot
-
-# # Set the 'year' column of the 'vdem_worldbank_df' dataframe to an int data type. 
-# vdem_worldBank_poli_region_grouped['year'] = vdem_worldBank_poli_region_grouped['year'].astype(int)
-
-# # a list of sample countries to use it as input.
-# random_sample = ['North Korea', 'Denmark']
-
-# #%%
-# print(vdem_worldBank_poli_region_grouped.columns)
-
-# #%%
-# # Edge-case for randome sampling
-# def get_random_n_countries(col: str, n : int, sample: list) -> list:
-#     """
-#     This function is used to extract 3 random country names from dataframe
-    
-#     Keyword arguments:
-#     col : column name (country_name)
-#     n: number of countries to extract
-#     sample : A list contains 2 countries as max and min limits
-#     """
-    
-#     sample_countries = [] # Empty list to store n random country names
-#     while True:
-#         sample_countries = random.sample(vdem_worldBank_df[country_var].unique().tolist(), n)
-
-#         if any(sample_country in sample for sample_country in sample_countries): # if country already exists in list, re-loop
-#             continue
-#         return sample_countries
-
-# country_var = "country_name"
-# # A function 'get_random_n_countries' that takes a column name, a number of countries to extract, and a list of sample countries as input. This function is used to extract three random country names from the dataframe that are not in the sample countries list.
-# sample_countries = get_random_n_countries(col = country_var, n = 3, 
-#                                           sample = random_sample)
-
-# # Select a subset of the 'vdem_worldbank_poli_region_grouped' dataframe that contains only the rows corresponding to the randomly selected countries.
-# # vdem_worldbank_poli_region_grouped_subset = vdem_worldBank_df[vdem_worldBank_df[country_var].isin(sample_countries)]
-
-# # It adds these country names to the 'random_sample' list. 
-# random_sample.extend(list(vdem_worldBank_df['country_name']))
-
-# # Select a subset of the 'vdem_worldbank_df' dataframe that contains only the rows corresponding to the countries in the 'random_sample' list.
-# vdem_worldbank_df_samples = vdem_worldBank_df[vdem_worldBank_df['country_name'].isin(random_sample)]
-
-# # Create a line plot of 5 countries which illustrates limits and comparing metrics. 
-# sns.lineplot(data = vdem_worldbank_df_samples, 
-#              x='year', y='democracy_index', 
-#              hue='country_name')
-# plt.show()
-
 # %% Small multiple time series
 # Creating a figure with six subplots, each showing a scatterplot of democracy index versus year for a different geographical region. 
 # The data for each subplot is filtered from the original vdem_worldbank_df dataframe based on the value of e_regionpol_6C column.
@@ -688,12 +637,6 @@ vif["Variable"] = life_expect.columns
 vif
 
 #%%[markdown]
-## Interpreting the results of the basic EDA
-# The basic EDA has generated a correlation matrix between the different variables in vdem_worldbank_poli_region_grouped. The heatmap shows the strength and direction of the correlation between different pairs of variables.
-# The green shades with 1 written in the heatmap indicate a stronger positive correlation between the variables.
-# The light blue shades with 0 in the heatmap indicate a stronger negative correlation between the variables.
-# 
-
 # Variables to test against average democracy index: GDP per capita, overall life expectancy, and average education.
 
 #%%[markdown]
@@ -717,7 +660,6 @@ print(df.describe())
 # The eco_gdp_pc variable has a mean of 14.96 with a standard deviation of 16.37, indicating that there is a wide range of GDP per capita values across the countries in the dataset. The minimum value of 0 indicates that there are some countries with very low levels of economic development, while the maximum value of 84.57 indicates that there are some countries with very high levels of economic development.
 # The demo_life_expcy variable has a mean of 68.50 with a standard deviation of 14.23, indicating that the life expectancy across the countries in the dataset is moderate. The minimum value of 0 indicates that there are some countries with very low life expectancy, while the maximum value of 83.53 indicates that there are some countries with very high life expectancy.
 # The edu_avg variable has a mean of 5.76 with a standard deviation of 4.39, indicating that the average education level across the countries in the dataset is moderate. The minimum value of 0 indicates that there are some countries with very low levels of education, while the maximum value of 13.24 indicates that there are some countries with very high levels of education.
-#  
 
 #%%  Correlation Matrix (Linearity)
 
