@@ -735,6 +735,87 @@ sns.heatmap(cor_mat, mask = mask, cmap = cmap, vmax = .3, center=0,
 plt.title('Correlation matrix')
 plt.show()
 
+#%%
+#Annova Test 1
+from scipy.stats import f_oneway
+
+# Group data by region and calculate mean Democracy Index for each region
+dem_index_by_region = vdem_worldBank_df.groupby('e_regionpol_6C')['democracy_index'].mean()
+
+# Perform ANOVA test
+f_stat, p_val = f_oneway(*[vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C']==region]['democracy_index'] for region in dem_index_by_region.index])
+
+print(f"ANOVA test result: F-statistic = {f_stat}, p-value = {p_val}")
+
+#%%
+#Annova Test 2 
+
+# Group data by region and calculate mean Life Expectancy for each region
+life_exp_by_region = vdem_worldBank_df.groupby('e_regionpol_6C')['LifeExpectancy'].mean()
+
+# Perform ANOVA test
+f_stat, p_val = f_oneway(*[vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C']==region]['LifeExpectancy'] for region in life_exp_by_region.index])
+
+print(f"ANOVA test result: F-statistic = {f_stat}, p-value = {p_val}")
+
+#%%
+#Annova Test3
+# ANOVA test for Child Mortality
+grouped_cm = vdem_worldBank_df.groupby('e_regionpol_6C')['Under5Mortality'].apply(list)
+f_val, p_val = stats.f_oneway(*grouped_cm)
+print("Child Mortality ANOVA test using region:")
+print("F value:", f_val)
+print("P value:", p_val)
+
+# ANOVA test for GNI Per Capita
+grouped_gni = vdem_worldBank_df.groupby('e_regionpol_6C')['GNIPerCapita'].apply(list)
+f_val, p_val = stats.f_oneway(*grouped_gni)
+print("GNI Per Capita ANOVA test using region:")
+print("F value:", f_val)
+print("P value:", p_val)
+
+# ANOVA test for Child School Enrollment
+grouped_enrollment = vdem_worldBank_df.groupby('e_regionpol_6C')['PrimarySchoolEnrollment'].apply(list)
+f_val, p_val = stats.f_oneway(*grouped_enrollment)
+print("Child School Enrollment ANOVA test using region:")
+print("F value:", f_val)
+print("P value:", p_val)
+
+# ANOVA test for Year
+grouped_year = vdem_worldBank_df.groupby('e_regionpol_6C')['year'].apply(list)
+f_val, p_val = stats.f_oneway(*grouped_year)
+print("Year ANOVA test using region:")
+print("F value:", f_val)
+print("P value:", p_val)
+
+#Annova Test4
+# ANOVA test for Child Mortality using country_name
+grouped_cm = vdem_worldBank_df.groupby('country_name')['Under5Mortality'].apply(list)
+f_val, p_val = stats.f_oneway(*grouped_cm)
+print("Child Mortality ANOVA test using country_name:")
+print("F value:", f_val)
+print("P value:", p_val)
+
+# ANOVA test for GNI Per Capita using country_name
+grouped_gni = vdem_worldBank_df.groupby('country_name')['GNIPerCapita'].apply(list)
+f_val, p_val = stats.f_oneway(*grouped_gni)
+print("GNI Per Capita ANOVA test using country_name:")
+print("F value:", f_val)
+print("P value:", p_val)
+
+# ANOVA test for Child School Enrollment using country_name
+grouped_enrollment = vdem_worldBank_df.groupby('country_name')['PrimarySchoolEnrollment'].apply(list)
+f_val, p_val = stats.f_oneway(*grouped_enrollment)
+print("Child School Enrollment ANOVA test using country_name:")
+print("F value:", f_val)
+print("P value:", p_val)
+
+# ANOVA test for Year using country_name
+grouped_year = vdem_worldBank_df.groupby('country_name')['year'].apply(list)
+f_val, p_val = stats.f_oneway(*grouped_year)
+print("Year ANOVA test using country_name:")
+print("F value:", f_val)
+print("P value:", p_val)
 #%% [markdown] Interpreting the results of the correlation matrix
 # The correlation matrix shows the relationship between the democracy index and various factors. 
 # A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
