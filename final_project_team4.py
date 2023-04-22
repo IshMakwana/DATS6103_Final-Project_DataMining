@@ -488,9 +488,40 @@ plt.show()
 # A line plot of democracy index over time for each politico-geographic region in the dataset 
 # It will be useful for visualizing how democracy index has changed over time for different politico-geographic regions.
 
+vdem_worldBank_df['e_regionpol_6C'] = vdem_worldBank_df['e_regionpol_6C'].replace({1: 'Eastern Europe and Central Asia', 2: 'Latin America and the Caribbean', 3: 'Middle East and North Africa', 4: 'Sub-Saharan Africa', 5: 'Western Europe, North America, and Oceania', 6: 'Asia and Pacific'})
+
+
 sns.set_context("paper")
 sns.relplot(data = vdem_worldBank_df, 
             x = 'year', y = 'democracy_index', 
+            hue =  'e_regionpol_6C', kind = 'line')
+plt.show()
+
+#%% Time series 2
+
+sns.relplot(data = vdem_worldBank_df, 
+            x = 'year', y = 'LifeExpectancy', 
+            hue =  'e_regionpol_6C', kind = 'line')
+plt.show()
+
+#%% Time series 3
+
+sns.relplot(data = vdem_worldBank_df, 
+            x = 'year', y = 'Under5Mortality', 
+            hue =  'e_regionpol_6C', kind = 'line')
+plt.show()
+
+#%% Time series 4
+
+sns.relplot(data = vdem_worldBank_df, 
+            x = 'year', y = 'GNIPerCapita', 
+            hue =  'e_regionpol_6C', kind = 'line')
+plt.show()
+
+#%% Time series 5
+
+sns.relplot(data = vdem_worldBank_df, 
+            x = 'year', y = 'PrimarySchoolEnrollment', 
             hue =  'e_regionpol_6C', kind = 'line')
 plt.show()
 
@@ -678,8 +709,10 @@ plt.show() # animation won't move here, have to open it in your working director
 # First createing a new dataframe called vdem_worldbank_poli_region_grouped_names with two columns: name and region, which contain the country names and their corresponding geopolitical region codes respectively.
 vdem_worldbank_poli_region_grouped_names = pd.DataFrame()
 
-vdem_worldbank_poli_region_grouped_names['name'] = vdem_worldBank_poli_region_grouped['country_name']
-vdem_worldbank_poli_region_grouped_names['region'] = vdem_worldBank_poli_region_grouped['geo_reg_polc_g6c']
+vdem_worldbank_poli_region_grouped_names['name'] = vdem_worldBank_grouped_country['country_name']
+vdem_worldbank_poli_region_grouped_names['region'] = vdem_worldBank_grouped_country['e_regionpol_6C']
+vdem_worldbank_poli_region_grouped_names.loc['United States', 'country_name'] = 'United States of America'
+
 
 # Loading the world map using the naturalearth_lowres dataset and filters out Antarctica and countries with a population estimate of zero.
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
@@ -717,7 +750,7 @@ plt.show()
 #%%
 # Calculating the Variance Inflation Factor (VIF) for the columns 'demo_mrty(m)_rate' and 'demo_mrty(i)_rate' in the vdem_worldbank_poli_region_grouped dataframe. 
 
-life_expect = vdem_worldBank_poli_region_grouped[['demo_mrty(m)_rate', 'demo_mrty(i)_rate']]
+life_expect = vdem_worldBank_df[['Under5Mortality', 'LifeExpectancy']]
 
 vif = pd.DataFrame()
 # Creating a new dataframe life_expect that contains only the columns of interest.
