@@ -251,49 +251,70 @@ vdem_worldBank_df = pd.read_csv(url2)
 
 #%% Basic Information (country time series)
 vdem_worldBank_df.head()
+
 #%% Data Types, Data Structure, number of rows and columns, and missing values (country time series)
 vdem_worldBank_df.info()
+
 #%% Descriptive Statistics (country time series)
 vdem_worldBank_df.describe()
+
 #%% Columns (country time series)
 vdem_worldBank_df.columns
+
 #%% Countries (country time series)
 vdem_worldBank_df['country_name'].unique() 
+
 #%% Create a new dataframe aggregating the mean of the democracy index for each country
 vdem_worldBank_grouped_country = vdem_worldBank_df.groupby('country_name').mean()
 vdem_worldBank_grouped_country.reset_index(inplace=True)
+
 #%% Basic Information (grouped by country)
 vdem_worldBank_grouped_country.head()
+
 #%% Data Types, number of rows and columns, and missing values (grouped by country)
 vdem_worldBank_grouped_country.info()
+
 #%% Data Structure (grouped by country)
 vdem_worldBank_grouped_country.shape
+
 #%% Missing Values (grouped by country)
 vdem_worldBank_grouped_country.isnull().sum()
+
 #%% Descriptive Statistics (grouped by country)
 vdem_worldBank_grouped_country.describe()
+
 #%% Create a new dataframe aggregating the mean of the democracy index for each political region with time series
 vdem_worldBank_poli_region = vdem_worldBank_df.groupby(['e_regionpol_6C', 'year']).mean()
 vdem_worldBank_poli_region.reset_index(inplace=True)
+
 #%% Basic Information (grouped by political region with time series)
 vdem_worldBank_poli_region.head()
+
 #%% Data Types, number of rows and columns, and missing values (grouped by political region with time series)
 vdem_worldBank_poli_region.info()
+
 #%% Data Structure (grouped by political region with time series)
 vdem_worldBank_poli_region.shape
+
 #%% Descriptive Statistics (grouped by political region with time series)
 vdem_worldBank_poli_region.describe()
+
 #%% Create a new dataframe aggregating the mean of the democracy index for each political region
 vdem_worldBank_poli_region_grouped = vdem_worldBank_df.groupby('e_regionpol_6C').mean()
 vdem_worldBank_poli_region_grouped.reset_index(inplace=True)
+
 #%% Basic Information (grouped by political region)
 vdem_worldBank_poli_region_grouped.head()
+
 #%% Data Types, number of rows and columns, and missing values (grouped by political region)
 vdem_worldBank_poli_region_grouped.info()
+
 #%% Data Structure (grouped by political region)
 vdem_worldBank_poli_region_grouped.shape
+
 #%% Descriptive Statistics (grouped by political region)
 vdem_worldBank_poli_region_grouped.describe()
+
 #%% Add the columns for political region dataframe
 poli_region_dict = {1: 'Eastern_Europe_and_Central_Asia', 
                     2: 'Latin_America_and_the_Caribbean', 
@@ -317,6 +338,7 @@ closest_country = vdem_worldBank_grouped_country.loc[(vdem_worldBank_grouped_cou
 print(f'Max democracy index: {round(max_demo_index, 2)}, Country: {vdem_worldBank_grouped_country[vdem_worldBank_grouped_country["democracy_index"] == max_demo_index]["country_name"].values[0]}')
 print(f'Min democracy index: {round(min_demo_index, 2)}, Country: {vdem_worldBank_grouped_country[vdem_worldBank_grouped_country["democracy_index"] == min_demo_index]["country_name"].values[0]}')
 print(f'Mean democracy index: {round(mean_demo_index, 2)}, Country: {closest_country}')
+
 #%% Outliers
 num_cols = ['democracy_index','v2x_polyarchy', 'v2x_libdem',          
             'v2x_partipdem', 'v2x_delibdem','v2x_egaldem', 
@@ -330,7 +352,7 @@ num_cols = ['democracy_index','v2x_polyarchy', 'v2x_libdem',
 # Create a new DataFrame containing only the numeric columns
 df_subset = vdem_worldBank_df[num_cols]
 # Create a boxplot for each numeric column
-sns.boxplot(data=df_subset, orient="h", palette="Set2")
+sns.boxplot(data = df_subset, orient = "h", palette = "Set2")
 
 #%%[markdown]
 # Merging code from merge_data file: 
@@ -389,57 +411,6 @@ sns.boxplot(data = vdem_worldBank_df,
             y = "democracy_index", 
             x = "e_regionpol_6C", dodge=False)
 plt.show()
-
-# #%% Initial time-series line plot
-
-# # Set the 'year' column of the 'vdem_worldbank_df' dataframe to an int data type. 
-# vdem_worldBank_poli_region_grouped['year'] = vdem_worldBank_poli_region_grouped['year'].astype(int)
-
-# # a list of sample countries to use it as input.
-# random_sample = ['North Korea', 'Denmark']
-
-# #%%
-# print(vdem_worldBank_poli_region_grouped.columns)
-
-# #%%
-# # Edge-case for randome sampling
-# def get_random_n_countries(col: str, n : int, sample: list) -> list:
-#     """
-#     This function is used to extract 3 random country names from dataframe
-    
-#     Keyword arguments:
-#     col : column name (country_name)
-#     n: number of countries to extract
-#     sample : A list contains 2 countries as max and min limits
-#     """
-    
-#     sample_countries = [] # Empty list to store n random country names
-#     while True:
-#         sample_countries = random.sample(vdem_worldBank_df[country_var].unique().tolist(), n)
-
-#         if any(sample_country in sample for sample_country in sample_countries): # if country already exists in list, re-loop
-#             continue
-#         return sample_countries
-
-# country_var = "country_name"
-# # A function 'get_random_n_countries' that takes a column name, a number of countries to extract, and a list of sample countries as input. This function is used to extract three random country names from the dataframe that are not in the sample countries list.
-# sample_countries = get_random_n_countries(col = country_var, n = 3, 
-#                                           sample = random_sample)
-
-# # Select a subset of the 'vdem_worldbank_poli_region_grouped' dataframe that contains only the rows corresponding to the randomly selected countries.
-# # vdem_worldbank_poli_region_grouped_subset = vdem_worldBank_df[vdem_worldBank_df[country_var].isin(sample_countries)]
-
-# # It adds these country names to the 'random_sample' list. 
-# random_sample.extend(list(vdem_worldBank_df['country_name']))
-
-# # Select a subset of the 'vdem_worldbank_df' dataframe that contains only the rows corresponding to the countries in the 'random_sample' list.
-# vdem_worldbank_df_samples = vdem_worldBank_df[vdem_worldBank_df['country_name'].isin(random_sample)]
-
-# # Create a line plot of 5 countries which illustrates limits and comparing metrics. 
-# sns.lineplot(data = vdem_worldbank_df_samples, 
-#              x='year', y='democracy_index', 
-#              hue='country_name')
-# plt.show()
 
 # %% Small multiple time series
 # Creating a figure with six subplots, each showing a scatterplot of democracy index versus year for a different geographical region. 
@@ -546,67 +517,6 @@ fig.update_layout(scene=dict(
 
 fig.show()
 
-# #%% Scatterplot
-
-# # The cmap variable defines the color palette used for the plot.
-# cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
-# g = sns.relplot(
-#     data = vdem_worldBank_df,
-#     x = 'democracy_index', 
-#     y = 'e_civil_war',
-#     palette=cmap,
-# )
-# # The set() function is used to set the x-axis and y-axis scales to logarithmic scales.
-# g.set(xscale="log", yscale="log")
-# # The grid() function is used to add minor gridlines to the plot.
-# g.ax.xaxis.grid(True, "minor", linewidth=.25)
-# g.ax.yaxis.grid(True, "minor", linewidth=.25)
-# # The despine() function is used to remove the spines on the left and bottom sides of the plot.
-# g.despine(left=True, bottom=True)
-
-# plt.show()
-
-
-# #%% Scatterplot 2
-# # This scatterplot helps in visualizing the relationship between democracy index, total resources income per capita, region, and year.
-# # The x-axis represents the democracy index, the y-axis represents total resources income per capita, and the size of the dots represents the year. The color of the dots represents the region.
-# # The size of the dots adds an additional layer of information by showing how the data changes over time. The use of different colors helps to distinguish the different regions, making it easier to see if there are any regional patterns in the data.
-
-# cmap = sns.cubehelix_palette(rot=-2, as_cmap=True)
-# g = sns.relplot(
-#     data=vdem_worldBank_df,
-#     x='democracy_index', y='e_total_resources_income_pc',
-#     hue='e_regionpol_6C', size='year',
-#     palette=cmap, sizes=(10,500),
-# )
-# g.set(xscale="log", yscale="log")
-# g.ax.xaxis.grid(True, "minor", linewidth=.25)
-# g.ax.yaxis.grid(True, "minor", linewidth=.25)
-# g.despine(left=True, bottom=True)
-
-# plt.show()
-
-# #%% Scatterplot 3
-# # This scatterplot shows the relationship between democracy index and GDP per capita, with points colored by the presence or absence of civil war (0 for no civil war, 1 for civil war) and sized by year.
-
-# # convert the e_civil_war column from a boolean to an integer using astype(int).
-# vdem_worldBank_df['e_civil_war'] = vdem_worldBank_df['e_civil_war'].astype(int)
-
-# # We size the points by year, with smaller points representing earlier years and larger points representing later years. The color palette is set to "muted" and the transparency of the points is set to 0.5. 
-# g = sns.relplot(
-#     data=vdem_worldBank_df,
-#     x='democracy_index', y='e_gdppc',
-#     hue='e_civil_war', hue_order=[0, 1],
-#     size='year', sizes=(10,50),
-#     palette="muted", alpha=.5,
-# )
-# g.ax.xaxis.grid(True, "minor", linewidth=.25)
-# g.ax.yaxis.grid(True, "minor", linewidth=.25)
-# g.despine(left=True, bottom=True)
-
-# plt.show()
-
-
 #%% Bubble plot animation (attempt #1)
 # The  Bubble plot shows the relationship between democracy index and income 
 # inequality (measured by the Palma ratio) across different countries in the V-Dem dataset. 
@@ -707,28 +617,13 @@ ax.set_axis_off()
 
 ax.plot()
 
-#%%[markdown]
-# ### Basic EDA
-# A heatmap of the correlation matrix for the vdem_worldbank_poli_region_grouped dataframe, highlighting cells where the correlation coefficient is less than -0.3.
-
-corr = vdem_worldBank_poli_region_grouped.corr() < abs(0.6)
-
-# A mask is then created using the np.triu() function to exclude the upper triangle of the heatmap, as it is redundant due to symmetry.
-mask = np.triu(np.ones_like(corr, dtype=bool))
-
-f, ax = plt.subplots(figsize=(11, 9))
-
-sns.heatmap(corr, annot=True, mask=mask, cmap = cmap, vmax=.3, center=0,
-            square=True, linewidths=.5, cbar_kws={"shrink": .5})
-
-plt.show()
-
 #%%
 # Calculating the Variance Inflation Factor (VIF) for the columns 'demo_mrty(m)_rate' and 'demo_mrty(i)_rate' in the vdem_worldbank_poli_region_grouped dataframe. 
 
 life_expect = vdem_worldBank_df[['Under5Mortality', 'LifeExpectancy']]
 
 vif = pd.DataFrame()
+
 # Creating a new dataframe life_expect that contains only the columns of interest.
 vif["VIF Factor"] = [variance_inflation_factor(life_expect.values, i) for i in range(life_expect.shape[1])]
 vif["Variable"] = life_expect.columns
@@ -745,13 +640,17 @@ vif
 # Variables to test against average democracy index: GDP per capita, overall life expectancy, and average education.
 
 #%%[markdown]
+
 # ### Descriptive Statistics
 print(vdem_worldBank_poli_region_grouped.columns)
+
 # Select variables of interest
-df = vdem_worldBank_df[['democracy_index', 'GNIPerCapita', 'LifeExpectancy', 'PrimarySchoolEnrollment']]
+df = vdem_worldBank_df[['democracy_index', 'GNIPerCapita', 
+                        'LifeExpectancy', 'PrimarySchoolEnrollment']]
 
 # Print descriptive statistics
 print(df.describe())
+
 #%%
 
 #%%[markdown]
@@ -762,29 +661,51 @@ print(df.describe())
 # The demo_life_expcy variable has a mean of 68.50 with a standard deviation of 14.23, indicating that the life expectancy across the countries in the dataset is moderate. The minimum value of 0 indicates that there are some countries with very low life expectancy, while the maximum value of 83.53 indicates that there are some countries with very high life expectancy.
 # The edu_avg variable has a mean of 5.76 with a standard deviation of 4.39, indicating that the average education level across the countries in the dataset is moderate. The minimum value of 0 indicates that there are some countries with very low levels of education, while the maximum value of 13.24 indicates that there are some countries with very high levels of education.
 #  
+
 #%%  Correlation Matrix (Linearity)
+
 cor_mat = vdem_worldBank_df[num_cols].corr()
+
 # Generate a mask for the upper triangle
 mask = np.triu(np.ones_like(cor_mat, dtype=bool))
 f, ax = plt.subplots(figsize=(11, 9))
 cmap = sns.diverging_palette(230, 20, as_cmap=True)
-sns.heatmap(cor_mat, mask=mask, cmap=cmap, vmax=.3, center=0,
-            square=True, linewidths=.5, cbar_kws={"shrink": .5}, fmt='.1g',annot=True)
+
+sns.heatmap(cor_mat, mask = mask, cmap = cmap, vmax = .3, center=0,
+            square = True, linewidths = .5, cbar_kws = {"shrink": .5}, 
+            fmt = '.1g', annot = True)
+
 plt.title('Correlation matrix')
 plt.show()
+
 #%% [markdown] Interpreting the results of the correlation matrix
-# The correlation matrix shows the relationship between the democracy index and various factors. A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. In this case, the democracy index is positively correlated with measures of political and economic freedom, as well as access to education and healthcare. Conversely, the democracy index is negatively correlated with factors such as adolescent fertility and HIV prevalence. These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
+# The correlation matrix shows the relationship between the democracy index and various factors. 
+# A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
+# In this case, the democracy index is positively correlated with measures of political and economic freedom, 
+#   as well as access to education and healthcare. Conversely, the democracy index is negatively correlated with factors 
+#   such as adolescent fertility and HIV prevalence. 
+# These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
 
 #%% Bubble Plot
 var_independent = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
-            'AgriForestFishValueAdded', 'CO2Emissions','ExportsOfGoodsAndServices', 'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+            'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
+            'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
+            'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
+            'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
+            'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
 
 # Group by country_name and calculate the mean for each feature
 df_subset = vdem_worldBank_grouped_country[var_independent + ['democracy_index']]
 df_subset['e_regionpol_6C'] = df_subset['e_regionpol_6C'].astype(int)
 
 features = ['AccessToCleanCooking','AdolescentFertility', 
-            'AgriForestFishValueAdded', 'CO2Emissions','ExportsOfGoodsAndServices', 'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+            'AgriForestFishValueAdded', 'CO2Emissions', 
+            'ExportsOfGoodsAndServices', 'FertilityRate', 
+            'ForeignDirectInvestment','GDP', 'GDPGrowth', 
+            'GNIPerCapita', 'MeaslesImmunization', 
+            'ImportsOfGoodsAndServices', 'LifeExpectancy', 
+            'MobileSubscriptions','Under5Mortality', 'NetMigration', 
+            'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
 
 countries = ['United States', 'China', 'India', 'Brazil', 'Japan']
 
@@ -801,15 +722,20 @@ for feature in features:
 
 #%% [markdown] Interpreting the results of the bubble plot
 # Use some interesting plot
+
 #%% Time Series Analysis (By Political Region)
+
 plt.figure(figsize=(10, 8))
-sns.lineplot(x='year', y='democracy_index', data=vdem_worldBank_poli_region, hue='political_region', legend=True, linewidth=3)
+sns.lineplot(x = 'year', y = 'democracy_index', data = vdem_worldBank_poli_region, 
+             hue = 'political_region', legend = True, linewidth = 3)
+
 color_dict = {1: 'blue', 2: 'orange', 3: 'green', 4: 'red', 5: 'purple', 6: 'brown'}
 plt.scatter(x='year', y='democracy_index', data=vdem_worldBank_df, c=vdem_worldBank_df['e_regionpol_6C'].map(color_dict), s=5, alpha=0.2)
 plt.xlabel('Year')
 plt.ylabel('Democracy Index')
 plt.title('Democracy Index over Time')
 plt.show()
+
 #%% [markdown] Interpreting the results of the time series analysis
 
 #%% Multicollinearity (VIF test)
@@ -821,12 +747,19 @@ vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
 print(vif)
 
 #%% [markdown] Model Building
+
 #%% Regression Tree Model
+
 # Split the data into training and test sets
 from sklearn.model_selection import train_test_split
+
 X = vdem_worldBank_df[features]
 y = vdem_worldBank_df['democracy_index']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                    test_size=0.2, 
+                                                    random_state=42)
+
 print("X_train shape:",X_train.shape)
 print("X_test shape:",X_test.shape)
 print("y_train shape:",y_train.shape)
@@ -842,9 +775,15 @@ from sklearn.metrics import median_absolute_error as MedAE
 from sklearn.tree import plot_tree
 
 # Instantiate dt
-dt = DecisionTreeRegressor(max_depth=4, min_samples_leaf=0.1, random_state=3)
-dt.fit(X_train, y_train)
-y_pred = dt.predict(X_test)
+dt_model = DecisionTreeRegressor(max_depth = 4, 
+                                 min_samples_leaf = 0.1, 
+                                 random_state = 3)
+
+dt_model.fit(X_train, y_train)
+y_pred = dt_model.predict(X_test)
+
+#%%
+# Decision Tree model (dt_model) evaluation metrics
 print("R^2: {}".format(r2_score(y_test, y_pred)))
 print("MSE: {}".format(MSE(y_test, y_pred)))
 print("MAE: {}".format(MAE(y_test, y_pred)))
@@ -852,12 +791,19 @@ print("MSLE: {}".format(MSLE(y_test, y_pred)))
 print("MedAE: {}".format(MedAE(y_test, y_pred)))
 
 # Plot the tree graph
-plt.figure(figsize=(10, 8))
-plot_tree(dt, feature_names=X_train.columns, filled=True, rounded=True)
+plt.figure(figsize = (10, 8))
+plot_tree(dt_model, feature_names = X_train.columns, 
+          filled = True, rounded = True, fontsize = 12,
+          impurity = True, 
+          proportion = True, 
+          precision = 2)
+plt.title('Decision Tree for variables of interest')
 plt.show()
 
+#%%
+
 # Plot the feature importances
-importances = pd.Series(data=dt.feature_importances_, index=X.columns)
+importances = pd.Series(data=dt_model.feature_importances_, index=X.columns)
 importances_sorted = importances.sort_values()
 importances_sorted.plot(kind='barh', color='lightgreen')
 plt.title('Features Importances')
@@ -871,20 +817,55 @@ plt.xlabel('GDP')
 plt.ylabel('GDP Growth')
 plt.show()
 
-#%% [markdown] Interpreting the results of the regression tree model
-# The result of the regression tree suggests that the model has moderate predictive power. The R^2 value of 0.54 indicates that the model explains 54% of the variance in the target variable. The MSE value of 0.027 suggests that the average squared difference between the predicted and actual values is relatively low. The MAE value of 0.126 suggests that the average absolute difference between the predicted and actual values is also relatively low.
+#%% [markdown] 
+# Interpreting the results of the regression tree model
+# The result of the regression tree suggests that the model has moderate predictive power. 
+# The R^2 value of 0.54 indicates that the model explains 54% of the variance in the target variable. 
+# The MSE value of 0.027 suggests that the average squared difference between the predicted and actual values is relatively low. 
+# The MAE value of 0.126 suggests that the average absolute difference between the predicted and actual values is also relatively low.
+# The MSLE value of 0.014 indicates that the model's error is distributed logarithmically, 
+#     with smaller errors being more common than larger ones. 
+# The MedAE value of 0.104 indicates that the median absolute error is relatively low, suggesting that the model is relatively consistent in its predictions.
 
-# The MSLE value of 0.014 indicates that the model's error is distributed logarithmically, with smaller errors being more common than larger ones. The MedAE value of 0.104 indicates that the median absolute error is relatively low, suggesting that the model is relatively consistent in its predictions.
+# Overall, while the model is not perfect, it appears to have some predictive power and is likely to be useful in some applications. 
+# However, further analysis and testing may be necessary to fully evaluate its performance.
 
-# Overall, while the model is not perfect, it appears to have some predictive power and is likely to be useful in some applications. However, further analysis and testing may be necessary to fully evaluate its performance.
+#%%[DT Model performance]
+
+# Cross validation using sklearn
+from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(dt_model, 
+                         X, y, cv = 5, 
+                         scoring='r2')
+
+print("Cross-validation for 5 fold")
+print("Cross-validation R^2 scores:", scores)
+print("Mean R^2:", scores.mean())
+
+#%% [markdown] 
+# Interpreting the results of the regression tree model-cross_validation metrics
+# The cross-validation R2 values are: -0.06587845, 0.4301455, 0.32436221, 0.25372059, 0.2647695. 
+# A higher R2 value implies that the model fits the data more accurately.
+
+# The average of the R2 values obtained from the folds, as determined by the cross-validation, 
+#    is 0.2414238701083093. 
+# This result represents how well the model as a whole performed in predicting the democracy index using the provided features.
+
+# An improved model fit is generally indicated by a higher R2 value, 
+# but it's also crucial to make sure the model isn't overfitting the data. 
+# Cross-validation can give a more precise assessment of the model's performance and aid in evaluating the model's performance on unknown data.
+
+
 #%% Random Forest Model
+
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import plot_tree
 
 # Instantiate rf
-rt = RandomForestRegressor(n_estimators=25, random_state=2)
-rt.fit(X_train, y_train)
-y_pred = rt.predict(X_test)
+rf_model = RandomForestRegressor(n_estimators = 25, random_state = 2)
+rf_model.fit(X_train, y_train)
+y_pred = rf_model.predict(X_test)
 print("R^2: {}".format(r2_score(y_test, y_pred)))
 print("MSE: {}".format(MSE(y_test, y_pred)))
 print("MAE: {}".format(MAE(y_test, y_pred)))
@@ -892,15 +873,15 @@ print("MSLE: {}".format(MSLE(y_test, y_pred)))
 print("MedAE: {}".format(MedAE(y_test, y_pred)))
 
 # Plot the feature importances
-importances = pd.Series(data=rt.feature_importances_, index=X.columns)
+importances = pd.Series(data = rf_model.feature_importances_, index = X.columns)
 importances_sorted = importances.sort_values()
-importances_sorted.plot(kind='barh', color='lightgreen')
+importances_sorted.plot(kind = 'barh', color = 'lightgreen')
 plt.title('Features Importances')
 plt.show()
 
 # Plot the test set with the decision boundary
-plt.figure(figsize=(10, 8))
-plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c=y_test, s=20, cmap='RdYlGn')
+plt.figure(figsize = (10, 8))
+plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c = y_test, s = 20, cmap = 'RdYlGn')
 plt.title('Test set')
 plt.xlabel('GDP')
 plt.ylabel('GDP Growth')
