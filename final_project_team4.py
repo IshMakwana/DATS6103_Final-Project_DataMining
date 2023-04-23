@@ -813,6 +813,28 @@ for variable in anova_dict.keys():
     print(variable)
     print(anova_dict[variable])
     print('\n')
+
+#%% ANOVA test attempt 2
+
+ANOVA_variables = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
+            'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
+            'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
+            'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
+            'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
+            'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+
+vdem_countries = vdem_worldBank_df['country_name'].unique()
+
+f_stat, p_val = stats.f_oneway(vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==1, 'democracy_index'],
+                               vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==2, 'democracy_index'],
+                               vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==3, 'democracy_index'],
+                               vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==4, 'democracy_index'],
+                               vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==5, 'democracy_index'],
+                               vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==6, 'democracy_index'])
+
+print('F-statistic: {:.2f}'.format(f_stat))
+print('p-value: {:.4f}'.format(p_val))
+
 #%% [markdown] Interpreting the results of the correlation matrix
 # The correlation matrix shows the relationship between the democracy index and various factors. 
 # A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
