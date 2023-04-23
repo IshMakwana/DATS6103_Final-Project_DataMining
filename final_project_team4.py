@@ -55,6 +55,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import geopandas
 from scipy.stats import pearsonr
+from scipy.stats import ttest_ind
 import statsmodels.api as sm
 
 
@@ -820,6 +821,26 @@ for variable in anova_dict.keys():
 #   such as adolescent fertility and HIV prevalence. 
 # These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
 
+#%% ttesting
+
+ttest_variables = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
+            'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
+            'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
+            'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
+            'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
+            'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+
+for x in ttest_variables:
+    sample1 = vdem_worldBank_grouped_country['democracy_index'].sample(n=5)
+    sample2 = vdem_worldBank_grouped_country[x].sample(n=5)
+
+    t, p, vdem_worldBank_df = sm.stats.ttest_ind(sample1, sample2)
+
+    if p < 0.05:
+        print(x)
+        print(f't-value: ', t)
+        print(f'p-value: ', p)
+
 #%% Bubble Plot
 var_independent = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
             'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
@@ -1185,3 +1206,5 @@ plt.show()
 # - The MSLE (mean squared logarithmic error) value is low at 0.0018, which indicates that the model is making accurate predictions across the entire range of target values.
 # - The MedAE (median absolute error) value is also low at 0.0219, which means that half of the absolute errors are smaller than this value.
 # - Overall, these results suggest that the random forest model is a good fit for the data and is making accurate predictions.
+
+# %%
