@@ -523,6 +523,27 @@ fig.update_layout(scene=dict(
 
 fig.show()
 
+#%%
+# 3-d scatter plot 2
+
+fig = px.scatter_3d(vdem_worldBank_df, 
+                    x='year', 
+                    y='democracy_index', 
+                    z='GNIPerCapita',
+              size='democracy_index',
+              color='e_regionpol_6C',
+              color_continuous_scale='reds',
+              opacity=0.7)
+
+fig.update_layout(scene=dict(
+                    xaxis_title='Year',
+                    yaxis_title='Democracy Index',
+                    zaxis_title='GNI Per Capita'),
+                    width=700,
+                    margin=dict(r=20, b=10, l=10, t=10))
+
+fig.show()
+
 #%% Bubble plot animation (attempt #1)
 # The  Bubble plot shows the relationship between democracy index and income 
 # inequality (measured by the Palma ratio) across different countries in the V-Dem dataset. 
