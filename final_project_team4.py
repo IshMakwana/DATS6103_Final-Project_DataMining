@@ -758,6 +758,39 @@ f_val, p_val = stats.f_oneway(*grouped_year)
 print("Year ANOVA test using country_name:")
 print("F value:", f_val)
 print("P value:", p_val)
+
+#%%
+import pandas as pd
+from scipy.stats import f_oneway
+# Grouping the vdem_worldBank_df dataframe by country_name
+# grouped_df = vdem_worldBank_df.groupby('country_name')
+grouped_df = vdem_worldBank_df.groupby('country_name').apply(lambda x: x.fillna(x.median()))
+# grouped_df.dropna(inplace=True)
+# Creating a dictionary to store the ANOVA results for each variable
+anova_dict = {}
+target_var = 'democracy_index'
+varia_of_interest = ['Under5Mortality', 'GNIPerCapita', 
+                     'PrimarySchoolEnrollment', 'year', 
+                     'LifeExpectancy', 'e_regionpol_6C']
+
+# Looping through each variable and performing ANOVA
+for variable in varia_of_interest:
+    # groups = []
+    # values = grouped_df[variable]
+    # groups.append(values)
+    columns_to_extract = [target_var, variable]
+    groups = grouped_df[columns_to_extract].apply(list)
+    # Performing ANOVA
+    f_statistic, p_value = f_oneway(*groups)
+    
+    # Storing the results in the dictionary
+    anova_dict[variable] = {'F-statistic': f_statistic, 'p-value': p_value}
+
+# Displaying the ANOVA results
+for variable in anova_dict.keys():
+    print(variable)
+    print(anova_dict[variable])
+    print('\n')
 #%% [markdown] Interpreting the results of the correlation matrix
 # The correlation matrix shows the relationship between the democracy index and various factors. 
 # A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
