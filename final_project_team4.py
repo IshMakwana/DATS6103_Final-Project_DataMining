@@ -601,6 +601,7 @@ sns.heatmap(cor_mat, mask = mask, cmap = cmap, vmax = .3, center=0,
 plt.title('Correlation matrix')
 plt.show()
 
+
 #%% [markdown] Interpreting the results of the correlation matrix
 
 # The correlation matrix shows the relationship between the democracy index and various factors. 
@@ -615,7 +616,7 @@ X = vdem_worldBank_df[features]
 
 vif = pd.DataFrame()
 vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
-
+vif['Features'] = features
 print(vif)
 
 #%% [markdown]
@@ -717,24 +718,24 @@ varia_of_interest = ['Under5Mortality', 'GNIPerCapita',
                      'LifeExpectancy', 'e_regionpol_6C']
 
 
-# Looping through each variable and performing ANOVA
-for variable in varia_of_interest:
-    # groups = []
-    # values = grouped_df[variable]
-    # groups.append(values)
-    columns_to_extract = [target_var, variable]
-    groups = grouped_df[columns_to_extract].apply(list)
-    # Performing ANOVA
-    f_statistic, p_value = f_oneway(*groups)
+# # Looping through each variable and performing ANOVA
+# for variable in varia_of_interest:
+#     # groups = []
+#     # values = grouped_df[variable]
+#     # groups.append(values)
+#     columns_to_extract = [target_var, variable]
+#     groups = grouped_df[columns_to_extract].apply(list)
+#     # Performing ANOVA
+#     f_statistic, p_value = f_oneway(*groups)
     
-    # Storing the results in the dictionary
-    anova_dict[variable] = {'F-statistic': f_statistic, 'p-value': p_value}
+#     # Storing the results in the dictionary
+#     anova_dict[variable] = {'F-statistic': f_statistic, 'p-value': p_value}
 
-# Displaying the ANOVA results
-for variable in anova_dict.keys():
-    print(variable)
-    print(anova_dict[variable])
-    print('\n')
+# # Displaying the ANOVA results
+# for variable in anova_dict.keys():
+#     print(variable)
+#     print(anova_dict[variable])
+#     print('\n')
 
 #%% ANOVA test attempt 2
 
@@ -757,13 +758,6 @@ f_stat, p_val = stats.f_oneway(vdem_worldBank_grouped_country.loc[vdem_worldBank
 print('F-statistic: {:.2f}'.format(f_stat))
 print('p-value: {:.4f}'.format(p_val))
 
-#%% [markdown] Interpreting the results of the correlation matrix
-# The correlation matrix shows the relationship between the democracy index and various factors. 
-# A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
-# In this case, the democracy index is positively correlated with measures of political and economic freedom, 
-#   as well as access to education and healthcare. Conversely, the democracy index is negatively correlated with factors 
-#   such as adolescent fertility and HIV prevalence. 
-# These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
 
 #%% ttesting
 
@@ -797,8 +791,9 @@ for x in ttest_variables:
 
 from sklearn.model_selection import train_test_split
 
-X = vdem_worldBank_df[features]
 y = vdem_worldBank_df['democracy_index']
+X = vdem_worldBank_df.drop(columns=['democracy_index'])
+
 
 # Split the data into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, 
