@@ -608,9 +608,26 @@ print(vif)
 from sklearn.model_selection import train_test_split
 
 y = vdem_worldBank_df['democracy_index']
-X = vdem_worldBank_df[features]
+X = vdem_worldBank_df[high_cor_features]
+
+#%%[markdown]
+
+# Feature importances: using filter method
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+
+# Select the top 10 features
+best_features = SelectKBest(score_func = chi2, 
+                            k = 'all')
 
 
+fit = best_features.fit(X,y)
+
+# Print the top 10 features
+features = fit.transform(X)
+print(features)
+
+#%%
 # Split the data into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, 
                                                     test_size=0.2, 
