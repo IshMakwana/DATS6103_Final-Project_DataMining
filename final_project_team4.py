@@ -347,10 +347,10 @@ fig = px.scatter_3d(vdem_worldBank_df,
                     x='year', 
                     y='democracy_index', 
                     z='LifeExpectancy',
-              size='democracy_index',
-              color='e_regionpol_6C',
-              color_continuous_scale='reds',
-              opacity=0.7)
+                    size='democracy_index',
+                    color='e_regionpol_6C',
+                    color_continuous_scale='reds',
+                    opacity=0.7)
 
 fig.update_layout(scene=dict(
                     xaxis_title='Year',
@@ -367,10 +367,10 @@ fig = px.scatter_3d(vdem_worldBank_df,
                     x='year', 
                     y='democracy_index', 
                     z='GNIPerCapita',
-              size='democracy_index',
-              color='e_regionpol_6C',
-              color_continuous_scale='reds',
-              opacity=0.7)
+                    size='democracy_index',
+                    color='e_regionpol_6C',
+                    color_continuous_scale='reds',
+                    opacity=0.7)
 
 fig.update_layout(scene=dict(
                     xaxis_title='Year',
@@ -386,45 +386,17 @@ fig.show()
 
 #%%
 # ### Descriptive Statistics
-print(vdem_worldBank_poli_region_grouped.columns)
+# print(vdem_worldBank_poli_region_grouped.columns)
 
 # Select variables of interest
-df = vdem_worldBank_df[['democracy_index', 'GNIPerCapita', 
-                        'LifeExpectancy', 'PrimarySchoolEnrollment']]
+# df = vdem_worldBank_df[['democracy_index', 'GNIPerCapita', 
+                    # 'LifeExpectancy', 'PrimarySchoolEnrollment']]
 
 # Print descriptive statistics
-print(df.describe())
-
-#%%[markdown]
-# ### Correlation Matrix
-#%%  Correlation Matrix (Linearity)
-
-cor_mat = vdem_worldBank_df[num_cols].corr() > abs(0.5)
-
-# Generate a mask for the upper triangle
-mask = np.triu(np.ones_like(cor_mat, dtype=bool))
-f, ax = plt.subplots(figsize=(11, 9))
-cmap = sns.diverging_palette(230, 20, as_cmap=True)
-
-sns.heatmap(cor_mat, mask = mask, cmap = cmap, vmax = .3, center=0,
-            square = True, linewidths = .5, cbar_kws = {"shrink": .5}, 
-            fmt = '.1g', annot = True)
-
-plt.title('Correlation matrix')
-plt.show()
-
-#%% [markdown] Interpreting the results of the correlation matrix
-
-# The correlation matrix shows the relationship between the democracy index and various factors. 
-# A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
-# In this case, the democracy index is positively correlated with measures of political and economic freedom, 
-#   as well as access to education and healthcare. Conversely, the democracy index is negatively correlated with factors 
-#   such as adolescent fertility and HIV prevalence. 
-# These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
+# print(df.describe())
 
 #%% Multicollinearity (VIF test)
 X = vdem_worldBank_df[features]
-
 vif = pd.DataFrame()
 vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
 
@@ -436,136 +408,129 @@ print(vif)
 # t-test
 
 #%% Annova Test 1
-from scipy.stats import f_oneway
-
+# from scipy.stats import f_oneway
 # Group data by region and calculate mean Democracy Index for each region
-dem_index_by_region = vdem_worldBank_df.groupby('e_regionpol_6C')['democracy_index'].mean()
-
+# dem_index_by_region = vdem_worldBank_df.groupby('e_regionpol_6C')['democracy_index'].mean()
 # Perform ANOVA test
-f_stat, p_val = f_oneway(*[vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C']==region]['democracy_index'] for region in dem_index_by_region.index])
-
-print(f"ANOVA test result: F-statistic = {f_stat}, p-value = {p_val}")
+# f_stat, p_val = f_oneway(*[vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C']==region]['democracy_index'] for region in dem_index_by_region.index])
+#print(f"ANOVA test result: F-statistic = {f_stat}, p-value = {p_val}")
 
 #%% Annova Test 2 
-
 # Group data by region and calculate mean Life Expectancy for each region
-life_exp_by_region = vdem_worldBank_df.groupby('e_regionpol_6C')['LifeExpectancy'].mean()
-
+# life_exp_by_region = vdem_worldBank_df.groupby('e_regionpol_6C')['LifeExpectancy'].mean()
 # Perform ANOVA test
-f_stat, p_val = f_oneway(*[vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C']==region]['LifeExpectancy'] for region in life_exp_by_region.index])
-
-print(f"ANOVA test result: F-statistic = {f_stat}, p-value = {p_val}")
+# f_stat, p_val = f_oneway(*[vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C']==region]['LifeExpectancy'] for region in life_exp_by_region.index]
+# print(f"ANOVA test result: F-statistic = {f_stat}, p-value = {p_val}")
 
 #%%
 # Annova Test3
 # ANOVA test for Child Mortality
-grouped_cm = vdem_worldBank_df.groupby('e_regionpol_6C')['Under5Mortality'].apply(list)
-f_val, p_val = stats.f_oneway(*grouped_cm)
-print("Child Mortality ANOVA test using region:")
-print("F value:", f_val)
-print("P value:", p_val)
+# grouped_cm = vdem_worldBank_df.groupby('e_regionpol_6C')['Under5Mortality'].apply(list)
+# f_val, p_val = stats.f_oneway(*grouped_cm)
+# print("Child Mortality ANOVA test using region:")
+# print("F value:", f_val)
+# print("P value:", p_val)
 
 # ANOVA test for GNI Per Capita
-grouped_gni = vdem_worldBank_df.groupby('e_regionpol_6C')['GNIPerCapita'].apply(list)
-f_val, p_val = stats.f_oneway(*grouped_gni)
-print("GNI Per Capita ANOVA test using region:")
-print("F value:", f_val)
-print("P value:", p_val)
+# grouped_gni = vdem_worldBank_df.groupby('e_regionpol_6C')['GNIPerCapita'].apply(list)
+# f_val, p_val = stats.f_oneway(*grouped_gni)
+# print("GNI Per Capita ANOVA test using region:")
+# print("F value:", f_val)
+# print("P value:", p_val)
 
 # ANOVA test for Child School Enrollment
-grouped_enrollment = vdem_worldBank_df.groupby('e_regionpol_6C')['PrimarySchoolEnrollment'].apply(list)
-f_val, p_val = stats.f_oneway(*grouped_enrollment)
-print("Child School Enrollment ANOVA test using region:")
-print("F value:", f_val)
-print("P value:", p_val)
+# grouped_enrollment = vdem_worldBank_df.groupby('e_regionpol_6C')['PrimarySchoolEnrollment'].apply(list)
+# f_val, p_val = stats.f_oneway(*grouped_enrollment)
+# print("Child School Enrollment ANOVA test using region:")
+# print("F value:", f_val)
+# print("P value:", p_val)
 
 # ANOVA test for Year
-grouped_year = vdem_worldBank_df.groupby('e_regionpol_6C')['year'].apply(list)
-f_val, p_val = stats.f_oneway(*grouped_year)
-print("Year ANOVA test using region:")
-print("F value:", f_val)
-print("P value:", p_val)
+# grouped_year = vdem_worldBank_df.groupby('e_regionpol_6C')['year'].apply(list)
+# f_val, p_val = stats.f_oneway(*grouped_year)
+# print("Year ANOVA test using region:")
+# print("F value:", f_val)
+# print("P value:", p_val)
 
 #Annova Test4
 # ANOVA test for Child Mortality using country_name
-grouped_cm = vdem_worldBank_df.groupby('country_name')['Under5Mortality'].apply(list)
-f_val, p_val = stats.f_oneway(*grouped_cm)
-print("Child Mortality ANOVA test using country_name:")
-print("F value:", f_val)
-print("P value:", p_val)
+# grouped_cm = vdem_worldBank_df.groupby('country_name')['Under5Mortality'].apply(list)
+# f_val, p_val = stats.f_oneway(*grouped_cm)
+# print("Child Mortality ANOVA test using country_name:")
+# print("F value:", f_val)
+# print("P value:", p_val)
 
 # ANOVA test for GNI Per Capita using country_name
-grouped_gni = vdem_worldBank_df.groupby('country_name')['GNIPerCapita'].apply(list)
-f_val, p_val = stats.f_oneway(*grouped_gni)
-print("GNI Per Capita ANOVA test using country_name:")
-print("F value:", f_val)
-print("P value:", p_val)
+# grouped_gni = vdem_worldBank_df.groupby('country_name')['GNIPerCapita'].apply(list)
+# f_val, p_val = stats.f_oneway(*grouped_gni)
+# print("GNI Per Capita ANOVA test using country_name:")
+# print("F value:", f_val)
+# print("P value:", p_val)
 
 # ANOVA test for Child School Enrollment using country_name
-grouped_enrollment = vdem_worldBank_df.groupby('country_name')['PrimarySchoolEnrollment'].apply(list)
-f_val, p_val = stats.f_oneway(*grouped_enrollment)
-print("Child School Enrollment ANOVA test using country_name:")
-print("F value:", f_val)
-print("P value:", p_val)
+# grouped_enrollment = vdem_worldBank_df.groupby('country_name')['PrimarySchoolEnrollment'].apply(list)
+# f_val, p_val = stats.f_oneway(*grouped_enrollment)
+# print("Child School Enrollment ANOVA test using country_name:")
+# print("F value:", f_val)
+# print("P value:", p_val)
 
 # ANOVA test for Year using country_name
-grouped_year = vdem_worldBank_df.groupby('country_name')['year'].apply(list)
-f_val, p_val = stats.f_oneway(*grouped_year)
-print("Year ANOVA test using country_name:")
-print("F value:", f_val)
-print("P value:", p_val)
+# grouped_year = vdem_worldBank_df.groupby('country_name')['year'].apply(list)
+# f_val, p_val = stats.f_oneway(*grouped_year)
+# print("Year ANOVA test using country_name:")
+# print("F value:", f_val)
+# print("P value:", p_val)
 
 #%% Annova Test 5
 # Grouping the vdem_worldBank_df dataframe by country_name
 # grouped_df = vdem_worldBank_df.groupby('country_name')
-grouped_df = vdem_worldBank_df.groupby('country_name').apply(lambda x: x.fillna(x.median()))
+# grouped_df = vdem_worldBank_df.groupby('country_name').apply(lambda x: x.fillna(x.median()))
 # grouped_df.dropna(inplace=True)
 # Creating a dictionary to store the ANOVA results for each variable
-anova_dict = {}
-target_var = 'democracy_index'
-varia_of_interest = ['Under5Mortality', 'GNIPerCapita', 
-                    'PrimarySchoolEnrollment', 'year', 
-                    'LifeExpectancy', 'e_regionpol_6C']
+# anova_dict = {}
+# target_var = 'democracy_index'
+# varia_of_interest = ['Under5Mortality', 'GNIPerCapita', 
+                    # 'PrimarySchoolEnrollment', 'year', 
+                    # 'LifeExpectancy', 'e_regionpol_6C']
 
 # Looping through each variable and performing ANOVA
-for variable in varia_of_interest:
+# for variable in varia_of_interest:
     # groups = []
     # values = grouped_df[variable]
     # groups.append(values)
-    columns_to_extract = [target_var, variable]
-    groups = grouped_df[columns_to_extract].apply(list)
+    # columns_to_extract = [target_var, variable]
+    # groups = grouped_df[columns_to_extract].apply(list)
     # Performing ANOVA
-    f_statistic, p_value = f_oneway(*groups)
+    # f_statistic, p_value = f_oneway(*groups)
     
     # Storing the results in the dictionary
-    anova_dict[variable] = {'F-statistic': f_statistic, 'p-value': p_value}
+    # anova_dict[variable] = {'F-statistic': f_statistic, 'p-value': p_value}
 
 # Displaying the ANOVA results
-for variable in anova_dict.keys():
-    print(variable)
-    print(anova_dict[variable])
-    print('\n')
+# for variable in anova_dict.keys():
+#     print(variable)
+#     print(anova_dict[variable])
+#     print('\n')
 
 #%% ANOVA test attempt 2
+# ANOVA_variables = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
+#             'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
+#             'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
+#             'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
+#             'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
+#             'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
 
-ANOVA_variables = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
-            'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
-            'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
-            'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
-            'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
-            'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+# vdem_countries = vdem_worldBank_df['country_name'].unique()
 
-vdem_countries = vdem_worldBank_df['country_name'].unique()
+# f_stat, p_val = stats.f_oneway(vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==1, 'democracy_index'],
+#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==2, 'democracy_index'],
+#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==3, 'democracy_index'],
+#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==4, 'democracy_index'],
+#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==5, 'democracy_index'],
+#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==6, 'democracy_index'])
 
-f_stat, p_val = stats.f_oneway(vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==1, 'democracy_index'],
-                                vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==2, 'democracy_index'],
-                                vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==3, 'democracy_index'],
-                                vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==4, 'democracy_index'],
-                                vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==5, 'democracy_index'],
-                                vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==6, 'democracy_index'])
-
-print('F-statistic: {:.2f}'.format(f_stat))
-print('p-value: {:.4f}'.format(p_val))
+# print('F-statistic: {:.2f}'.format(f_stat))
+# print('p-value: {:.4f}'.format(p_val))
 
 #%% [markdown] Interpreting the results of the correlation matrix
 # The correlation matrix shows the relationship between the democracy index and various factors. 
@@ -588,15 +553,57 @@ for x in ttest_variables:
     sample1 = vdem_worldBank_grouped_country['democracy_index'].sample(n=5)
     sample2 = vdem_worldBank_grouped_country[x].sample(n=5)
 
-    t, p, vdem_worldBank_df = sm.stats.ttest_ind(sample1, sample2)
+    t, p, df = sm.stats.ttest_ind(sample1, sample2)
 
     if p < 0.05:
         print(x)
         print(f't-value: ', t)
         print(f'p-value: ', p)
 
+#%% [markdown]
+# ## Feature Selection
+# We used the filter method to perform feature selection. target variables and independent variables are both continuous numerical variables, so we used pearson's Since both target variables and independent variables are continuous numerical variables, we used variables with a correlation coefficient greater than or equal to 0.3 or less than -0.3 as features based on the results of pearson's correlation.
 
-#%% [markdown] Model Building
+#%%[markdown]
+# ### Correlation Matrix
+#%%  Correlation Matrix (Linearity)
+new_vdem_worldBank_df = vdem_worldBank_df[["democracy_index"] + features]
+
+cor_mat = new_vdem_worldBank_df.corr()
+
+# Generate a mask for the upper triangle
+mask = np.triu(np.ones_like(cor_mat, dtype=bool))
+f, ax = plt.subplots(figsize=(11, 9))
+cmap = sns.diverging_palette(230, 20, as_cmap=True)
+
+sns.heatmap(cor_mat, mask = mask, cmap = cmap, vmax = .3, center=0,
+            square = True, linewidths = .5, cbar_kws = {"shrink": .5}, 
+            fmt = '.1g', annot = True)
+
+plt.title('Correlation matrix')
+plt.show()
+
+#%% Create a list of variables with correlations greater than or equal to 0.3 or less than or equal to -0.3
+# Subset correlation matrix for variables with correlations greater than or equal to 0.3 or less than or equal to -0.3
+high_corr = cor_mat[(cor_mat['democracy_index'] >= 0.3) | (cor_mat['democracy_index'] <= -0.3)]
+
+# Get unique variable names
+high_cor_features = high_corr.index.tolist()
+high_cor_features = high_cor_features[1:]
+
+#%% [markdown] Interpreting the results of the correlation matrix
+
+# The correlation matrix shows the relationship between the democracy index and various factors. 
+# A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
+# In this case, the democracy index is positively correlated with measures of political and economic freedom, 
+#   as well as access to education and healthcare. Conversely, the democracy index is negatively correlated with factors 
+#   such as adolescent fertility and HIV prevalence. 
+# These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
+
+#%% Correlation Matrix
+
+#%% [markdown] 
+# ##Model Building
 # Regression Tree Model
 # Random Forest Model
 # Gradient Boosting Model
