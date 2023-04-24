@@ -651,6 +651,7 @@ dt_model.fit(X_train, y_train)
 y_pred = dt_model.predict(X_test)
 
 # Decision/Regression Tree model (dt_model) evaluation metrics
+print("Decision/Regression Tree model evaluation metrics: ")
 print(f"R^2: {r2_score(y_test, y_pred)} ({round(r2_score(y_test, y_pred) * 100, 1)}%)")
 print(f"MSE: {MSE(y_test, y_pred)} ({round(MSE(y_test, y_pred) * 100, 1)}%)")
 print(f"MAE: {MAE(y_test, y_pred)} ({round(MAE(y_test, y_pred)* 100, 1)}%)")
@@ -673,15 +674,6 @@ importances_sorted = importances.sort_values()
 importances_sorted.plot(kind='barh', color='lightgreen')
 plt.title('Features Importances')
 plt.show()
-
-# ## Plot the test set with the decision boundary
-# plt.figure(figsize=(10, 8))
-# plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c=y_test, s=20, cmap='RdYlGn')
-# plt.title('Test set')
-# plt.xlabel('GDP')
-# plt.ylabel('GDP Growth')
-# plt.show()
-
 
 #%%[markdown]
 #### Interpreting the results of the regression tree model:
@@ -718,9 +710,12 @@ scores = cross_val_score(dt_model,
                         X, y, cv = 5, 
                         scoring='r2')
 
-print("5 fold Cross-validation for regression tree model:")
-print("Cross-validation R^2 scores:", reg_tree_scores)
-print("Mean R^2:", reg_tree_scores.mean())
+print("5-fold X-Validation for regression model:")
+print("Cross-validation R^2 scores:")
+for r_2 in reg_tree_scores:
+    print(round(r_2, 4), end = ", ")
+print()
+print("Mean R^2:", round(reg_tree_scores.mean(), 4))
 
 
 #%%[markdown]
@@ -765,7 +760,7 @@ rf_model.fit(X_train, y_train)
 rf_y_pred = rf_model.predict(X_test)
 
 # RF model evaluation metrics
-
+print("Random forest model evaluation metrics: ")
 print(f"R^2: {r2_score(y_test, rf_y_pred)} ({round(r2_score(y_test, rf_y_pred) * 100, 1)}%)")
 print(f"MSE: {MSE(y_test, rf_y_pred)} ({round(MSE(y_test, rf_y_pred) * 100, 1)}%)")
 print(f"MAE: {MAE(y_test, rf_y_pred)} ({round(MAE(y_test, rf_y_pred)* 100, 1)}%)")
@@ -797,7 +792,7 @@ plt.show()
 
 #%%[markdown]
 
-### Random forest Model performance [CV]
+### Random forest Model performance [CV]    
 # Cross validation using sklearn
 from sklearn.model_selection import cross_val_score
 
@@ -805,26 +800,29 @@ rf_scores = cross_val_score(rf_model,
                          X, y, cv = 5, 
                          scoring='r2')
 
-print("5 fold Cross-validation for random forest model:")
-print("Cross-validation R^2 scores:", rf_scores)
-print("Mean R^2:", rf_scores.mean())
+print("5-fold X-Validation for random forest model:")
+print("Cross-validation R^2 scores:")
+for r_2 in rf_scores:
+    print(round(r_2, 4), end = ", ")
+print()
+print("Mean R^2:", round(rf_scores.mean(), 4))
 
 #%%[markdown]
 #### The 5-fold cross-validation result for a random forest model is displayed in the output. 
 
 # The cross-validation's R-squared values for each fold are: 0.47413435  0.3568414   0.38703758  0.53499121 -0.11419026
 #   indicating that the model's performance differs considerably between folds. 
-
+#
 # Lower than the R-squared value of the initial random forest model, the mean R-squared value 
 #   across all folds is 0.3277. 
-
+#
 # This implies that the original model may have overfitted the data and that the performance 
 #   of the model may not be as excellent when applied to fresh, unforeseen data. 
-
+#
 # To boost the model's performance, it might be required to further tweak its hyperparameters 
-
+#
 #               or 
-
+#
 #   look into alternative machine learning techniques.
 
 #%%[markdown]
@@ -863,7 +861,8 @@ rf_best = RandomForestRegressor(n_estimators=grid_search.best_params_
 rf_best.fit(X_train, y_train)
 rf_best_y_pred = rf_best.predict(X_test)
 
-# Evaluate the model
+# Evaluate the refined Random forest model
+print("Refined RF model evaluation metrics: ")
 print(f"R^2: {r2_score(y_test, rf_best_y_pred)} ({round(r2_score(y_test, rf_best_y_pred) * 100, 1)}%)")
 print(f"MSE: {MSE(y_test, rf_best_y_pred)} ({round(MSE(y_test, rf_best_y_pred) * 100, 1)}%)")
 print(f"MAE: {MAE(y_test, rf_best_y_pred)} ({round(MAE(y_test, rf_best_y_pred)* 100, 1)}%)")
@@ -881,14 +880,6 @@ importances_sorted = importances.sort_values()
 importances_sorted.plot(kind='barh', color='lightgreen')
 plt.title('Features Importances')
 plt.show()
-
-# Plot the test set with the decision boundary
-# plt.figure(figsize=(10, 8))
-# plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c=y_test, s=20, cmap='RdYlGn')
-# plt.title('Test set')
-# plt.xlabel('GDP')
-# plt.ylabel('GDP Growth')
-# plt.show()
 
 #%% [markdown] 
 #### Interpreting the results of the refined random forest model
@@ -914,9 +905,13 @@ rf_hyp_scores = cross_val_score(rf_best,
                          X, y, cv = 5, 
                          scoring='r2')
 
-print("5 fold Cross-validation for refined random forest model:")
-print("Cross-validation R^2 scores:", rf_hyp_scores)
-print("Mean R^2:", rf_hyp_scores.mean())
+print("5-fold X-Validation for refined random forest model:")
+print("Cross-validation R^2 scores:")
+for r_2 in rf_hyp_scores:
+    print(round(r_2, 4), end = "  ")
+print()
+print("Mean R^2:", round(rf_hyp_scores.mean(), 4))
+
 
 #%%[markdown]
 
@@ -946,7 +941,7 @@ gb_model.fit(X_train, y_train)
 y_pred_gb = gb_model.predict(X_test)
 
 # Gradient Boosting model evaluation metrics
-
+print("Gradient Boosting model evaluation metrics: ")
 print(f"R^2: {r2_score(y_test, y_pred_gb)} ({round(r2_score(y_test, y_pred_gb) * 100, 1)}%)")
 print(f"MSE: {MSE(y_test, y_pred_gb)} ({round(MSE(y_test, y_pred_gb) * 100, 1)}%)")
 print(f"MAE: {MAE(y_test, y_pred_gb)} ({round(MAE(y_test, y_pred_gb)* 100, 1)}%)")
@@ -962,26 +957,18 @@ importances_sorted.plot(kind = 'barh', color = 'lightgreen')
 plt.title('Features Importances (GB)')
 plt.show()
 
-# Plot the test set with the decision boundary
-# plt.figure(figsize = (10, 8))
-# plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c = y_test, s = 20, cmap = 'RdYlGn')
-# plt.title('Test set')
-# plt.xlabel('GDP')
-# plt.ylabel('GDP Growth')
-# plt.show()
-
 #%% [markdown] Interpreting the results of the Gradient Boosting model:
 
 # The gradient boosting model has a R^2 value of 0.6732, 
 #       which means that it can explain 67.3% of the variance in the target variable. 
-
+# 
 # The MSE (mean squared error) value is very low at 0.019, indicating that the model's predictions 
 #      are close to the actual values. 
-
+# 
 # The MAE (mean absolute error) value is also low at 0.1138, which means that the average difference between the predicted and actual values is small. 
-
+# 
 # The MSLE (mean squared logarithmic error) value is low at 0.0106, which indicates that the model is making accurate predictions across the entire range of target values. 
-
+# 
 # The MedAE (median absolute error) value is also low at 0.0952, which means that half of the absolute errors are smaller than this value. 
 
 
@@ -995,9 +982,12 @@ gb_scores = cross_val_score(gb_model,
                          X, y, cv = 5, 
                          scoring='r2')
 
-print("5 fold Cross-validation for gradient boosting model:")
-print("Cross-validation R^2 scores:", gb_scores)
-print("Mean R^2:", gb_scores.mean())
+print("5-fold X-Validation for Gradient Boosting model:")
+print("Cross-validation R^2 scores:")
+for r_2 in gb_scores:
+    print(round(r_2, 4), end = "  ")
+print()
+print("Mean R^2:", round(gb_scores.mean(), 4))
 
 #%%[markdown]
 
