@@ -772,7 +772,7 @@ for x in ttest_variables:
     sample1 = vdem_worldBank_grouped_country['democracy_index'].sample(n=5)
     sample2 = vdem_worldBank_grouped_country[x].sample(n=5)
 
-    t, p, vdem_worldBank_grouped_country = sm.stats.ttest_ind(sample1, sample2)
+    t, p, df_ttest = sm.stats.ttest_ind(sample1, sample2)
 
     if p < 0.05:
         print(x)
