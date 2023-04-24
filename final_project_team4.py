@@ -522,6 +522,26 @@ fig.show()
 # print('F-statistic: {:.2f}'.format(f_stat))
 # print('p-value: {:.4f}'.format(p_val))
 
+#%%
+# Annova Test 3rd attempt
+from scipy.stats import f_oneway
+from scipy import stats
+
+nan_count = vdem_worldBank_grouped_country.isna().sum()
+print(nan_count)
+
+ANOVA_variables = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
+                   'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
+                   'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
+                   'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
+                   'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
+                   'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+
+for var in ANOVA_variables:
+    f_stat, p_val = stats.f_oneway(*[vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country[var]==i, 'democracy_index'] 
+                                      for i in vdem_worldBank_grouped_country[var].unique()])
+    print(f"ANOVA test result for {var}:")
+    print(f"F value: {f_stat:.2f}, p-value: {p_val:.4f}\n")
 
 #%% ttesting
 
