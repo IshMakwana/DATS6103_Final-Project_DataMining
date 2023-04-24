@@ -20,84 +20,43 @@ import plotly.express as px
 import random
 import plotly.graph_objs as go
 
-
-#%% 
-
-import pandas as pd
-
-url = 'https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/vdem_worldBank.csv'
-WorldBank_df= pd.read_csv(url)
-print(df.head(5))
-
 #%%
-
-# def getDFfromZip(url):
-#     """ Return the data frame from a csv file in a zip file
-#     Parameters:
-#         url(str): url of the zip file
-#     Returns:
-#         df(pandas.DataFrame): data frame of the csv file
-#     """
-#     response = requests.get(url) # Send a request to download the file
+def getDFfromZip(url):
+    """ Return the data frame from a csv file in a zip file
+    Parameters:
+        url(str): url of the zip file
+    Returns:
+        df(pandas.DataFrame): data frame of the csv file
+    """
+    response = requests.get(url) # Send a request to download the file
     
-#     if response.status_code == 200: # Check if the request was successful
-#         # Read the zip file from the response
-#         with zipfile.ZipFile(io.BytesIO(response.content)) as zip_file:
-#             # Find the CSV file within the zip file
-#             for file in zip_file.namelist():
-#                 if file.endswith(".csv"):
-#                     # Read the CSV file into a pandas DataFrame
-#                     df = pd.read_csv(zip_file.open(file))                    
-#                     print(df.shape)      
-#                     return df
-#             # If the CSV file was not found, return None
-#             return None
-#     else: 
-#         print("Failed to download the dataset.")
-#         return None
+    if response.status_code == 200: # Check if the request was successful
+        # Read the zip file from the response
+        with zipfile.ZipFile(io.BytesIO(response.content)) as zip_file:
+            # Find the CSV file within the zip file
+            for file in zip_file.namelist():
+                if file.endswith(".csv"):
+                    # Read the CSV file into a pandas DataFrame
+                    df = pd.read_csv(zip_file.open(file))                    
+                    print(df.shape)      
+                    return df
+            # If the CSV file was not found, return None
+            return None
+    else: 
+        print("Failed to download the dataset.")
+        return None
 
-# url = "https://v-dem.net/media/datasets/V-Dem-CY-FullOthers_csv_v13.zip"
-# VDem = getDFfromZip(url)
-# VDem.head()
-# VDem.shape
+url = "https://v-dem.net/media/datasets/V-Dem-CY-FullOthers_csv_v13.zip"
+VDem = getDFfromZip(url)
+VDem.head()
+VDem.shape
 
 #%% Import data seets from local (World Bank; World Development Indicators) and reformat
-# url2 = "https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/WorldBank.csv"
+url2 = "https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/WorldBank.csv"
 
-# WorldBank_df = pd.read_csv(url2)
+WorldBank_df = pd.read_csv(url2)
 
-""" Variables of Interest(19):
-Infrastracture
-- Access_to_clean_fuels_and_technologies_for_cooking_(%_of_population)
-- Mobile_cellular_subscriptions_(per_100_people)
-
-Demographic
-- Adolescent_fertility_rate_(births_per_1,000_women_ages_15-19)
-- Fertility_rate,_total_(births_per_woman)
-- Life_expectancy_at_birth,_total_(years)
-- Mortality_rate,_under-5_(per_1,000_live_births)
-- Net_migration
-- Population_growth_(annual_%)
-
-Environment
-- CO2_emissions_(metric_tons_per_capita)
-
-Health
-- Immunization,_measles_(%_of_children_ages_12-23_months)
-- Prevalence_of_HIV,_total_(%_of_population_ages_15-49)
-
-Education
-- School_enrollment,_primary_(%_gross)'], dtype=object)
-
-Economy
-- Agriculture,_forestry,_and_fishing,_value_added_(%_of_GDP)
-- Exports_of_goods_and_services_(%_of_GDP)
-- Foreign_direct_investment,_net_inflows_(BoP,_current_US$)
-- GDP_(current_US$)', 'GDP_growth_(annual_%)
-- GNI_per_capita,_Atlas_method_(current_US$)
-- Imports_of_goods_and_services_(%_of_GDP)
-"""
-
+#%%
 # create a dictionary for c_id
 c_id_dict = WorldBank_df.set_index('c_id')['CountryName'].to_dict()
 droped_WorldBank_df = WorldBank_df.drop(['CountryName', 'SeriesName'], axis=1)
