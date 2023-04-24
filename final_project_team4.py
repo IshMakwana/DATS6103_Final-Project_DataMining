@@ -391,13 +391,6 @@ fig.show()
 # df = vdem_worldBank_df[['democracy_index', 'GNIPerCapita', 
                     # 'LifeExpectancy', 'PrimarySchoolEnrollment']]
 
-#%% Multicollinearity (VIF test)
-X = vdem_worldBank_df[features]
-vif = pd.DataFrame()
-vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
-vif['Features'] = features
-print(vif)
-
 #%% [markdown]
 # ### Hyptothesis Testing
 # ANOVA
@@ -581,6 +574,16 @@ high_corr = cor_mat[(cor_mat['democracy_index'] >= 0.3) | (cor_mat['democracy_in
 # Get unique variable names
 high_cor_features = high_corr.index.tolist()
 high_cor_features = high_cor_features[1:]
+print((high_cor_features))
+
+#%% Multicollinearity (VIF test)
+X = vdem_worldBank_df[high_cor_features]
+vif = pd.DataFrame()
+vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+vif['Features'] = high_cor_features
+print(vif)
+
+#%% Drop highly correlated variables
 
 #%% [markdown] Interpreting the results of the correlation matrix
 
