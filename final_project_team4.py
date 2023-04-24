@@ -434,7 +434,6 @@ for feature in features:
     sns.scatterplot(x='democracy_index', y=feature, size='GDP', sizes=(100, 12000), alpha=0.5, hue='e_regionpol_6C', palette=colors, data=df_subset, legend=False)
     sns.regplot(x='democracy_index', y=feature, data=df_subset, scatter=False, color='black')
     plt.title('Democracy Index vs. ' + feature)
-
     plt.show()
 
 #%% [markdown] Interpreting the results of the bubble plot
@@ -840,27 +839,7 @@ plot_tree(dt_model, feature_names = X_train.columns,
 plt.title('Decision Tree for variables of interest')
 plt.show()
 
-# from sklearn.tree import export_graphviz
-# import graphviz
-
-# # Export decision tree to graphviz format
-# dot_data = export_graphviz(dt_model, out_file = None, 
-#                            feature_names = X_train.columns,  
-#                            class_names = ['0', '1'],  
-#                            filled = True, rounded = True,  
-#                            special_characters = True)
-
-# # Create graph from graphviz format
-# graph = graphviz.Source(dot_data)
-
-# # Add space between nodes
-# graph.render(filename = 'reg_tree', format = 'png', cleanup = True)
-# graph
-
-
 ## Plot the feature importances
-#%%
-# Plot the feature importances
 importances = pd.Series(data=dt_model.feature_importances_, index=X.columns)
 importances_sorted = importances.sort_values()
 importances_sorted.plot(kind='barh', color='lightgreen')
@@ -877,7 +856,7 @@ plt.show()
 
 
 #%%[markdown]
-### Interpreting the results of the regression tree model:
+#### Interpreting the results of the regression tree model:
 
 # The result of the regression tree suggests that the model has moderate predictive power. 
 
@@ -947,6 +926,7 @@ print("Mean R^2:", reg_tree_scores.mean())
 # Random Forest Model
 
 #%% Ensembling methods / Random Forest Model
+
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.tree import plot_tree
 
@@ -990,7 +970,7 @@ plt.show()
 
 #%%[markdown]
 
-### Random forest Model performance
+### Random forest Model performance [CV]
 # Cross validation using sklearn
 from sklearn.model_selection import cross_val_score
 
