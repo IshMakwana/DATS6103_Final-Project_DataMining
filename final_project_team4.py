@@ -575,8 +575,7 @@ high_corr = cor_mat[(cor_mat['democracy_index'] >= 0.3) | (cor_mat['democracy_in
 high_cor_features = high_corr.index.tolist()
 high_cor_features = high_cor_features[1:]
 print((high_cor_features))
-
-#%% Multicollinearity (VIF test)
+# Test Again
 X = vdem_worldBank_df[high_cor_features]
 vif = pd.DataFrame()
 vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
@@ -584,6 +583,22 @@ vif['Features'] = high_cor_features
 print(vif)
 
 #%% Drop highly correlated variables
+high_cor_features.remove('LifeExpectancy')
+# Test Again
+X = vdem_worldBank_df[high_cor_features]
+vif = pd.DataFrame()
+vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+vif['Features'] = high_cor_features
+print(vif)
+
+#%% Drop highly correlated variables
+high_cor_features.remove('FertilityRate')
+# Test Again
+X = vdem_worldBank_df[high_cor_features]
+vif = pd.DataFrame()
+vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+vif['Features'] = high_cor_features
+print(vif)
 
 #%% [markdown] Interpreting the results of the correlation matrix
 
@@ -783,7 +798,6 @@ importances_sorted = importances.sort_values()
 importances_sorted.plot(kind = 'barh', color = 'lightgreen')
 plt.title('Features Importances')
 plt.show()
-
 
 #%%[markdown]
 
