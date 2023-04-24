@@ -246,7 +246,6 @@ for feature in features:
     sns.scatterplot(x='democracy_index', y=feature, size='GDP', sizes=(100, 12000), alpha=0.5, hue='e_regionpol_6C', palette=colors, data=df_subset, legend=False)
     sns.regplot(x='democracy_index', y=feature, data=df_subset, scatter=False, color='black')
     plt.title('Democracy Index vs. ' + feature)
-
     plt.show()
 
 #%% [markdown] Interpreting the results of the bubble plot
@@ -399,7 +398,7 @@ print(df.describe())
 # ### Correlation Matrix
 #%%  Correlation Matrix (Linearity)
 
-cor_mat = vdem_worldBank_df[num_cols].corr() > abs(0.5)
+cor_mat = vdem_worldBank_df[num_cols].corr()
 
 # Generate a mask for the upper triangle
 mask = np.triu(np.ones_like(cor_mat, dtype=bool))
@@ -412,6 +411,7 @@ sns.heatmap(cor_mat, mask = mask, cmap = cmap, vmax = .3, center=0,
 
 plt.title('Correlation matrix')
 plt.show()
+
 
 #%% [markdown] Interpreting the results of the correlation matrix
 
@@ -427,7 +427,7 @@ X = vdem_worldBank_df[features]
 
 vif = pd.DataFrame()
 vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
-
+vif['Features'] = features
 print(vif)
 
 #%% [markdown]
@@ -527,24 +527,24 @@ varia_of_interest = ['Under5Mortality', 'GNIPerCapita',
                     'PrimarySchoolEnrollment', 'year', 
                     'LifeExpectancy', 'e_regionpol_6C']
 
-# Looping through each variable and performing ANOVA
-for variable in varia_of_interest:
-    # groups = []
-    # values = grouped_df[variable]
-    # groups.append(values)
-    columns_to_extract = [target_var, variable]
-    groups = grouped_df[columns_to_extract].apply(list)
-    # Performing ANOVA
-    f_statistic, p_value = f_oneway(*groups)
+# # Looping through each variable and performing ANOVA
+# for variable in varia_of_interest:
+#     # groups = []
+#     # values = grouped_df[variable]
+#     # groups.append(values)
+#     columns_to_extract = [target_var, variable]
+#     groups = grouped_df[columns_to_extract].apply(list)
+#     # Performing ANOVA
+#     f_statistic, p_value = f_oneway(*groups)
     
-    # Storing the results in the dictionary
-    anova_dict[variable] = {'F-statistic': f_statistic, 'p-value': p_value}
+#     # Storing the results in the dictionary
+#     anova_dict[variable] = {'F-statistic': f_statistic, 'p-value': p_value}
 
-# Displaying the ANOVA results
-for variable in anova_dict.keys():
-    print(variable)
-    print(anova_dict[variable])
-    print('\n')
+# # Displaying the ANOVA results
+# for variable in anova_dict.keys():
+#     print(variable)
+#     print(anova_dict[variable])
+#     print('\n')
 
 #%% ANOVA test attempt 2
 
@@ -567,13 +567,6 @@ f_stat, p_val = stats.f_oneway(vdem_worldBank_grouped_country.loc[vdem_worldBank
 print('F-statistic: {:.2f}'.format(f_stat))
 print('p-value: {:.4f}'.format(p_val))
 
-#%% [markdown] Interpreting the results of the correlation matrix
-# The correlation matrix shows the relationship between the democracy index and various factors. 
-# A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
-# In this case, the democracy index is positively correlated with measures of political and economic freedom, 
-#   as well as access to education and healthcare. Conversely, the democracy index is negatively correlated with factors 
-#   such as adolescent fertility and HIV prevalence. 
-# These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
 
 #%% ttesting
 
@@ -588,7 +581,7 @@ for x in ttest_variables:
     sample1 = vdem_worldBank_grouped_country['democracy_index'].sample(n=5)
     sample2 = vdem_worldBank_grouped_country[x].sample(n=5)
 
-    t, p, vdem_worldBank_df = sm.stats.ttest_ind(sample1, sample2)
+    t, p, df_ttest = sm.stats.ttest_ind(sample1, sample2)
 
     if p < 0.05:
         print(x)
@@ -596,18 +589,20 @@ for x in ttest_variables:
         print(f'p-value: ', p)
 
 
-#%% [markdown] Model Building
-# Regression Tree Model
-# Random Forest Model
-# Gradient Boosting Model
+#%%[markdown] 
+### Model Building
+# * Regression Tree Model
+# * Random Forest Model
+# * Gradient Boosting Model
 
 #%%[markdown] 
 ## Model Building
 ### Model - 1: Decision (Regression) Tree
 from sklearn.model_selection import train_test_split
 
-X = vdem_worldBank_df[features]
 y = vdem_worldBank_df['democracy_index']
+X = vdem_worldBank_df[features]
+
 
 # Split the data into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, 
@@ -636,14 +631,6 @@ dt_model = DecisionTreeRegressor(max_depth = 4,
 dt_model.fit(X_train, y_train)
 y_pred = dt_model.predict(X_test)
 
-
-# Decision Tree model (dt_model) evaluation metrics
-print("R^2: {}".format(r2_score(y_test, y_pred)))
-print("MSE: {}".format(MSE(y_test, y_pred)))
-print("MAE: {}".format(MAE(y_test, y_pred)))
-print("MSLE: {}".format(MSLE(y_test, y_pred)))
-print("MedAE: {}".format(MedAE(y_test, y_pred)))
-
 # Decision/Regression Tree model (dt_model) evaluation metrics
 print(f"R^2: {r2_score(y_test, y_pred)} ({round(r2_score(y_test, y_pred) * 100, 1)}%)")
 print(f"MSE: {MSE(y_test, y_pred)} ({round(MSE(y_test, y_pred) * 100, 1)}%)")
@@ -661,27 +648,7 @@ plot_tree(dt_model, feature_names = X_train.columns,
 plt.title('Decision Tree for variables of interest')
 plt.show()
 
-# from sklearn.tree import export_graphviz
-# import graphviz
-
-# # Export decision tree to graphviz format
-# dot_data = export_graphviz(dt_model, out_file = None, 
-#                            feature_names = X_train.columns,  
-#                            class_names = ['0', '1'],  
-#                            filled = True, rounded = True,  
-#                            special_characters = True)
-
-# # Create graph from graphviz format
-# graph = graphviz.Source(dot_data)
-
-# # Add space between nodes
-# graph.render(filename = 'reg_tree', format = 'png', cleanup = True)
-# graph
-
-
 ## Plot the feature importances
-#%%
-# Plot the feature importances
 importances = pd.Series(data=dt_model.feature_importances_, index=X.columns)
 importances_sorted = importances.sort_values()
 importances_sorted.plot(kind='barh', color='lightgreen')
@@ -696,25 +663,22 @@ plt.xlabel('GDP')
 plt.ylabel('GDP Growth')
 plt.show()
 
-#%% [markdown]  Interpreting the results of the regression tree model
-
-#%% DT Model performance
 
 #%%[markdown]
-### Interpreting the results of the regression tree model:
+#### Interpreting the results of the regression tree model:
 
 # The result of the regression tree suggests that the model has moderate predictive power. 
 
-# The R^2 value of 0.54 indicates that the model explains 54% of the variance in the target variable. 
+# The R^2 value of 0.49 indicates that the model explains 49% of the variance in the target variable. 
 
-# The MSE value of 0.027 suggests that the average squared difference between the predicted and actual values is relatively low. 
+# The MSE value of 0.0304 suggests that the average squared difference between the predicted and actual values is relatively low. 
 
-# The MAE value of 0.126 suggests that the average absolute difference between the predicted and actual values is also relatively low.
+# The MAE value of 0.138 suggests that the average absolute difference between the predicted and actual values is also relatively low.
 
-# The MSLE value of 0.014 indicates that the model's error is distributed logarithmically, 
+# The MSLE value of 0.016 indicates that the model's error is distributed logarithmically, 
 #     with smaller errors being more common than larger ones. 
 
-# The MedAE value of 0.104 indicates that the median absolute error is relatively low, suggesting that the model is relatively consistent in its predictions.
+# The MedAE value of 0.113 indicates that the median absolute error is relatively low, suggesting that the model is relatively consistent in its predictions.
 
 # Overall, while the model is not perfect, it appears to have some predictive power and is likely to be useful in some applications. 
 
@@ -724,7 +688,6 @@ plt.show()
 #%%[markdown]
 
 ### Decision Tree Model performance
-#%%[DT Model performance]
 
 # Cross validation using sklearn
 from sklearn.model_selection import cross_val_score
@@ -741,19 +704,17 @@ print("Cross-validation R^2 scores:", reg_tree_scores)
 print("Mean R^2:", reg_tree_scores.mean())
 
 
-#%% [markdown] Interpreting the results of the regression tree 
-
 #%%[markdown]
 
 #### Interpreting the results of the regression tree model-cross_validation metrics:
 
-# The cross-validation R2 values are: 0.4301455   0.32436221  0.25372059  0.2647695  -0.06587845. 
+# The cross-validation R2 values are: 0.39435305  0.36157301  0.31673186  0.25394055 -0.05657121.
 
-# The R-squared value of the original regression model is 0.5426, which indicates that the model 
-#           explains about 54% of the variance in the dependent variable. 
+# The R-squared value of the original regression model is 0.491, which indicates that the model 
+#           explains about 49.1% of the variance in the dependent variable. 
 
-# The R-squared value from the 5-fold cross-validation for the regression tree model is 0.2414, 
-#           which means that the model explains 24% of the variance on average across the 5 folds.
+# The R-squared value from the 5-fold cross-validation for the regression tree model is 0.254, 
+#           which means that the model explains 25.4% of the variance on average across the 5 folds.
 
 # This suggests that the original model may be overfitting the data, and the performance of the 
 #            model may not generalize well to new data. 
@@ -774,6 +735,7 @@ print("Mean R^2:", reg_tree_scores.mean())
 # Random Forest Model
 
 #%% Ensembling methods / Random Forest Model
+
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.tree import plot_tree
 
@@ -790,11 +752,6 @@ print(f"MSE: {MSE(y_test, rf_y_pred)} ({round(MSE(y_test, rf_y_pred) * 100, 1)}%
 print(f"MAE: {MAE(y_test, rf_y_pred)} ({round(MAE(y_test, rf_y_pred)* 100, 1)}%)")
 print(f"MSLE: {MSLE(y_test, rf_y_pred)} ({round(MSLE(y_test, rf_y_pred) * 100, 1)}%)")
 print(f"MedAE: {MedAE(y_test, rf_y_pred)} ({round(MedAE(y_test, rf_y_pred) * 100, 1)}%)")
-print("R^2: {}".format(r2_score(y_test, y_pred)))
-print("MSE: {}".format(MSE(y_test, y_pred)))
-print("MAE: {}".format(MAE(y_test, y_pred)))
-print("MSLE: {}".format(MSLE(y_test, y_pred)))
-print("MedAE: {}".format(MedAE(y_test, y_pred)))
 
 # Plot the feature importances
 importances = pd.Series(data = rf_model.feature_importances_, index = X.columns)
@@ -804,61 +761,25 @@ plt.title('Features Importances')
 plt.show()
 
 
-#%% [markdown] Interpreting the results of the random forest model
-
-#%% Gradient Boosting algorithm (Ensemble) to boost model accuracy and performance
-
-# Instantiate rf
-gb_model = GradientBoostingRegressor(n_estimators = 25, 
-                                    learning_rate = 0.1, 
-                                    random_state = 2)
-gb_model.fit(X_train, y_train)
-y_pred_gb = gb_model.predict(X_test)
-
-# Gradient Boosting model evaluation metrics
-print("R^2: {}".format(r2_score(y_test, y_pred_gb)))
-print("MSE: {}".format(MSE(y_test, y_pred_gb)))
-print("MAE: {}".format(MAE(y_test, y_pred_gb)))
-print("MSLE: {}".format(MSLE(y_test, y_pred_gb)))
-print("MedAE: {}".format(MedAE(y_test, y_pred_gb)))
-
-# Plot the feature importances
-importances = pd.Series(data = gb_model.feature_importances_, 
-                        index = X.columns)
-importances_sorted = importances.sort_values()
-importances_sorted.plot(kind = 'barh', color = 'lightgreen')
-plt.title('Features Importances (GB)')
-plt.show()
-
-#%% [markdown] Interpreting the results of the Gradient Boosting model:
-
-# Plot the test set with the decision boundary
-plt.figure(figsize = (10, 8))
-plt.scatter(X_test['GDP'], X_test['GDPGrowth'], c = y_test, s = 20, cmap = 'RdYlGn')
-plt.title('Test set')
-plt.xlabel('GDP')
-plt.ylabel('GDP Growth')
-plt.show()
-
 #%%[markdown]
 
 ### Interpreting the results of the random forest model:
 
-# The random forest model has a high R^2 value of 0.9434, 
-#       which means that it can explain 94.34% of the variance in the target variable. 
+# The random forest model has a high R^2 value of 0.9564, 
+#       which means that it can explain 95.6% of the variance in the target variable. 
 
-# The MSE (mean squared error) value is very low at 0.0033, indicating that the model's predictions 
+# The MSE (mean squared error) value is very low at 0.0026, indicating that the model's predictions 
 #      are very close to the actual values. 
 
-# The MAE (mean absolute error) value is also low at 0.037, which means that the average difference between the predicted and actual values is small. 
+# The MAE (mean absolute error) value is also low at 0.0351, which means that the average difference between the predicted and actual values is small. 
 
-# The MSLE (mean squared logarithmic error) value is low at 0.0018, which indicates that the model is making accurate predictions across the entire range of target values. 
+# The MSLE (mean squared logarithmic error) value is low at 0.0014, which indicates that the model is making accurate predictions across the entire range of target values. 
 
-# The MedAE (median absolute error) value is also low at 0.0219, which means that half of the absolute errors are smaller than this value. 
+# The MedAE (median absolute error) value is also low at 0.0226, which means that half of the absolute errors are smaller than this value. 
 
 #%%[markdown]
 
-### Random forest Model performance
+### Random forest Model performance [CV]
 # Cross validation using sklearn
 from sklearn.model_selection import cross_val_score
 
@@ -873,11 +794,11 @@ print("Mean R^2:", rf_scores.mean())
 #%%[markdown]
 #### The 5-fold cross-validation result for a random forest model is displayed in the output. 
 
-# The cross-validation's R-squared values for each fold are [0.331, 0.489, 0.424, 0.590, 0.354], 
+# The cross-validation's R-squared values for each fold are: 0.42169178, 0.47199265, 0.45277613, 0.56451087, 0.06465839, 
 #   indicating that the model's performance differs considerably between folds. 
 
 # Lower than the R-squared value of the initial random forest model, the mean R-squared value 
-#   across all folds is 0.438. 
+#   across all folds is 0.3951. 
 
 # This implies that the original model may have overfitted the data and that the performance 
 #   of the model may not be as excellent when applied to fresh, unforeseen data. 
@@ -889,8 +810,10 @@ print("Mean R^2:", rf_scores.mean())
 #   look into alternative machine learning techniques.
 
 #%%[markdown]
+
 ###  Refining the random forest model
 #%%Hyperparameter tuning
+
 # GridSearchCV
 from sklearn.model_selection import GridSearchCV
 
@@ -952,11 +875,13 @@ plt.show()
 #%% [markdown] 
 #### Interpreting the results of the refined random forest model
 # After refining the random forest model using GridSearchCV, 
+
 # the R^2 value decreased to 0.5205, indicating that the model's ability to explain the variance in the target variable has decreased. 
 # The MSE value increased to 0.0283, indicating that the average squared difference between the predicted and actual values has increased.
 # The MAE value increased to 0.1358, indicating that the average absolute difference between the predicted and actual values has also increased.
 # The MSLE value of 0.0149 indicates that the model's error is distributed logarithmically, with smaller errors being more common than larger ones. 
 # The MedAE value of 0.1146 indicates that the median absolute error is higher than the previous model.
+
 # Overall, while the refined random forest model has a lower performance than the previous one, it is still making relatively accurate predictions. 
 # Further analysis and testing may be necessary to fully evaluate its performance.
 
@@ -979,15 +904,14 @@ print("Mean R^2:", rf_hyp_scores.mean())
 
 #### The 5-fold cross-validation result for a refined random forest model is displayed in the output. 
 
-# With a mean R2 of 0.246, the cross-validation R2 scores vary from 0.33 to 0.59. 
-
-# This shows that 44% of the variance in the target variable can be explained by the revised random forest model.
-
-# The fifth fold has a negative R2 value (-0.12) though, which is unusual and indicates that the model does poorly on that fold. 
-#   This is a significant point to note. This can be the result of data imbalances or other circumstances that have an impact on that specific fold.
-
-# Overall, the refined random forest model using 5-fold cross-validation has a mean R2 of 0.24, which is lower than the mean R2 of 
-# 0.5205 for the original random forest model, indicating that the refined model might not perform as well as the original model.
+# The cross-validation mean R-squared value of 0.2856 indicates that the refined random forest model is 
+# not performing as well as the original model, which has an R-squared value of 0.5086. 
+# This suggests that the refined random forest model may be overfitting the training data and not generalizing 
+# well to new data. 
+# The negative R-squared value in one of the folds also suggests that the model is performing worse than a model 
+# that simply predicts the mean value of the target variable. 
+# 
+# Further refinement or another machine learning algorithm may be necessary for further analysis.
 
 
 #%%[markdown]
@@ -1030,17 +954,17 @@ plt.show()
 
 #%% [markdown] Interpreting the results of the Gradient Boosting model:
 
-# The gradient boosting model has a R^2 value of 0.7118, 
-#       which means that it can explain 71.18% of the variance in the target variable. 
+# The gradient boosting model has a R^2 value of 0.714, 
+#       which means that it can explain 71.42% of the variance in the target variable. 
 
 # The MSE (mean squared error) value is very low at 0.017, indicating that the model's predictions 
 #      are close to the actual values. 
 
-# The MAE (mean absolute error) value is also low at 0.107, which means that the average difference between the predicted and actual values is small. 
+# The MAE (mean absolute error) value is also low at 0.108, which means that the average difference between the predicted and actual values is small. 
 
 # The MSLE (mean squared logarithmic error) value is low at 0.0092, which indicates that the model is making accurate predictions across the entire range of target values. 
 
-# The MedAE (median absolute error) value is also low at 0.0926, which means that half of the absolute errors are smaller than this value. 
+# The MedAE (median absolute error) value is also low at 0.0967, which means that half of the absolute errors are smaller than this value. 
 
 
 #%%[markdown]
@@ -1057,36 +981,55 @@ print("5 fold Cross-validation for gradient boosting model:")
 print("Cross-validation R^2 scores:", gb_scores)
 print("Mean R^2:", gb_scores.mean())
 
+#%%[markdown]
+
+# The R-squared value of the cross-validation for the gradient boosting model is 0.4029, 
+#       which is lower than the original R-squared value of 0.714. 
+# 
+# This indicates that the model is overfitting to the training data and is not able to 
+#       generalize well to new data. 
+# 
+# The cross-validation score gives an estimate of how well the model is likely to perform on new data. 
+# 
+# Since the cross-validation score is lower than the original R-squared value, 
+#           it suggests that the model needs to be improved in order to better generalize to new data.
 
 
 #%%[markdown]
 # Overall, these results suggest that the random forest model is a good fit over regression and gradient boosting models 
-#     for the data and is making accurate predictions with R^2 (R-squared) value of 94.3%.
+#     for the data and is making accurate predictions with R^2 (R-squared) value of 95.6%.
 
-#%% [markdown] Compare the results of the regression tree and random forest models
-# To compare the performance of the regression tree, gradient boosting and random forest models, 
+#%% [markdown] 
+### Compare the results of the regression tree and random forest models
+#  To compare the performance of the regression tree, gradient boosting and random forest models, 
 # we can look at the evaluation metrics such as: 
-#   R-squared (R^2), 
-#   mean squared error (MSE), 
-#   mean absolute error (MAE), 
-#   mean squared logarithmic error (MSLE), and 
-#   median absolute error (MedAE). 
-# We can also compare the feature importances of the models.
+# *  R-squared (R^2), 
+# *  mean squared error (MSE), 
+# *  mean absolute error (MAE), 
+# *  mean squared logarithmic error (MSLE), and 
+# *  median absolute error (MedAE). 
+
+# - We can also compare the feature importances of the models.
 # From the evaluation metrics, we can see that the random forest model outperforms the regression tree model and gradient boosting model on all metrics. 
-# The R^2 value of the random forest model is 0.9434, which is much higher than the R^2 value of the regression tree model (0.5426). 
+# The R^2 value of the random forest model is 0.956, which is much higher than the R^2 value of the regression tree model (0.4907). 
 # The MSE, MAE, MSLE, and MedAE values of the random forest model are also lower than those of the regression tree and gradient boosting models, 
 #       indicating that the random forest model is making more accurate predictions.
+
 # We can also compare the feature importances of the two models: 
 #     The feature importances of the random forest model are generally higher than those of the regression tree & gradient boosting models, 
 #       indicating that the random forest model is able to better capture the relationships between the features and the target variable.
+
 # Overall, the random forest model appears to be a better choice for this dataset as it outperforms the regression tree and gradient boosting model on all evaluation metrics and has higher feature importances
 
-#%% [markdown] Results
-# - The random forest model has a high R^2 value of 0.9434, which means that it can explain 94.34% of the variance in the target variable.
-# - The MSE (mean squared error) value is very low at 0.0033, indicating that the model's predictions are very close to the actual values.
-# - The MAE (mean absolute error) value is also low at 0.037, which means that the average difference between the predicted and actual values is small.
-# - The MSLE (mean squared logarithmic error) value is low at 0.0018, which indicates that the model is making accurate predictions across the entire range of target values.
-# - The MedAE (median absolute error) value is also low at 0.0219, which means that half of the absolute errors are smaller than this value.
-# - Overall, these results suggest that the random forest model is a good fit for the data and is making accurate predictions.
+#%% [markdown] 
+### Results
+# - The random forest model has a high R^2 value of 0.956, which means that it can explain 95.6% of the variance in the target variable.
+# - The MSE (mean squared error) value is very low at 0.0026, indicating that the model's predictions are very close to the actual values.
+# - The MAE (mean absolute error) value is also low at 0.035, which means that the average difference between the predicted and actual values is small.
+# - The MSLE (mean squared logarithmic error) value is low at 0.00147, which indicates that the model is making accurate predictions across the entire range of target values.
+# - The MedAE (median absolute error) value is also low at 0.0226, which means that half of the absolute errors are smaller than this value.
+# - Overall, these results suggest that the random forest model is a good fit for this data among all other models and is making accurate predictions.
 
-# %%
+#%%[markdown]
+### Limitations:
+# * Due to less number of observations, all the machine learning models are over-fitting the data even with refined and hyperparameter techniques.
