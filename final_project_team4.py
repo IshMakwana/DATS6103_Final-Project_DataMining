@@ -39,6 +39,8 @@ import pandas as pd
 from scipy.stats import pearsonr
 from scipy.stats import ttest_ind
 import statsmodels.api as sm
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error, mean_squared_log_error, median_absolute_error
+
 
 #%%
 """ Variables of Interest(19):
@@ -587,6 +589,16 @@ sns.heatmap(cor_mat, mask = mask, cmap = cmap, vmax = .3, center=0,
 plt.title('Correlation matrix')
 plt.show()
 
+#%% [markdown] Interpreting the results of the correlation matrix
+
+# The correlation matrix shows the relationship between the democracy index and various factors. 
+# A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
+# In this case, the democracy index is positively correlated with measures of political and economic freedom, 
+#   as well as access to education and healthcare. Conversely, the democracy index is negatively correlated with factors 
+#   such as adolescent fertility and HIV prevalence. 
+# These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
+
+
 #%% Create a list of variables with correlations greater than or equal to 0.3 or less than or equal to -0.3
 # Subset correlation matrix for variables with correlations greater than or equal to 0.3 or less than or equal to -0.3
 high_corr = cor_mat[(cor_mat['democracy_index'] >= 0.3) | (cor_mat['democracy_index'] <= -0.3)]
@@ -610,18 +622,6 @@ for feature in ['LifeExpectancy', 'FertilityRate']:
     high_cor_features.remove(feature)
     print(f"VIF after removing {feature} feature: ")
     calc_vif(vdem_worldBank_df, high_cor_features)
-
-
-#%% [markdown] Interpreting the results of the correlation matrix
-
-# The correlation matrix shows the relationship between the democracy index and various factors. 
-# A high positive correlation indicates that as the democracy index increases, so do the values of the other factors. 
-# In this case, the democracy index is positively correlated with measures of political and economic freedom, 
-#   as well as access to education and healthcare. Conversely, the democracy index is negatively correlated with factors 
-#   such as adolescent fertility and HIV prevalence. 
-# These correlations suggest that democratic societies tend to have better social, economic, and health outcomes.
-
-#%% Correlation Matrix
 
 #%% [markdown] 
 # ##Model Building
@@ -664,11 +664,18 @@ y_pred = dt_model.predict(X_test)
 
 # Decision/Regression Tree model (dt_model) evaluation metrics
 print("Decision/Regression Tree model evaluation metrics: ")
-print(f"R^2: {r2_score(y_test, y_pred)} ({round(r2_score(y_test, y_pred) * 100, 1)}%)")
-print(f"MSE: {MSE(y_test, y_pred)} ({round(MSE(y_test, y_pred) * 100, 1)}%)")
-print(f"MAE: {MAE(y_test, y_pred)} ({round(MAE(y_test, y_pred)* 100, 1)}%)")
-print(f"MSLE: {MSLE(y_test, y_pred)} ({round(MSLE(y_test, y_pred) * 100, 1)}%)")
-print(f"MedAE: {MedAE(y_test, y_pred)} ({round(MedAE(y_test, y_pred) * 100, 1)}%)")
+r2_dt = r2_score(y_test, y_pred)
+mse_dt = mean_squared_error(y_test, y_pred)
+mae_dt = mean_absolute_error(y_test, y_pred)
+msle_dt = mean_squared_log_error(y_test, y_pred)
+medae_dt = median_absolute_error(y_test, y_pred)
+
+# Evaluate the refined Random forest model
+print(f"R^2: {r2_dt} ({round(r2_dt * 100, 1)}%)")
+print(f"MSE: {mse_dt} ({round(mse_dt * 100, 1)}%)")
+print(f"MAE: {mae_dt} ({round(mae_dt * 100, 1)}%)")
+print(f"MSLE: {msle_dt} ({round(msle_dt * 100, 1)}%)")
+print(f"MedAE: {medae_dt} ({round(medae_dt * 100, 1)}%)")
 
 # Decision (Regression) Tree map
 plt.figure(figsize = (12, 10))
@@ -680,11 +687,16 @@ plot_tree(dt_model, feature_names = X_train.columns,
 plt.title('Decision Tree for variables of interest')
 plt.show()
 
-## Plot the feature importances
-importances = pd.Series(data=dt_model.feature_importances_, index=X.columns)
+importances = pd.Series(data = dt_model.feature_importances_, index = X.columns)
 importances_sorted = importances.sort_values()
-importances_sorted.plot(kind='barh', color='lightgreen')
+
+# Plotting the bar histogram with labels and legends
+importances_sorted.plot(kind = 'barh', color = 'lightgreen')
 plt.title('Features Importances')
+plt.xlabel('Importance Score')
+plt.ylabel('Features')
+plt.legend(['Feature Importance'], loc='lower right')
+
 plt.show()
 
 #%%[markdown]
@@ -706,6 +718,16 @@ plt.show()
 # Overall, while the model is not perfect, it appears to have some predictive power and is likely to be useful in some applications. 
 
 # However, further analysis and testing may be necessary to fully evaluate its performance.
+
+
+#%%[markdown]
+### Prediction accuracy with new data for DT model
+# Hold-out concept (out-of-bag samples)
+
+# dt_out_of_bag = RandomForestRegressor(oob_score = True)
+# rf_out_of_bag.fit(X_train, y_train)
+# rf_obb_score = rf_out_of_bag.oob_score_
+# print(f"Prediction accuracy with new data: {round(rf_obb_score, 2) * 100}% ") 
 
 
 #%%[markdown]
@@ -755,6 +777,7 @@ print("Mean R^2:", round(reg_tree_scores.mean(), 4))
 # but it's also crucial to make sure the model isn't overfitting the data. 
 # Cross-validation can give a more precise assessment of the model's performance and aid in evaluating the model's performance on unknown data.
 
+
 #%%[markdown]
 ## Ensembling methods
 ### Model - 2
@@ -764,6 +787,7 @@ print("Mean R^2:", round(reg_tree_scores.mean(), 4))
 
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.tree import plot_tree
+from sklearn.feature_selection import SelectFromModel
 
 # Instantiate rf
 rf_model = RandomForestRegressor(n_estimators = 25, 
@@ -773,17 +797,30 @@ rf_y_pred = rf_model.predict(X_test)
 
 # RF model evaluation metrics
 print("Random forest model evaluation metrics: ")
-print(f"R^2: {r2_score(y_test, rf_y_pred)} ({round(r2_score(y_test, rf_y_pred) * 100, 1)}%)")
-print(f"MSE: {MSE(y_test, rf_y_pred)} ({round(MSE(y_test, rf_y_pred) * 100, 1)}%)")
-print(f"MAE: {MAE(y_test, rf_y_pred)} ({round(MAE(y_test, rf_y_pred)* 100, 1)}%)")
-print(f"MSLE: {MSLE(y_test, rf_y_pred)} ({round(MSLE(y_test, rf_y_pred) * 100, 1)}%)")
-print(f"MedAE: {MedAE(y_test, rf_y_pred)} ({round(MedAE(y_test, rf_y_pred) * 100, 1)}%)")
+r2_rf = r2_score(y_test, rf_y_pred)
+mse_rf = mean_squared_error(y_test, rf_y_pred)
+mae_rf = mean_absolute_error(y_test, rf_y_pred)
+msle_rf = mean_squared_log_error(y_test, rf_y_pred)
+medae_rf = median_absolute_error(y_test, rf_y_pred)
 
+print(f"R^2: {r2_rf} ({round(r2_rf * 100, 1)}%)")
+print(f"MSE: {mse_rf} ({round(mse_rf * 100, 1)}%)")
+print(f"MAE: {mae_rf} ({round(mae_rf * 100, 1)}%)")
+print(f"MSLE: {msle_rf} ({round(msle_rf * 100, 1)}%)")
+print(f"MedAE: {medae_rf} ({round(medae_rf * 100, 1)}%)")
+
+#%%
 # Plot the feature importances
 importances = pd.Series(data = rf_model.feature_importances_, index = X.columns)
 importances_sorted = importances.sort_values()
+
+# Plotting the bar histogram with labels and legends
 importances_sorted.plot(kind = 'barh', color = 'lightgreen')
 plt.title('Features Importances')
+plt.xlabel('Importance Score')
+plt.ylabel('Features')
+plt.legend(['Feature Importance'], loc='lower right')
+
 plt.show()
 
 #%%[markdown]
@@ -801,6 +838,33 @@ plt.show()
 # The MSLE (mean squared logarithmic error) value is low at 0.0023, which indicates that the model is making accurate predictions across the entire range of target values. 
 # 
 # The MedAE (median absolute error) value is also low at 0.0303, which means that half of the absolute errors are smaller than this value. 
+
+
+#%%[markdown]
+### Prediction accuracy with new data
+# Hold-out concept (out-of-bag samples)
+
+rf_out_of_bag = RandomForestRegressor(oob_score = True)
+rf_out_of_bag.fit(X_train, y_train)
+rf_obb_score = rf_out_of_bag.oob_score_
+print(f"Prediction accuracy with new data: {round(rf_obb_score, 2) * 100}% ") 
+
+#%%[markdown]
+### Interpretation of model
+
+# The code performs random forest regression on training data using the 'RandomForestRegressor()' function 
+# with oob_score = True to enable 'out-of-bag' (OOB) scoring. 
+#
+# This technique uses some training data that is not used for training each individual tree to estimate 
+# the accuracy of the model without requiring a separate test set or cross-validation.
+#
+# The model is trained using the fit() method on the training data, and the 'oob_score_' attribute 
+# of the RandomForestRegressor object is used to display the OOB score of the model. 
+#
+# The output value of 'oob_score_' is '0.9108', indicating a high accuracy of the model on the OOB data, 
+# with a score of '0.91' or '91%'. This suggests that the model is likely to perform well on new, 
+# unseen data and may be suitable for generalization to such data.
+
 
 #%%[markdown]
 
@@ -820,6 +884,7 @@ print()
 print("Mean R^2:", round(rf_scores.mean(), 4))
 
 #%%[markdown]
+
 #### The 5-fold cross-validation result for a random forest model is displayed in the output. 
 
 # The cross-validation's R-squared values for each fold are: 0.47413435  0.3568414   0.38703758  0.53499121 -0.11419026
@@ -873,14 +938,20 @@ rf_best = RandomForestRegressor(n_estimators=grid_search.best_params_
 rf_best.fit(X_train, y_train)
 rf_best_y_pred = rf_best.predict(X_test)
 
-# Evaluate the refined Random forest model
-print("Refined RF model evaluation metrics: ")
-print(f"R^2: {r2_score(y_test, rf_best_y_pred)} ({round(r2_score(y_test, rf_best_y_pred) * 100, 1)}%)")
-print(f"MSE: {MSE(y_test, rf_best_y_pred)} ({round(MSE(y_test, rf_best_y_pred) * 100, 1)}%)")
-print(f"MAE: {MAE(y_test, rf_best_y_pred)} ({round(MAE(y_test, rf_best_y_pred)* 100, 1)}%)")
-print(f"MSLE: {MSLE(y_test, rf_best_y_pred)} ({round(MSLE(y_test, rf_best_y_pred) * 100, 1)}%)")
-print(f"MedAE: {MedAE(y_test, rf_best_y_pred)} ({round(MedAE(y_test, rf_best_y_pred) * 100, 1)}%)")
 
+print("Refined RF model evaluation metrics: ")
+r2_rf_best = r2_score(y_test, rf_best_y_pred)
+mse_rf_best = mean_squared_error(y_test, rf_best_y_pred)
+mae_rf_best = mean_absolute_error(y_test, rf_best_y_pred)
+msle_rf_best = mean_squared_log_error(y_test, rf_best_y_pred)
+medae_rf_best = median_absolute_error(y_test, rf_best_y_pred)
+
+# Evaluate the refined Random forest model
+print(f"R^2: {r2_rf_best} ({round(r2_rf_best * 100, 1)}%)")
+print(f"MSE: {mse_rf_best} ({round(mse_rf_best * 100, 1)}%)")
+print(f"MAE: {mae_rf_best} ({round(mae_rf_best * 100, 1)}%)")
+print(f"MSLE: {msle_rf_best} ({round(msle_rf_best * 100, 1)}%)")
+print(f"MedAE: {medae_rf_best} ({round(medae_rf_best * 100, 1)}%)")
 # Plot Tree Graph
 plt.figure(figsize=(20, 10))
 plot_tree(rf_best.estimators_[0], feature_names=X_train.columns, filled=True, rounded=True)
@@ -952,13 +1023,20 @@ gb_model = GradientBoostingRegressor(n_estimators = 25,
 gb_model.fit(X_train, y_train)
 y_pred_gb = gb_model.predict(X_test)
 
+
+r2_gb = r2_score(y_test, y_pred_gb)
+mse_gb = mean_squared_error(y_test, y_pred_gb)
+mae_gb = mean_absolute_error(y_test, y_pred_gb)
+msle_gb = mean_squared_log_error(y_test, y_pred_gb)
+medae_gb = median_absolute_error(y_test, y_pred_gb)
+
 # Gradient Boosting model evaluation metrics
 print("Gradient Boosting model evaluation metrics: ")
-print(f"R^2: {r2_score(y_test, y_pred_gb)} ({round(r2_score(y_test, y_pred_gb) * 100, 1)}%)")
-print(f"MSE: {MSE(y_test, y_pred_gb)} ({round(MSE(y_test, y_pred_gb) * 100, 1)}%)")
-print(f"MAE: {MAE(y_test, y_pred_gb)} ({round(MAE(y_test, y_pred_gb)* 100, 1)}%)")
-print(f"MSLE: {MSLE(y_test, y_pred_gb)} ({round(MSLE(y_test, y_pred_gb) * 100, 1)}%)")
-print(f"MedAE: {MedAE(y_test, y_pred_gb)} ({round(MedAE(y_test, y_pred_gb) * 100, 1)}%)")
+print(f"R^2: {r2_gb} ({round(r2_gb * 100, 1)}%)")
+print(f"MSE: {mse_gb} ({round(mse_gb * 100, 1)}%)")
+print(f"MAE: {mae_gb} ({round(mae_gb * 100, 1)}%)")
+print(f"MSLE: {msle_gb} ({round(msle_gb * 100, 1)}%)")
+print(f"MedAE: {medae_gb} ({round(medae_gb * 100, 1)}%)")
 
 # Plot the feature importances
 importances = pd.Series(data = gb_model.feature_importances_, 
@@ -1053,3 +1131,57 @@ print("Mean R^2:", round(gb_scores.mean(), 4))
 #%%[markdown]
 ### Limitations:
 # * Due to less number of observations, all the machine learning models are over-fitting the data even with refined and hyperparameter techniques.
+
+
+#%%[markdown]
+############################################################################################################################################################################
+##### SUMMARY #####
+########################################################################################################################################################################
+
+models = ['Decision Tree', 
+          'Random forest', 
+          'Refined Random forest', 
+          'Gradient boosting']
+
+# R-squared (R^2)
+r2 = [round(r2_dt, 2), 
+      round(r2_rf, 2), 
+      round(r2_rf_best, 2), 
+      round(r2_gb, 2)]
+
+# Root mean squared error (RMSE)
+rmse = [round(np.sqrt(mse_dt), 2), 
+        round(np.sqrt(mse_rf), 2), 
+        round(np.sqrt(mse_rf_best), 2), 
+        round(np.sqrt(mse_gb), 2)
+        ]
+
+# mean absolute error (MAE) 
+mae = [round(mae_dt, 2), round(mae_rf, 2), 
+       round(mae_rf_best, 2), round(mae_gb, 2)]
+
+# mean squared logarithmic error (MSLE)
+msle = [round(msle_dt, 2), 
+        round(msle_rf, 2), 
+        round(msle_rf_best, 2), 
+        round(msle_gb, 2)]
+
+# median absolute error (MedAE). 
+medae = [round(medae_dt, 2), 
+         round(medae_rf, 2), 
+         round(medae_rf_best, 2), 
+         round(medae_gb, 2)
+         ]
+
+model_perf = {'Model' : models, 
+              'R-Squared' : r2, 
+              'RMSE' : rmse,
+              'MAE' : mae,
+              'MSLE' : msle,
+              'MedAE' : medae
+              }
+
+df_perf = pd.DataFrame(model_perf)
+df_perf
+
+# %%
