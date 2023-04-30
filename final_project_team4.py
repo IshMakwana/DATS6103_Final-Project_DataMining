@@ -382,17 +382,6 @@ fig.update_layout(scene=dict(
 
 fig.show()
 
-#%%[markdown]
-# Variables to test against average democracy index: GDP per capita, overall life expectancy, and average education.
-
-#%%
-# ### Descriptive Statistics
-# print(vdem_worldBank_poli_region_grouped.columns)
-
-# Select variables of interest
-# df = vdem_worldBank_df[['democracy_index', 'GNIPerCapita', 
-                    # 'LifeExpectancy', 'PrimarySchoolEnrollment']]
-
 #%% [markdown]
 # ### Hyptothesis Testing
 # ANOVA
@@ -547,24 +536,24 @@ for var in ANOVA_variables:
 
 #%% ttesting
 
-ttest_variables = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
-            'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
-            'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
-            'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
-            'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
-            'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
+# ttest_variables = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
+#             'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
+#             'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
+#             'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
+#             'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
+#             'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
 
-for x in ttest_variables:
-    sample1 = vdem_worldBank_grouped_country['democracy_index'].sample(n=5)
-    sample2 = vdem_worldBank_grouped_country[x].sample(n=5)
+# for x in ttest_variables:
+#     sample1 = vdem_worldBank_grouped_country['democracy_index'].sample(n=5)
+#     sample2 = vdem_worldBank_grouped_country[x].sample(n=5)
 
 
-    t, p, df_ttest = sm.stats.ttest_ind(sample1, sample2)
+#     t, p, df_ttest = sm.stats.ttest_ind(sample1, sample2)
 
-    if p < 0.05:
-        print(x)
-        print(f't-value: ', t)
-        print(f'p-value: ', p)
+#     if p < 0.05:
+#         print(x)
+#         print(f't-value: ', t)
+#         print(f'p-value: ', p)
 
 #%% [markdown]
 # ## Feature Selection
@@ -738,8 +727,8 @@ plt.show()
 from sklearn.model_selection import cross_val_score
 
 reg_tree_scores = cross_val_score(dt_model, 
-                         X, y, cv = 5, 
-                         scoring='r2')
+                        X, y, cv = 5, 
+                        scoring='r2')
 scores = cross_val_score(dt_model, 
                         X, y, cv = 5, 
                         scoring='r2')
@@ -873,8 +862,8 @@ print(f"Prediction accuracy with new data: {round(rf_obb_score, 2) * 100}% ")
 from sklearn.model_selection import cross_val_score
 
 rf_scores = cross_val_score(rf_model, 
-                         X, y, cv = 5, 
-                         scoring='r2')
+                        X, y, cv = 5, 
+                        scoring='r2')
 
 print("5-fold X-Validation for random forest model:")
 print("Cross-validation R^2 scores:")
