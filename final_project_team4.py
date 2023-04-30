@@ -76,10 +76,12 @@ Economy
 """
 
 #%% [markdown]
-# ## Exploratory Data Analysis
-#%% EDA
+#%% 
+### Data collection
+# Reading merged (V-dem + world-Bank) dataset from GitHub repository
 url2 = "https://raw.githubusercontent.com/IshMakwana/DATS6103_Final-Project_DataMining/main/dataset/vdem_worldBank.csv"
 vdem_worldBank_df = pd.read_csv(url2)
+
 #%% Basic Information (vdem_worldBank_df)
 print(vdem_worldBank_df.head())
 print(vdem_worldBank_df.info())
@@ -156,9 +158,7 @@ df_subset = vdem_worldBank_df[num_cols]
 sns.boxplot(data = df_subset, orient = "h", palette = "Set2")
 
 #%% [markdown] 
-# ### Distribution of the variables
-
-#%% Distribution of the variables(with time series)
+### Distribution of the variables(with time series)
 
 # Create histograms for each numeric column
 sns.set_style('darkgrid')
@@ -387,132 +387,6 @@ fig.show()
 # ANOVA
 # t-test
 
-#%% Annova Test 1
-# from scipy.stats import f_oneway
-# Group data by region and calculate mean Democracy Index for each region
-# dem_index_by_region = vdem_worldBank_df.groupby('e_regionpol_6C')['democracy_index'].mean()
-# Perform ANOVA test
-# f_stat, p_val = f_oneway(*[vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C']==region]['democracy_index'] for region in dem_index_by_region.index])
-#print(f"ANOVA test result: F-statistic = {f_stat}, p-value = {p_val}")
-
-#%% Annova Test 2 
-# Group data by region and calculate mean Life Expectancy for each region
-# life_exp_by_region = vdem_worldBank_df.groupby('e_regionpol_6C')['LifeExpectancy'].mean()
-# Perform ANOVA test
-# f_stat, p_val = f_oneway(*[vdem_worldBank_df[vdem_worldBank_df['e_regionpol_6C']==region]['LifeExpectancy'] for region in life_exp_by_region.index]
-# print(f"ANOVA test result: F-statistic = {f_stat}, p-value = {p_val}")
-
-#%%
-# Annova Test3
-# ANOVA test for Child Mortality
-# grouped_cm = vdem_worldBank_df.groupby('e_regionpol_6C')['Under5Mortality'].apply(list)
-# f_val, p_val = stats.f_oneway(*grouped_cm)
-# print("Child Mortality ANOVA test using region:")
-# print("F value:", f_val)
-# print("P value:", p_val)
-
-# ANOVA test for GNI Per Capita
-# grouped_gni = vdem_worldBank_df.groupby('e_regionpol_6C')['GNIPerCapita'].apply(list)
-# f_val, p_val = stats.f_oneway(*grouped_gni)
-# print("GNI Per Capita ANOVA test using region:")
-# print("F value:", f_val)
-# print("P value:", p_val)
-
-# ANOVA test for Child School Enrollment
-# grouped_enrollment = vdem_worldBank_df.groupby('e_regionpol_6C')['PrimarySchoolEnrollment'].apply(list)
-# f_val, p_val = stats.f_oneway(*grouped_enrollment)
-# print("Child School Enrollment ANOVA test using region:")
-# print("F value:", f_val)
-# print("P value:", p_val)
-
-# ANOVA test for Year
-# grouped_year = vdem_worldBank_df.groupby('e_regionpol_6C')['year'].apply(list)
-# f_val, p_val = stats.f_oneway(*grouped_year)
-# print("Year ANOVA test using region:")
-# print("F value:", f_val)
-# print("P value:", p_val)
-
-#Annova Test4
-# ANOVA test for Child Mortality using country_name
-# grouped_cm = vdem_worldBank_df.groupby('country_name')['Under5Mortality'].apply(list)
-# f_val, p_val = stats.f_oneway(*grouped_cm)
-# print("Child Mortality ANOVA test using country_name:")
-# print("F value:", f_val)
-# print("P value:", p_val)
-
-# ANOVA test for GNI Per Capita using country_name
-# grouped_gni = vdem_worldBank_df.groupby('country_name')['GNIPerCapita'].apply(list)
-# f_val, p_val = stats.f_oneway(*grouped_gni)
-# print("GNI Per Capita ANOVA test using country_name:")
-# print("F value:", f_val)
-# print("P value:", p_val)
-
-# ANOVA test for Child School Enrollment using country_name
-# grouped_enrollment = vdem_worldBank_df.groupby('country_name')['PrimarySchoolEnrollment'].apply(list)
-# f_val, p_val = stats.f_oneway(*grouped_enrollment)
-# print("Child School Enrollment ANOVA test using country_name:")
-# print("F value:", f_val)
-# print("P value:", p_val)
-
-# ANOVA test for Year using country_name
-# grouped_year = vdem_worldBank_df.groupby('country_name')['year'].apply(list)
-# f_val, p_val = stats.f_oneway(*grouped_year)
-# print("Year ANOVA test using country_name:")
-# print("F value:", f_val)
-# print("P value:", p_val)
-
-#%% Annova Test 5
-# Grouping the vdem_worldBank_df dataframe by country_name
-# grouped_df = vdem_worldBank_df.groupby('country_name')
-# grouped_df = vdem_worldBank_df.groupby('country_name').apply(lambda x: x.fillna(x.median()))
-# grouped_df.dropna(inplace=True)
-# Creating a dictionary to store the ANOVA results for each variable
-# anova_dict = {}
-# target_var = 'democracy_index'
-# varia_of_interest = ['Under5Mortality', 'GNIPerCapita', 
-                    # 'PrimarySchoolEnrollment', 'year', 
-                    # 'LifeExpectancy', 'e_regionpol_6C']
-
-# Looping through each variable and performing ANOVA
-# for variable in varia_of_interest:
-    # groups = []
-    # values = grouped_df[variable]
-    # groups.append(values)
-    # columns_to_extract = [target_var, variable]
-    # groups = grouped_df[columns_to_extract].apply(list)
-    # Performing ANOVA
-    # f_statistic, p_value = f_oneway(*groups)
-    
-    # Storing the results in the dictionary
-    # anova_dict[variable] = {'F-statistic': f_statistic, 'p-value': p_value}
-
-# Displaying the ANOVA results
-
-# for variable in anova_dict.keys():
-#     print(variable)
-#     print(anova_dict[variable])
-#     print('\n')
-
-#%% ANOVA test attempt 2
-# ANOVA_variables = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
-#             'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
-#             'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
-#             'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
-#             'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
-#             'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
-
-# vdem_countries = vdem_worldBank_df['country_name'].unique()
-
-# f_stat, p_val = stats.f_oneway(vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==1, 'democracy_index'],
-#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==2, 'democracy_index'],
-#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==3, 'democracy_index'],
-#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==4, 'democracy_index'],
-#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==5, 'democracy_index'],
-#                                 vdem_worldBank_grouped_country.loc[vdem_worldBank_grouped_country['e_regionpol_6C']==6, 'democracy_index'])
-
-# print('F-statistic: {:.2f}'.format(f_stat))
-# print('p-value: {:.4f}'.format(p_val))
-
 #%%
 # Annova Test 3rd attempt
 from scipy.stats import f_oneway
@@ -534,33 +408,16 @@ for var in ANOVA_variables:
     print(f"ANOVA test result for {var}:")
     print(f"F value: {f_stat:.2f}, p-value: {p_val:.4f}\n")
 
-#%% ttesting
-
-# ttest_variables = ['e_regionpol_6C','AccessToCleanCooking','AdolescentFertility', 
-#             'AgriForestFishValueAdded', 'CO2Emissions', 'ExportsOfGoodsAndServices', 
-#             'FertilityRate', 'ForeignDirectInvestment','GDP', 'GDPGrowth', 
-#             'GNIPerCapita', 'MeaslesImmunization','ImportsOfGoodsAndServices', 
-#             'LifeExpectancy', 'MobileSubscriptions','Under5Mortality', 'NetMigration', 
-#             'PopulationGrowth', 'HIVPrevalence','PrimarySchoolEnrollment']
-
-# for x in ttest_variables:
-#     sample1 = vdem_worldBank_grouped_country['democracy_index'].sample(n=5)
-#     sample2 = vdem_worldBank_grouped_country[x].sample(n=5)
-
-
-#     t, p, df_ttest = sm.stats.ttest_ind(sample1, sample2)
-
-#     if p < 0.05:
-#         print(x)
-#         print(f't-value: ', t)
-#         print(f'p-value: ', p)
 
 #%% [markdown]
-# ## Feature Selection
-# We used the filter method to perform feature selection. target variables and independent variables are both continuous numerical variables, so we used pearson's Since both target variables and independent variables are continuous numerical variables, we used variables with a correlation coefficient greater than or equal to 0.3 or less than -0.3 as features based on the results of pearson's correlation.
+### Feature Selection
+# We used the filter method to perform feature selection. 
+# Target variables and independent variables are both continuous numerical variables, 
+# so we used pearson's Since both target variables and independent variables are continuous 
+# numerical variables, we used variables with a correlation coefficient greater than or 
+# equal to 0.3 or less than -0.3 as features based on the results of pearson's correlation.
 
-#%%[markdown]
-# ### Correlation Matrix
+### Correlation Matrix
 #%%  Correlation Matrix (Linearity)
 new_vdem_worldBank_df = vdem_worldBank_df[["democracy_index"] + features]
 
@@ -690,22 +547,22 @@ plt.show()
 
 #%%[markdown]
 #### Interpreting the results of the regression tree model:
-
+#
 # The result of the regression tree suggests that the model has moderate predictive power. 
-
+# 
 # The R^2 value of 0.49 indicates that the model explains 49% of the variance in the target variable. 
-
+# 
 # The MSE value of 0.0304 suggests that the average squared difference between the predicted and actual values is relatively low. 
-
+#
 # The MAE value of 0.138 suggests that the average absolute difference between the predicted and actual values is also relatively low.
-
+#
 # The MSLE value of 0.016 indicates that the model's error is distributed logarithmically, 
 #     with smaller errors being more common than larger ones. 
-
+#
 # The MedAE value of 0.12 indicates that the median absolute error is relatively low, suggesting that the model is relatively consistent in its predictions.
-
+#
 # Overall, while the model is not perfect, it appears to have some predictive power and is likely to be useful in some applications. 
-
+#
 # However, further analysis and testing may be necessary to fully evaluate its performance.
 
 
