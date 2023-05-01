@@ -470,9 +470,12 @@ for feature in ['LifeExpectancy', 'FertilityRate']:
     calc_vif(vdem_worldBank_df, high_cor_features)
 
 #%% [markdown] 
-# ##Model Building
+## Model Building
+#
 # Regression Tree Model
+#
 # Random Forest Model
+#
 # Gradient Boosting Model
 
 #%%[markdown] 
@@ -567,16 +570,6 @@ plt.show()
 
 
 #%%[markdown]
-### Prediction accuracy with new data for DT model
-# Hold-out concept (out-of-bag samples)
-
-# dt_out_of_bag = RandomForestRegressor(oob_score = True)
-# rf_out_of_bag.fit(X_train, y_train)
-# rf_obb_score = rf_out_of_bag.oob_score_
-# print(f"Prediction accuracy with new data: {round(rf_obb_score, 2) * 100}% ") 
-
-
-#%%[markdown]
 
 ### Decision Tree Model performance
 
@@ -584,10 +577,7 @@ plt.show()
 from sklearn.model_selection import cross_val_score
 
 reg_tree_scores = cross_val_score(dt_model, 
-                        X, y, cv = 5, 
-                        scoring='r2')
-scores = cross_val_score(dt_model, 
-                        X, y, cv = 5, 
+                        X_train, y_train, cv = 5, 
                         scoring='r2')
 
 print("5-fold X-Validation for regression model:")
@@ -602,13 +592,13 @@ print("Mean R^2:", round(reg_tree_scores.mean(), 4))
 
 #### Interpreting the results of the regression tree model-cross_validation metrics:
 #
-# The cross-validation R2 values are: 0.40813912 0.29964666 0.35225868 0.32715057 0.03348702.
+# The cross-validation R2 values are: 0.3744, 0.4732, 0.495, 0.5571, 0.4695,
 #
 # The R-squared value of the original regression model is 0.491, which indicates that the model 
 #           explains about 49.1% of the variance in the dependent variable. 
 #
-# The R-squared value from the 5-fold cross-validation for the regression tree model is 0.284, 
-#           which means that the model explains 28.4% of the variance on average across the 5 folds.
+# The R-squared value from the 5-fold cross-validation for the regression tree model is 0.4738, 
+#           which means that the model explains 47.3% of the variance on average across the 5 folds.
 # 
 # This suggests that the original model may be overfitting the data, and the performance of the 
 #            model may not generalize well to new data. 
@@ -626,8 +616,8 @@ print("Mean R^2:", round(reg_tree_scores.mean(), 4))
 
 #%%[markdown]
 ## Ensembling methods
-### Model - 2
-# Random Forest Model
+## Model - 2
+### Random Forest Model
 
 #%% Ensembling methods / Random Forest Model
 
@@ -719,8 +709,8 @@ print(f"Prediction accuracy with new data: {round(rf_obb_score, 2) * 100}% ")
 from sklearn.model_selection import cross_val_score
 
 rf_scores = cross_val_score(rf_model, 
-                        X, y, cv = 5, 
-                        scoring='r2')
+                        X_train, y_train, cv = 5, 
+                        scoring = 'r2')
 
 print("5-fold X-Validation for random forest model:")
 print("Cross-validation R^2 scores:")
@@ -733,11 +723,11 @@ print("Mean R^2:", round(rf_scores.mean(), 4))
 
 #### The 5-fold cross-validation result for a random forest model is displayed in the output. 
 
-# The cross-validation's R-squared values for each fold are: 0.47413435  0.3568414   0.38703758  0.53499121 -0.11419026
-#   indicating that the model's performance differs considerably between folds. 
+# The cross-validation's R-squared values for each fold are: 0.892, 0.8775, 0.8732, 0.908, 0.8936
+#   indicating that the model's performance differs very slightly between folds. 
 #
 # Lower than the R-squared value of the initial random forest model, the mean R-squared value 
-#   across all folds is 0.3277. 
+#   across all folds is 0.8889. 
 #
 # This implies that the original model may have overfitted the data and that the performance 
 #   of the model may not be as excellent when applied to fresh, unforeseen data. 
@@ -748,8 +738,8 @@ print("Mean R^2:", round(rf_scores.mean(), 4))
 #
 #   look into alternative machine learning techniques.
 
-#%%[markdown]
 
+#%%[markdown]
 ###  Refining the random forest model
 #%%Hyperparameter tuning
 
@@ -831,7 +821,7 @@ plt.show()
 from sklearn.model_selection import cross_val_score
 
 rf_hyp_scores = cross_val_score(rf_best, 
-                         X, y, cv = 5, 
+                         X_train, y_train, cv = 5, 
                          scoring='r2')
 
 print("5-fold X-Validation for refined random forest model:")
@@ -846,12 +836,10 @@ print("Mean R^2:", round(rf_hyp_scores.mean(), 4))
 
 #### The 5-fold cross-validation result for a refined random forest model is displayed in the output. 
 
-# The cross-validation mean R-squared value of 0.2835 indicates that the refined random forest model is 
+# The cross-validation mean R-squared value of 0.4692 indicates that the refined random forest model is 
 # not performing as well as the original model, which has an R-squared value of 0.5119. 
 # This suggests that the refined random forest model may be overfitting the training data and not generalizing 
 # well to new data. 
-# The negative R-squared value in one of the folds also suggests that the model is performing worse than a model 
-# that simply predicts the mean value of the target variable. 
 # 
 # Further refinement or another machine learning algorithm may be necessary for further analysis.
 
@@ -915,7 +903,7 @@ plt.show()
 from sklearn.model_selection import cross_val_score
 
 gb_scores = cross_val_score(gb_model, 
-                         X, y, cv = 5, 
+                         X_train, y_train, cv = 5, 
                          scoring='r2')
 
 print("5-fold X-Validation for Gradient Boosting model:")
